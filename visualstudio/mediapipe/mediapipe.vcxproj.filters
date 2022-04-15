@@ -1,0 +1,1008 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="gpu">
+      <UniqueIdentifier>{e5ed5f3d-01d2-486f-ad87-9fe5e09cc46f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modules">
+      <UniqueIdentifier>{57ef58e7-2153-44c4-8274-8ce36e34b79d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modules\face_geometry">
+      <UniqueIdentifier>{a629a8e1-135b-473b-a773-a890b41ec950}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modules\face_geometry\protos">
+      <UniqueIdentifier>{fa384380-8d33-49fb-bc9c-9c52494975c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util">
+      <UniqueIdentifier>{34fba7f2-40f7-4843-bccd-694bfea16877}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="calculators">
+      <UniqueIdentifier>{f9859532-feb3-42d7-8a4e-a85e4153a7dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="calculators\core">
+      <UniqueIdentifier>{9b85e802-a191-4916-a6c0-d1600e92c6e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="calculators\tflite">
+      <UniqueIdentifier>{8f543c9c-2ca9-4451-b688-b51126a41183}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="calculators\image">
+      <UniqueIdentifier>{b236918d-7203-4d0d-8732-8f246dbe646c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="calculators\tensor">
+      <UniqueIdentifier>{e30eb76d-9c52-4005-810a-81a3434114b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util\tflite">
+      <UniqueIdentifier>{bb6b049a-a602-45a3-8537-e0b733d6975e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util\tflite\delegates">
+      <UniqueIdentifier>{f69f56be-8915-44ee-b15d-5e4cd51a8a9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util\tflite\delegates\gpu">
+      <UniqueIdentifier>{305be117-a9e7-4f50-a52f-b162c7a60764}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util\tflite\delegates\gpu\common">
+      <UniqueIdentifier>{da726418-62d1-40de-a2f9-d8af0fa0cd75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util\tflite\delegates\gpu\common\mediapipe">
+      <UniqueIdentifier>{54b7ac8b-0b84-428f-8e65-9edab8212f44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util\tflite\operations">
+      <UniqueIdentifier>{b00b5955-7411-4b93-b777-984f37a66956}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework">
+      <UniqueIdentifier>{cf6ac0b6-4bb8-4194-9002-47b7940ceee7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\formats">
+      <UniqueIdentifier>{1d70d66b-f99a-4c15-a3ab-92420b284a8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\formats\annotation">
+      <UniqueIdentifier>{f26ffbdb-28a9-4514-9108-d1bc18656c79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\formats\object_detection">
+      <UniqueIdentifier>{5bd4c841-c420-4e67-988e-453c4e0be5cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\tool">
+      <UniqueIdentifier>{e7b37e35-7c35-4d38-a5b4-a02a64ad5bcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\deps">
+      <UniqueIdentifier>{a31627a6-10cb-4c3a-977c-bdc8a288e45f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="calculators\util">
+      <UniqueIdentifier>{257774ea-0c0a-4aef-8ed0-b2f836faf39c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\api2">
+      <UniqueIdentifier>{eacac5fb-732f-446b-a6cf-c7efef96570b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\stream_handler">
+      <UniqueIdentifier>{ccab44d4-b8c0-44e0-b52b-e62fc6f314ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modules\face_geometry\libs">
+      <UniqueIdentifier>{6772055b-0df9-4d34-abda-9537c97b0460}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util\filtering">
+      <UniqueIdentifier>{0fdcfda2-481c-42cc-bcee-3ce066d08c00}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\mediapipe\framework\deps\status_builder.cc">
+      <Filter>framework\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\deps\ret_check.cc">
+      <Filter>framework\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\formats\image_frame.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\formats\image_opencv.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\deps\registration.cc">
+      <Filter>framework\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\formats\image_frame_opencv.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\validate.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\validate_type.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\tag_map.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\subgraph_expansion.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\deps\topologicalsorter.cc">
+      <Filter>framework\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\status_util.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\template_expander.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\proto_util_lite.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\template_parser.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\cpu_util.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\deps\status.cc">
+      <Filter>framework\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\deps\monotonic_clock.cc">
+      <Filter>framework\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\deps\clock.cc">
+      <Filter>framework\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\name_util.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\validate_name.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\deps\threadpool_std_thread_impl.cc">
+      <Filter>framework\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\deps\registration_token.cc">
+      <Filter>framework\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\gpu\gpu_service.cc">
+      <Filter>gpu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\fill_packet_set.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\deps\file_helpers.cc">
+      <Filter>framework\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\deps\file_path.cc">
+      <Filter>framework\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\resource_util.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\resource_util_default.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\header_util.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\formats\tensor.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\api2\packet.cc">
+      <Filter>framework\api2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\formats\image.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\formats\location.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\annotation_renderer.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\api2\node.cc">
+      <Filter>framework\api2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\rectangle_util.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\packet_generator_wrapper_calculator.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\options_util.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\options_field_util.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\options_syntax_util.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\options_registry.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\tag_map_helper.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\container_util.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\sync_set_input_stream_handler.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\operation_parser.cc">
+      <Filter>util\tflite\delegates\gpu\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\mediapipe\landmarks_to_transform_matrix.cc">
+      <Filter>util\tflite\delegates\gpu\common\mediapipe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\mediapipe\transform_landmarks.cc">
+      <Filter>util\tflite\delegates\gpu\common\mediapipe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\mediapipe\transform_tensor_bilinear.cc">
+      <Filter>util\tflite\delegates\gpu\common\mediapipe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\operations.cc">
+      <Filter>util\tflite\delegates\gpu\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\model.cc">
+      <Filter>util\tflite\delegates\gpu\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\model_builder_helper.cc">
+      <Filter>util\tflite\delegates\gpu\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\object_reader.cc">
+      <Filter>util\tflite\delegates\gpu\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\utils.cc">
+      <Filter>util\tflite\delegates</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tflite\operations\max_pool_argmax.cc">
+      <Filter>util\tflite\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tflite\operations\max_unpooling.cc">
+      <Filter>util\tflite\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tflite\operations\transpose_conv_bias.cc">
+      <Filter>util\tflite\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tflite\cpu_op_resolver.cc">
+      <Filter>util\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tflite\op_resolver.cc">
+      <Filter>util\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tflite\tflite_gpu_runner.cc">
+      <Filter>util\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tflite\tflite_model_loader.cc">
+      <Filter>util\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tflite\operations\landmarks_to_transform_matrix.cc">
+      <Filter>util\tflite\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tflite\operations\transform_landmarks.cc">
+      <Filter>util\tflite\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tflite\operations\transform_tensor_bilinear.cc">
+      <Filter>util\tflite\operations</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\formats\matrix.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\core\split_vector_calculator.pb.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\core\gate_calculator.pb.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\core\constant_side_packet_calculator.pb.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\core\flow_limiter_calculator.pb.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\tensor\image_to_tensor_calculator.pb.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\tensor\inference_calculator.pb.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\tensor\tensors_to_detections_calculator.pb.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\tensor\tensors_to_floats_calculator.pb.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\tensor\tensors_to_landmarks_calculator.pb.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\formats\rect.pb.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\formats\landmark.pb.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\formats\image_format.pb.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\basic_types_registration.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\calculator.pb.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\calculator_base.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\calculator_context.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\calculator_context_manager.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\calculator_contract.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\calculator_graph.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\calculator_node.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\calculator_options.pb.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\calculator_state.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\collection_item_id.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\counter_factory.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\delegating_executor.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\executor.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\graph_output_stream.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\graph_service_manager.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\input_side_packet_handler.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\input_stream_handler.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\input_stream_manager.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\input_stream_shard.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\legacy_calculator_support.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\mediapipe_options.pb.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\output_side_packet_impl.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\output_stream_handler.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\output_stream_manager.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\output_stream_shard.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\packet.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\packet_factory.pb.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\packet_generator.pb.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\packet_generator_graph.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\packet_type.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\scheduler.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\scheduler_queue.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\subgraph.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\thread_pool_executor.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\timestamp.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\validated_graph_config.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\status_handler.pb.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\stream_handler.pb.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\thread_pool_executor.pb.cc">
+      <Filter>framework</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\tool\calculator_graph_template.pb.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\tool\field_data.pb.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\deps\proto_descriptor.pb.cc">
+      <Filter>framework\deps</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\tflite\ssd_anchors_calculator.pb.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\tflite\tflite_custom_op_resolver_calculator.pb.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\tflite\tflite_tensors_to_detections_calculator.pb.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\annotation_overlay_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\association_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\collection_has_min_size_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\detections_to_rects_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\detections_to_render_data_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\landmark_projection_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\landmarks_refinement_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\local_file_contents_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\non_max_suppression_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\rect_to_render_data_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\rect_transformation_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\thresholding_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\formats\annotation\locus.pb.cc">
+      <Filter>framework\formats\annotation</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\formats\annotation\rasterization.pb.cc">
+      <Filter>framework\formats\annotation</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\formats\classification.pb.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\formats\detection.pb.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\formats\location_data.pb.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\formats\matrix_data.pb.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\formats\object_detection\anchor.pb.cc">
+      <Filter>framework\formats\object_detection</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\stream_handler\default_input_stream_handler.pb.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\stream_handler\sync_set_input_stream_handler.pb.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\tool\packet_generator_wrapper_calculator.pb.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\tool\switch_container.pb.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="gpu\gpu_origin.pb.cc">
+      <Filter>gpu</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\face_geometry\effect_renderer_calculator.pb.cc">
+      <Filter>modules\face_geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\face_geometry\env_generator_calculator.pb.cc">
+      <Filter>modules\face_geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\face_geometry\geometry_pipeline_calculator.pb.cc">
+      <Filter>modules\face_geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\face_geometry\protos\environment.pb.cc">
+      <Filter>modules\face_geometry\protos</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\face_geometry\protos\face_geometry.pb.cc">
+      <Filter>modules\face_geometry\protos</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\face_geometry\protos\geometry_pipeline_metadata.pb.cc">
+      <Filter>modules\face_geometry\protos</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\face_geometry\protos\mesh_3d.pb.cc">
+      <Filter>modules\face_geometry\protos</Filter>
+    </ClCompile>
+    <ClCompile Include="util\color.pb.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\render_data.pb.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\core\clip_vector_size_calculator.pb.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\core\concatenate_vector_calculator.pb.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\landmarks_smoothing_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\landmarks_to_detection_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\landmarks_to_render_data_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\gpu\gpu_buffer_format.cc">
+      <Filter>gpu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\gpu\gpu_buffer_storage.cc">
+      <Filter>gpu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\gpu\gpu_buffer.cc">
+      <Filter>gpu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\face_geometry\libs\effect_renderer.cc">
+      <Filter>modules\face_geometry\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\face_geometry\libs\geometry_pipeline.cc">
+      <Filter>modules\face_geometry\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\face_geometry\libs\mesh_3d_utils.cc">
+      <Filter>modules\face_geometry\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\face_geometry\libs\procrustes_solver.cc">
+      <Filter>modules\face_geometry\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\face_geometry\libs\validation_utils.cc">
+      <Filter>modules\face_geometry\libs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\filtering\low_pass_filter.cc">
+      <Filter>util\filtering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\filtering\one_euro_filter.cc">
+      <Filter>util\filtering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\filtering\relative_velocity_filter.cc">
+      <Filter>util\filtering</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\mediapipe\framework\tool\options_util.h">
+      <Filter>framework\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\tool\proto_util_lite.h">
+      <Filter>framework\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\deps\registration.h">
+      <Filter>framework\deps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\deps\registration_token.h">
+      <Filter>framework\deps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\formats\tensor.h">
+      <Filter>framework\formats</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\api2\packet.h">
+      <Filter>framework\api2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\annotation_renderer.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\tool\options_field_util.h">
+      <Filter>framework\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\tool\options_syntax_util.h">
+      <Filter>framework\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\tool\options_registry.h">
+      <Filter>framework\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\operation_parser.h">
+      <Filter>util\tflite\delegates\gpu\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\mediapipe\landmarks_to_transform_matrix.h">
+      <Filter>util\tflite\delegates\gpu\common\mediapipe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\mediapipe\transform_landmarks.h">
+      <Filter>util\tflite\delegates\gpu\common\mediapipe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\mediapipe\transform_tensor_bilinear.h">
+      <Filter>util\tflite\delegates\gpu\common\mediapipe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\operations.h">
+      <Filter>util\tflite\delegates\gpu\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\model.h">
+      <Filter>util\tflite\delegates\gpu\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\model_builder_helper.h">
+      <Filter>util\tflite\delegates\gpu\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\object_reader.h">
+      <Filter>util\tflite\delegates\gpu\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\utils.h">
+      <Filter>util\tflite\delegates</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tflite\operations\max_pool_argmax.h">
+      <Filter>util\tflite\operations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tflite\operations\max_unpooling.h">
+      <Filter>util\tflite\operations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tflite\operations\transpose_conv_bias.h">
+      <Filter>util\tflite\operations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tflite\config.h">
+      <Filter>util\tflite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tflite\cpu_op_resolver.h">
+      <Filter>util\tflite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tflite\op_resolver.h">
+      <Filter>util\tflite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tflite\tflite_gpu_runner.h">
+      <Filter>util\tflite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tflite\tflite_model_loader.h">
+      <Filter>util\tflite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tflite\operations\landmarks_to_transform_matrix.h">
+      <Filter>util\tflite\operations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tflite\operations\transform_landmarks.h">
+      <Filter>util\tflite\operations</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tflite\operations\transform_tensor_bilinear.h">
+      <Filter>util\tflite\operations</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\core\constant_side_packet_calculator.pb.h">
+      <Filter>calculators\core</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\core\flow_limiter_calculator.pb.h">
+      <Filter>calculators\core</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\tensor\image_to_tensor_calculator.pb.h">
+      <Filter>calculators\tensor</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\tensor\inference_calculator.pb.h">
+      <Filter>calculators\tensor</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\tensor\tensors_to_detections_calculator.pb.h">
+      <Filter>calculators\tensor</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\tensor\tensors_to_floats_calculator.pb.h">
+      <Filter>calculators\tensor</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\tensor\tensors_to_landmarks_calculator.pb.h">
+      <Filter>calculators\tensor</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\formats\rect.pb.h">
+      <Filter>framework\formats</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\formats\landmark.pb.h">
+      <Filter>framework\formats</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\formats\image_format.pb.h">
+      <Filter>framework\formats</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\calculator.pb.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\calculator_base.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\calculator_context.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\calculator_contract.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\calculator_graph.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\calculator_node.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\calculator_options.pb.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\calculator_state.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\collection.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\delegating_executor.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\executor.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\graph_output_stream.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\graph_service_manager.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\input_side_packet_handler.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\input_stream.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\input_stream_handler.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\input_stream_manager.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\input_stream_shard.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\mediapipe_options.pb.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\api2\node.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\output_side_packet.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\output_stream.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\output_stream_handler.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\output_stream_manager.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\output_stream_poller.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\packet.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\packet_factory.pb.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\packet_generator.pb.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\packet_set.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\packet_type.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\port.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\scheduler.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\scheduler_queue.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\subgraph.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\timestamp.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\framework\validated_graph_config.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\status_handler.pb.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\stream_handler.pb.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\thread_pool_executor.pb.h">
+      <Filter>framework</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\tool\calculator_graph_template.pb.h">
+      <Filter>framework\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\tool\field_data.pb.h">
+      <Filter>framework\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\deps\proto_descriptor.pb.h">
+      <Filter>framework\deps</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\tflite\ssd_anchors_calculator.pb.h">
+      <Filter>calculators\tflite</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\tflite\tflite_custom_op_resolver_calculator.pb.h">
+      <Filter>calculators\tflite</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\tflite\tflite_tensors_to_detections_calculator.pb.h">
+      <Filter>calculators\tflite</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\annotation_overlay_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\association_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\collection_has_min_size_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\detections_to_rects_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\detections_to_render_data_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\landmark_projection_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\landmarks_refinement_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\local_file_contents_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\non_max_suppression_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\rect_to_render_data_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\rect_transformation_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\thresholding_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\formats\annotation\locus.pb.h">
+      <Filter>framework\formats\annotation</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\formats\annotation\rasterization.pb.h">
+      <Filter>framework\formats\annotation</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\formats\classification.pb.h">
+      <Filter>framework\formats</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\formats\detection.pb.h">
+      <Filter>framework\formats</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\formats\location_data.pb.h">
+      <Filter>framework\formats</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\formats\matrix_data.pb.h">
+      <Filter>framework\formats</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\formats\object_detection\anchor.pb.h">
+      <Filter>framework\formats\object_detection</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\stream_handler\default_input_stream_handler.pb.h">
+      <Filter>framework\stream_handler</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\stream_handler\sync_set_input_stream_handler.pb.h">
+      <Filter>framework\stream_handler</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\tool\packet_generator_wrapper_calculator.pb.h">
+      <Filter>framework\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\tool\switch_container.pb.h">
+      <Filter>framework\tool</Filter>
+    </ClInclude>
+    <ClInclude Include="gpu\gpu_origin.pb.h">
+      <Filter>gpu</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\face_geometry\effect_renderer_calculator.pb.h">
+      <Filter>modules\face_geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\face_geometry\env_generator_calculator.pb.h">
+      <Filter>modules\face_geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\face_geometry\geometry_pipeline_calculator.pb.h">
+      <Filter>modules\face_geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\face_geometry\protos\environment.pb.h">
+      <Filter>modules\face_geometry\protos</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\face_geometry\protos\face_geometry.pb.h">
+      <Filter>modules\face_geometry\protos</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\face_geometry\protos\geometry_pipeline_metadata.pb.h">
+      <Filter>modules\face_geometry\protos</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\face_geometry\protos\mesh_3d.pb.h">
+      <Filter>modules\face_geometry\protos</Filter>
+    </ClInclude>
+    <ClInclude Include="util\color.pb.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\render_data.pb.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\core\clip_vector_size_calculator.pb.h">
+      <Filter>calculators\core</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\core\concatenate_vector_calculator.pb.h">
+      <Filter>calculators\core</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\landmarks_smoothing_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\landmarks_to_detection_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\landmarks_to_render_data_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\gpu\gpu_buffer_format.h">
+      <Filter>gpu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\gpu\gpu_buffer_storage.h">
+      <Filter>gpu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\gpu\gpu_buffer.h">
+      <Filter>gpu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\modules\face_geometry\libs\effect_renderer.h">
+      <Filter>modules\face_geometry\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\modules\face_geometry\libs\geometry_pipeline.h">
+      <Filter>modules\face_geometry\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\modules\face_geometry\libs\mesh_3d_utils.h">
+      <Filter>modules\face_geometry\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\modules\face_geometry\libs\procrustes_solver.h">
+      <Filter>modules\face_geometry\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\modules\face_geometry\libs\validation_utils.h">
+      <Filter>modules\face_geometry\libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\filtering\low_pass_filter.h">
+      <Filter>util\filtering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\filtering\one_euro_filter.h">
+      <Filter>util\filtering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\filtering\relative_velocity_filter.h">
+      <Filter>util\filtering</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

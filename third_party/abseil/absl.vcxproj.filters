@@ -1,0 +1,309 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="base">
+      <UniqueIdentifier>{31cb22e9-208f-4a10-a9b0-e0bad23cc50d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cointainer">
+      <UniqueIdentifier>{d51fe6b2-21fb-4ac7-bce0-4ffd01892cf0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="debugging">
+      <UniqueIdentifier>{9b1c3ad7-ee5b-4038-9140-7969524a3e18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hash">
+      <UniqueIdentifier>{2dde1ce5-b934-4d66-b133-cb43062bced9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="numeric">
+      <UniqueIdentifier>{c2a0e26f-018a-4133-be66-f0d929f7042c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="status">
+      <UniqueIdentifier>{f2c5337e-0966-4d7a-ab1c-65e094b899d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="strings">
+      <UniqueIdentifier>{94934417-d094-4846-91ed-954730f3f8b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="synchronization">
+      <UniqueIdentifier>{feb378e9-0aa0-4a90-bd1d-b8b713f44d82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="time">
+      <UniqueIdentifier>{3f4c4785-2135-44d2-bdc0-0274c34d0027}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="types">
+      <UniqueIdentifier>{70413ffa-5026-423f-9fb0-c0ad357b83bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="strings\internal">
+      <UniqueIdentifier>{d26dceed-1860-453c-93fc-76e3180d5690}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="strings\internal\str_format">
+      <UniqueIdentifier>{91b34d3f-d9e6-4872-9aab-0e8c796cf220}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hash\internal">
+      <UniqueIdentifier>{f25fb881-29ce-4382-875a-a648b0dd79a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="synchronization\internal">
+      <UniqueIdentifier>{877bb9fb-1e4c-40b2-9960-9d9e12708197}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="base\internal">
+      <UniqueIdentifier>{efe6ba6a-529c-4032-880f-f7374363c187}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cointainer\internal">
+      <UniqueIdentifier>{2efad4b5-9781-4d99-994d-7215028f8244}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="flags">
+      <UniqueIdentifier>{3853134c-5ea5-4603-8b9f-2a81b04b1241}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="flags\internal">
+      <UniqueIdentifier>{fc134e17-5b8c-4f06-af97-d66dec966f28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="time\internal">
+      <UniqueIdentifier>{63abb30b-f7b4-49d5-8658-dca9fcbe7f21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="time\internal\cctz">
+      <UniqueIdentifier>{b131537c-a3b2-455e-a3c8-514e988823ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="time\internal\cctz\src">
+      <UniqueIdentifier>{8c48aaf4-f7e1-4fa7-83ad-70b82ed10d47}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include=".\absl\strings\internal\str_format\arg.cc">
+      <Filter>strings\internal\str_format</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\ascii.cc">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\types\bad_optional_access.cc">
+      <Filter>types</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\internal\str_format\bind.cc">
+      <Filter>strings\internal\str_format</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\charconv.cc">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\internal\charconv_bigint.cc">
+      <Filter>strings\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\internal\charconv_parse.cc">
+      <Filter>strings\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\hash\internal\city.cc">
+      <Filter>hash\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\time\clock.cc">
+      <Filter>time</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\flags\internal\commandlineflag.cc">
+      <Filter>flags\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\flags\commandlineflag.cc">
+      <Filter>flags</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\cord.cc">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\internal\cord_internal.cc">
+      <Filter>strings\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\internal\cord_rep_ring.cc">
+      <Filter>strings\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\internal\cordz_handle.cc">
+      <Filter>strings\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\internal\cordz_info.cc">
+      <Filter>strings\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\synchronization\internal\create_thread_identity.cc">
+      <Filter>synchronization\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\base\internal\cycleclock.cc">
+      <Filter>base\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\time\duration.cc">
+      <Filter>time</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\escaping.cc">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\internal\escaping.cc">
+      <Filter>strings\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\internal\str_format\extension.cc">
+      <Filter>strings\internal\str_format</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\flags\flag.cc">
+      <Filter>flags</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\flags\internal\flag.cc">
+      <Filter>flags\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\internal\str_format\float_conversion.cc">
+      <Filter>strings\internal\str_format</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\time\format.cc">
+      <Filter>time</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\synchronization\internal\graphcycles.cc">
+      <Filter>synchronization\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\hash\internal\hash.cc">
+      <Filter>hash\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\numeric\int128.cc">
+      <Filter>numeric</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\base\internal\low_level_alloc.cc">
+      <Filter>base\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\flags\marshalling.cc">
+      <Filter>flags</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\match.cc">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\internal\memutil.cc">
+      <Filter>strings\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\synchronization\mutex.cc">
+      <Filter>synchronization</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\synchronization\notification.cc">
+      <Filter>synchronization</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\numbers.cc">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\internal\str_format\output.cc">
+      <Filter>strings\internal\str_format</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\flags\parse.cc">
+      <Filter>flags</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\internal\str_format\parser.cc">
+      <Filter>strings\internal\str_format</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\synchronization\internal\per_thread_sem.cc">
+      <Filter>synchronization\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\flags\internal\private_handle_accessor.cc">
+      <Filter>flags\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\flags\internal\program_name.cc">
+      <Filter>flags\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\container\internal\raw_hash_set.cc">
+      <Filter>cointainer\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\base\internal\raw_logging.cc">
+      <Filter>base\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\flags\reflection.cc">
+      <Filter>flags</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\base\internal\spinlock.cc">
+      <Filter>base\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\base\internal\spinlock_wait.cc">
+      <Filter>base\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\debugging\stacktrace.cc">
+      <Filter>debugging</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\status\status.cc">
+      <Filter>status</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\status\status_payload_printer.cc">
+      <Filter>status</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\status\statusor.cc">
+      <Filter>status</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\str_cat.cc">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\str_split.cc">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\substitute.cc">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\string_view.cc">
+      <Filter>strings</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\debugging\symbolize.cc">
+      <Filter>debugging</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\base\internal\sysinfo.cc">
+      <Filter>base\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\base\internal\thread_identity.cc">
+      <Filter>base\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\base\internal\throw_delegate.cc">
+      <Filter>base\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\time\time.cc">
+      <Filter>time</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\time\internal\cctz\src\time_zone_fixed.cc">
+      <Filter>time\internal\cctz\src</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\time\internal\cctz\src\time_zone_format.cc">
+      <Filter>time\internal\cctz\src</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\time\internal\cctz\src\time_zone_if.cc">
+      <Filter>time\internal\cctz\src</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\time\internal\cctz\src\time_zone_impl.cc">
+      <Filter>time\internal\cctz\src</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\time\internal\cctz\src\time_zone_info.cc">
+      <Filter>time\internal\cctz\src</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\time\internal\cctz\src\time_zone_libc.cc">
+      <Filter>time\internal\cctz\src</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\time\internal\cctz\src\time_zone_lookup.cc">
+      <Filter>time\internal\cctz\src</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\time\internal\cctz\src\time_zone_posix.cc">
+      <Filter>time\internal\cctz\src</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\base\internal\unscaledcycleclock.cc">
+      <Filter>base\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\flags\usage.cc">
+      <Filter>flags</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\flags\internal\usage.cc">
+      <Filter>flags\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\flags\usage_config.cc">
+      <Filter>flags</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\strings\internal\utf8.cc">
+      <Filter>strings\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\synchronization\internal\waiter.cc">
+      <Filter>synchronization\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\hash\internal\wyhash.cc">
+      <Filter>hash\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\absl\time\internal\cctz\src\zone_info_source.cc">
+      <Filter>time\internal\cctz\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include=".\absl\flags\flag.h">
+      <Filter>flags</Filter>
+    </ClInclude>
+    <ClInclude Include=".\absl\flags\internal\flag.h">
+      <Filter>flags\internal</Filter>
+    </ClInclude>
+    <ClInclude Include=".\absl\base\options.h">
+      <Filter>base</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

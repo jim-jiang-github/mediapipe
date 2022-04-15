@@ -172,7 +172,7 @@ Location Location::CreateCvMaskLocation(const cv::Mat_<T>& mask) {
   auto* rasterization = location_data.mutable_mask()->mutable_rasterization();
   const auto kForegroundThreshold = static_cast<T>(0);
   for (int y = 0; y < mask.rows; y++) {
-    Rasterization::Interval* interval;
+    Rasterization::Interval* interval = nullptr; // VS error C4703 potentially uninitialized local pointer variable
     bool traversing = false;
     for (int x = 0; x < mask.cols; x++) {
       const bool is_foreground =

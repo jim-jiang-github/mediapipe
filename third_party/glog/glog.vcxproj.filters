@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include=".\src\demangle.cc" />
+    <ClCompile Include=".\src\logging.cc" />
+    <ClCompile Include=".\src\raw_logging.cc" />
+    <ClCompile Include=".\src\signalhandler.cc" />
+    <ClCompile Include=".\src\symbolize.cc" />
+    <ClCompile Include=".\src\utilities.cc" />
+    <ClCompile Include=".\src\vlog_is_on.cc" />
+    <ClCompile Include=".\src\windows\port.cc" />
+  </ItemGroup>
+</Project>

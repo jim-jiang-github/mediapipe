@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31019.35
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mediapipe", "mediapipe\mediapipe.vcxproj", "{E3C083BF-698D-456A-B5B5-82A6839A4CCC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xnnpack", "..\third_party\tensorflow\third_party\XNNPACK\xnnpack.vcxproj", "{3CA1E958-347B-4F73-A0AF-8F450BCDF9A2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "absl", "..\third_party\abseil\absl.vcxproj", "{F5BED556-0DB6-4D2A-A6F1-09727FFDC8FD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tensorflow-lite", "..\third_party\tensorflow\tensorflow-lite.vcxproj", "{F9A7FA78-25D1-4739-844F-1930E2E3BF14}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "protobuf", "..\third_party\tensorflow\third_party\protobuf\protobuf.vcxproj", "{724082B1-2B49-40CE-9DB8-A8FDE10F9E7E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glog", "..\third_party\glog\glog.vcxproj", "{D352ABC3-E2B8-498D-850E-2714070172BD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "face_mesh2", "face_mesh2\face_mesh2.vcxproj", "{0FE8078A-D6AD-459A-AB44-AEE95FA0FDF2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E3C083BF-698D-456A-B5B5-82A6839A4CCC}.Debug|x64.ActiveCfg = Debug|x64
+		{E3C083BF-698D-456A-B5B5-82A6839A4CCC}.Debug|x64.Build.0 = Debug|x64
+		{E3C083BF-698D-456A-B5B5-82A6839A4CCC}.Release|x64.ActiveCfg = Release|x64
+		{E3C083BF-698D-456A-B5B5-82A6839A4CCC}.Release|x64.Build.0 = Release|x64
+		{3CA1E958-347B-4F73-A0AF-8F450BCDF9A2}.Debug|x64.ActiveCfg = Debug|x64
+		{3CA1E958-347B-4F73-A0AF-8F450BCDF9A2}.Debug|x64.Build.0 = Debug|x64
+		{3CA1E958-347B-4F73-A0AF-8F450BCDF9A2}.Release|x64.ActiveCfg = Release|x64
+		{3CA1E958-347B-4F73-A0AF-8F450BCDF9A2}.Release|x64.Build.0 = Release|x64
+		{F5BED556-0DB6-4D2A-A6F1-09727FFDC8FD}.Debug|x64.ActiveCfg = Debug|x64
+		{F5BED556-0DB6-4D2A-A6F1-09727FFDC8FD}.Debug|x64.Build.0 = Debug|x64
+		{F5BED556-0DB6-4D2A-A6F1-09727FFDC8FD}.Release|x64.ActiveCfg = Release|x64
+		{F5BED556-0DB6-4D2A-A6F1-09727FFDC8FD}.Release|x64.Build.0 = Release|x64
+		{F9A7FA78-25D1-4739-844F-1930E2E3BF14}.Debug|x64.ActiveCfg = Debug|x64
+		{F9A7FA78-25D1-4739-844F-1930E2E3BF14}.Debug|x64.Build.0 = Debug|x64
+		{F9A7FA78-25D1-4739-844F-1930E2E3BF14}.Release|x64.ActiveCfg = Release|x64
+		{F9A7FA78-25D1-4739-844F-1930E2E3BF14}.Release|x64.Build.0 = Release|x64
+		{724082B1-2B49-40CE-9DB8-A8FDE10F9E7E}.Debug|x64.ActiveCfg = Debug|x64
+		{724082B1-2B49-40CE-9DB8-A8FDE10F9E7E}.Debug|x64.Build.0 = Debug|x64
+		{724082B1-2B49-40CE-9DB8-A8FDE10F9E7E}.Release|x64.ActiveCfg = Release|x64
+		{724082B1-2B49-40CE-9DB8-A8FDE10F9E7E}.Release|x64.Build.0 = Release|x64
+		{D352ABC3-E2B8-498D-850E-2714070172BD}.Debug|x64.ActiveCfg = Debug|x64
+		{D352ABC3-E2B8-498D-850E-2714070172BD}.Debug|x64.Build.0 = Debug|x64
+		{D352ABC3-E2B8-498D-850E-2714070172BD}.Release|x64.ActiveCfg = Release|x64
+		{D352ABC3-E2B8-498D-850E-2714070172BD}.Release|x64.Build.0 = Release|x64
+		{0FE8078A-D6AD-459A-AB44-AEE95FA0FDF2}.Debug|x64.ActiveCfg = Debug|x64
+		{0FE8078A-D6AD-459A-AB44-AEE95FA0FDF2}.Debug|x64.Build.0 = Debug|x64
+		{0FE8078A-D6AD-459A-AB44-AEE95FA0FDF2}.Release|x64.ActiveCfg = Release|x64
+		{0FE8078A-D6AD-459A-AB44-AEE95FA0FDF2}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {74F172CA-98CC-4AF9-B2B1-E3D441C5B751}
+	EndGlobalSection
+EndGlobal

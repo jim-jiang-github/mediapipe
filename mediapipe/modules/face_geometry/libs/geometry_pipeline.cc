@@ -124,12 +124,15 @@ class ScreenToMetricSpaceConverter {
                        const PerspectiveCameraFrustum& pcf,                 //
                        LandmarkList& metric_landmark_list,                  //
                        Eigen::Matrix4f& pose_transform_mat) const {
-    RET_CHECK_EQ(screen_landmark_list.landmark_size(),
+    //
+    // with_attention, #(landmarks)=478 vs. canonical_metric_landmarks_.cols()=468
+    //
+    RET_CHECK_GE(screen_landmark_list.landmark_size(),
                  canonical_metric_landmarks_.cols())
         << "The number of landmarks doesn't match the number passed upon "
            "initialization!";
 
-    Eigen::Matrix3Xf screen_landmarks;
+    Eigen::Matrix3Xf screen_landmarks(3, canonical_metric_landmarks_.cols());
     ConvertLandmarkListToEigenMatrix(screen_landmark_list, screen_landmarks);
 
     ProjectXY(pcf, screen_landmarks);
@@ -260,8 +263,8 @@ class ScreenToMetricSpaceConverter {
   static void ConvertLandmarkListToEigenMatrix(
       const NormalizedLandmarkList& landmark_list,
       Eigen::Matrix3Xf& eigen_matrix) {
-    eigen_matrix = Eigen::Matrix3Xf(3, landmark_list.landmark_size());
-    for (int i = 0; i < landmark_list.landmark_size(); ++i) {
+    //eigen_matrix = Eigen::Matrix3Xf(3, landmark_list.landmark_size());
+    for (int i = 0; i < eigen_matrix.cols(); ++i) {
       const auto& landmark = landmark_list.landmark(i);
       eigen_matrix(0, i) = landmark.x();
       eigen_matrix(1, i) = landmark.y();
@@ -345,7 +348,7 @@ class GeometryPipelineImpl : public GeometryPipeline {
       // Copy the canonical face mesh as the face geometry mesh.
       mutable_mesh->CopyFrom(canonical_mesh_);
       // Replace XYZ vertex mesh coodinates with the metric landmark positions.
-      for (int i = 0; i < canonical_mesh_num_vertices_; ++i) {
+      for (uint32_t i = 0; i < canonical_mesh_num_vertices_; ++i) {
         uint32_t vertex_buffer_offset = canonical_mesh_vertex_size_ * i +
                                         canonical_mesh_vertex_position_offset_;
 
@@ -429,7 +432,7 @@ absl::StatusOr<std::unique_ptr<GeometryPipeline>> CreateGeometryPipeline(
   Eigen::VectorXf landmark_weights =
       Eigen::VectorXf::Zero(canonical_mesh_num_vertices);
 
-  for (int i = 0; i < canonical_mesh_num_vertices; ++i) {
+  for (uint32_t i = 0; i < canonical_mesh_num_vertices; ++i) {
     uint32_t vertex_buffer_offset =
         canonical_mesh_vertex_size * i + canonical_mesh_vertex_position_offset;
 

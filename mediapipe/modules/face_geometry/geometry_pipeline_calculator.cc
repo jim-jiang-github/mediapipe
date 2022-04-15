@@ -90,12 +90,31 @@ class GeometryPipelineCalculator : public CalculatorBase {
   absl::Status Open(CalculatorContext* cc) override {
     cc->SetOffset(mediapipe::TimestampDiff(0));
 
+#if 1
+    face_geometry::GeometryPipelineMetadata metadata;
+    {
+      auto const& metadata_path = cc->Options<FaceGeometryPipelineCalculatorOptions>().metadata_path();
+      ASSIGN_OR_RETURN(std::string resolved_path,
+                     mediapipe::PathToResourceAsFile(metadata_path),
+                     _ << "Failed to resolve path! Path = " << metadata_path);
+
+      std::string metadata_blob; // 140 KB
+      MP_RETURN_IF_ERROR(mediapipe::GetResourceContents(resolved_path, &metadata_blob)) << "Failed to read content blob! Resolved path = " << resolved_path;
+      if (0==resolved_path.compare(resolved_path.length() - 6, 6, ".pbtxt")) {
+        RET_CHECK(google::protobuf::TextFormat::ParseFromString(metadata_blob, &metadata)) << "Failed to parse a metadata proto from a text blob!";
+      } else { // if (0==resolved_path.compare(resolved_path.length() - 9, 9, ".binarypb")) {
+        RET_CHECK(metadata.ParseFromString(metadata_blob)) << "Failed to parse a metadata proto from a binary blob!";
+      }
+    }
+#else
     const auto& options = cc->Options<FaceGeometryPipelineCalculatorOptions>();
 
     ASSIGN_OR_RETURN(
         face_geometry::GeometryPipelineMetadata metadata,
         ReadMetadataFromFile(options.metadata_path()),
         _ << "Failed to read the geometry pipeline metadata from file!");
+
+#endif
 
     MP_RETURN_IF_ERROR(
         face_geometry::ValidateGeometryPipelineMetadata(metadata))

@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include=".\src\google\protobuf\any.cc" />
+    <ClCompile Include=".\src\google\protobuf\any.pb.cc" />
+    <ClCompile Include=".\src\google\protobuf\any_lite.cc" />
+    <ClCompile Include=".\src\google\protobuf\api.pb.cc" />
+    <ClCompile Include=".\src\google\protobuf\arena.cc" />
+    <ClCompile Include=".\src\google\protobuf\arenastring.cc" />
+    <ClCompile Include=".\src\google\protobuf\descriptor.cc" />
+    <ClCompile Include=".\src\google\protobuf\descriptor.pb.cc" />
+    <ClCompile Include=".\src\google\protobuf\descriptor_database.cc" />
+    <ClCompile Include=".\src\google\protobuf\duration.pb.cc" />
+    <ClCompile Include=".\src\google\protobuf\dynamic_message.cc" />
+    <ClCompile Include=".\src\google\protobuf\empty.pb.cc" />
+    <ClCompile Include=".\src\google\protobuf\extension_set.cc" />
+    <ClCompile Include=".\src\google\protobuf\extension_set_heavy.cc" />
+    <ClCompile Include=".\src\google\protobuf\field_mask.pb.cc" />
+    <ClCompile Include=".\src\google\protobuf\generated_enum_util.cc" />
+    <ClCompile Include=".\src\google\protobuf\generated_message_reflection.cc" />
+    <ClCompile Include=".\src\google\protobuf\generated_message_table_driven.cc" />
+    <ClCompile Include=".\src\google\protobuf\generated_message_table_driven_lite.cc" />
+    <ClCompile Include=".\src\google\protobuf\generated_message_util.cc" />
+    <ClCompile Include=".\src\google\protobuf\implicit_weak_message.cc" />
+    <ClCompile Include=".\src\google\protobuf\map.cc" />
+    <ClCompile Include=".\src\google\protobuf\map_field.cc" />
+    <ClCompile Include=".\src\google\protobuf\message.cc" />
+    <ClCompile Include=".\src\google\protobuf\message_lite.cc" />
+    <ClCompile Include=".\src\google\protobuf\parse_context.cc" />
+    <ClCompile Include=".\src\google\protobuf\reflection_ops.cc" />
+    <ClCompile Include=".\src\google\protobuf\repeated_field.cc" />
+    <ClCompile Include=".\src\google\protobuf\service.cc" />
+    <ClCompile Include=".\src\google\protobuf\source_context.pb.cc" />
+    <ClCompile Include=".\src\google\protobuf\struct.pb.cc" />
+    <ClCompile Include=".\src\google\protobuf\stubs\strutil.cc" />
+    <ClCompile Include=".\src\google\protobuf\text_format.cc" />
+    <ClCompile Include=".\src\google\protobuf\timestamp.pb.cc" />
+    <ClCompile Include=".\src\google\protobuf\type.pb.cc" />
+    <ClCompile Include=".\src\google\protobuf\unknown_field_set.cc" />
+    <ClCompile Include=".\src\google\protobuf\wire_format.cc" />
+    <ClCompile Include=".\src\google\protobuf\wire_format_lite.cc" />
+    <ClCompile Include=".\src\google\protobuf\wrappers.pb.cc" />
+    <ClCompile Include=".\src\google\protobuf\stubs\bytestream.cc">
+      <Filter>stubs</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\io\coded_stream.cc">
+      <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\stubs\common.cc">
+      <Filter>stubs</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\internal\datapiece.cc">
+      <Filter>util\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\internal\default_value_objectwriter.cc">
+      <Filter>util\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\delimited_message_util.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\internal\error_listener.cc">
+      <Filter>util\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\field_comparator.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\field_mask_util.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\internal\field_mask_utility.cc">
+      <Filter>util\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\io\gzip_stream.cc">
+      <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\compiler\importer.cc">
+      <Filter>compiler</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\stubs\int128.cc">
+      <Filter>stubs</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\io\io_win32.cc">
+      <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\internal\json_escaping.cc">
+      <Filter>util\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\internal\json_objectwriter.cc">
+      <Filter>util\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\internal\json_stream_parser.cc">
+      <Filter>util\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\json_util.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\message_differencer.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\internal\object_writer.cc">
+      <Filter>util\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\compiler\parser.cc">
+      <Filter>compiler</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\io\printer.cc">
+      <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\internal\proto_writer.cc">
+      <Filter>util\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\internal\protostream_objectwriter.cc">
+      <Filter>util\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\internal\protostream_objectsource.cc">
+      <Filter>util\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\stubs\statusor.cc">
+      <Filter>stubs</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\stubs\status.cc">
+      <Filter>stubs</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\stubs\stringprintf.cc">
+      <Filter>stubs</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\stubs\stringpiece.cc">
+      <Filter>stubs</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\io\strtod.cc">
+      <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\stubs\structurally_valid.cc">
+      <Filter>stubs</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\stubs\substitute.cc">
+      <Filter>stubs</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\stubs\time.cc">
+      <Filter>stubs</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\time_util.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\io\tokenizer.cc">
+      <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\internal\type_info.cc">
+      <Filter>util\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\type_resolver_util.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\util\internal\utility.cc">
+      <Filter>util\internal</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\io\zero_copy_stream_impl_lite.cc">
+      <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\io\zero_copy_stream_impl.cc">
+      <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\google\protobuf\io\zero_copy_stream.cc">
+      <Filter>io</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="stubs">
+      <UniqueIdentifier>{a161dd01-8744-4b52-966a-b73698fec918}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="io">
+      <UniqueIdentifier>{f8ee48c2-e93a-44fa-8c24-16c03d3a84bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util">
+      <UniqueIdentifier>{b5c3ba38-9f45-4327-af7f-d3d3d0d63bb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util\internal">
+      <UniqueIdentifier>{e9099c38-0935-452c-9c57-f17ac7f1e98a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="compiler">
+      <UniqueIdentifier>{cddd8418-25a0-4bcc-81e8-9e2923cc8ae3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,1525 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="XNNPACK">
+      <UniqueIdentifier>{70717e3f-6a10-45c1-945c-73a818793fa8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\subgraph">
+      <UniqueIdentifier>{2cb8aa72-d58c-48cb-b337-1f6df7a51d92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party">
+      <UniqueIdentifier>{45a8d065-5642-4868-95e1-4594648ab560}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\clog">
+      <UniqueIdentifier>{f566592f-3a62-4d8e-9642-760f37fbed0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\pthreadpool">
+      <UniqueIdentifier>{6da83bbc-fc91-4843-8a52-7cfd39e516ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\cpu_info">
+      <UniqueIdentifier>{8e9c0e60-70ec-424c-b47f-533a28e3af01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\cpu_info\x86">
+      <UniqueIdentifier>{f170d569-7c26-4981-bcd3-597d0cae3610}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\cpu_info\x86\cache">
+      <UniqueIdentifier>{06ec9c94-3cb1-45f7-9f40-43fbbb42e3f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third_party\cpu_info\x86\windows">
+      <UniqueIdentifier>{0c2d565b-6fcf-48d6-b311-8b04da4c1d1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-argmaxpool">
+      <UniqueIdentifier>{e8e551a0-a62f-4bdc-8af5-5575618734e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\operators">
+      <UniqueIdentifier>{abd62b54-f528-4d89-891e-bc40bd3f816b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-avgpool">
+      <UniqueIdentifier>{bb6534a6-d04e-47ea-83d4-077bb0633159}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qu8-avgpool">
+      <UniqueIdentifier>{3fb6c1ad-fd31-4ede-bc20-81ae2ad4b9b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-clamp">
+      <UniqueIdentifier>{298963ae-e2cd-442f-8b49-31a71f3f36fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-clamp\gen">
+      <UniqueIdentifier>{af782be4-0d2c-403a-a5a0-bd7c2096df7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-conv-hwc2chw">
+      <UniqueIdentifier>{3594efff-f532-4abf-8e42-7521c0902c41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-dwconv">
+      <UniqueIdentifier>{1f3b9130-345f-4af3-9f38-055c7e762046}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-dwconv\gen">
+      <UniqueIdentifier>{f2da4c85-bd0b-4bb4-9a5c-54e1452577f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-dwconv2d-chw">
+      <UniqueIdentifier>{b548fdbb-1a45-441b-b550-967ae31e32f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-dwconv2d-chw\gen">
+      <UniqueIdentifier>{a161ebbf-13ee-444e-9871-5b69c54f7cd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\x32-depthtospace2d-chw2hwc">
+      <UniqueIdentifier>{d33dd0d5-c1d2-43e7-bdd9-ca2b31a4d3ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-gavgpool">
+      <UniqueIdentifier>{7fc534e8-2750-4981-b14e-c0062357eae7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qu8-gavgpool">
+      <UniqueIdentifier>{ca0aef8b-6b8a-4294-afa5-472c5c21d610}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qs8-gavgpool">
+      <UniqueIdentifier>{8c19f538-e1a4-4e42-8e87-441e4858ad9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qs8-gavgpool\gen">
+      <UniqueIdentifier>{d4754f44-54d9-46e3-b8ed-9002dc0a049e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-gavgpool-cw">
+      <UniqueIdentifier>{d35d078a-7e33-46fe-b1c5-a6b94cd3d0a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-gemm">
+      <UniqueIdentifier>{b316e8f1-d9d7-4f2d-9ae0-d7c31e13dcc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-gemm\gen">
+      <UniqueIdentifier>{58b94641-70f6-48c9-9d1d-be740903501a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\x32-fill">
+      <UniqueIdentifier>{aaa30951-caf1-4eb7-a478-ae66ea591c34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-ibilinear">
+      <UniqueIdentifier>{ca331ac1-2661-4b1f-b4e5-9d1a6f12a594}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-ibilinear\gen">
+      <UniqueIdentifier>{3f999341-88d7-42fa-9eb4-d3fce7d4c551}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-ibilinear-chw">
+      <UniqueIdentifier>{e690acb3-e69e-41ed-9e84-2af37c2a1b92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-ibilinear-chw\gen">
+      <UniqueIdentifier>{ddcef9a0-e725-4b14-9581-c950b81a18e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-igemm">
+      <UniqueIdentifier>{ed79c02e-d9ba-40c4-aaaa-918ae93410f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-igemm\gen">
+      <UniqueIdentifier>{4d5c1e99-f99e-4393-a062-2f194349ef65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\x8-lut">
+      <UniqueIdentifier>{159d50ef-adb1-4342-8579-a7166c046062}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\u8-lut32norm">
+      <UniqueIdentifier>{65174a2b-c47c-425d-9258-45deb1407d1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-maxpool">
+      <UniqueIdentifier>{055a8af4-996f-40c2-a6c6-b4fe5e0b84f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\u8-maxpool">
+      <UniqueIdentifier>{9a685376-0482-4bd3-a3e0-b60c80685cbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\x32-pad">
+      <UniqueIdentifier>{e8decd8b-f6d8-4bcd-936c-e0527a0dc5e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-pavgpool">
+      <UniqueIdentifier>{5bc68d4a-4836-4c2e-bc08-9fcbc86ee9b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-prelu">
+      <UniqueIdentifier>{5b81239b-4f6b-4239-ba73-7d33bd922bd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-prelu\gen">
+      <UniqueIdentifier>{c014195d-1c53-4e3a-9523-d99eacd51017}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-raddstoreexpminusmax">
+      <UniqueIdentifier>{d63baa51-b25d-4161-80a5-a77ddf3e6e8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-raddstoreexpminusmax\gen">
+      <UniqueIdentifier>{a515fe15-e321-4a7a-950f-032519b42aab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-rmax">
+      <UniqueIdentifier>{89c83aa3-9999-4923-89dc-5065bceb5b25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\u8-rmax">
+      <UniqueIdentifier>{057fb9e2-4e96-4801-a52c-be3867b2f1ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-spmm">
+      <UniqueIdentifier>{09156c86-e9d2-4ef6-abfe-8375976cbdaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-spmm\gen">
+      <UniqueIdentifier>{6da03615-9a45-4ab6-bc9e-b01549fb4e80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\x32-unpool">
+      <UniqueIdentifier>{0080ca6a-84d9-4cbc-8368-b977714d35f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qs8-vadd">
+      <UniqueIdentifier>{bbdd1d29-f55d-4159-aaeb-44f02018f917}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qs8-vadd\gen">
+      <UniqueIdentifier>{0dbdca0a-b62e-415d-81e0-f480614f6d37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qs8-vaddc">
+      <UniqueIdentifier>{4e81a285-8275-4130-91b0-c34448dc6783}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qs8-vaddc\gen">
+      <UniqueIdentifier>{3f71fc34-940e-44c3-b0ee-cf00d9c3067d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vbinary">
+      <UniqueIdentifier>{946a94c0-d213-4e87-9424-5a8409302afb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vbinary\gen">
+      <UniqueIdentifier>{3b6c709a-dd75-4b11-8a88-b4d9b4c48c3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vmulcaddc">
+      <UniqueIdentifier>{bf7aca49-d3ef-408e-a184-914454cfa09f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vmulcaddc\gen">
+      <UniqueIdentifier>{9e553537-b882-463e-a9de-fb23dbacc62f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vunary">
+      <UniqueIdentifier>{ab4a97e3-42d9-4c0d-a82a-e513ed63cd17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vunary\gen">
+      <UniqueIdentifier>{be1daca9-b456-40a7-baec-0bea40638029}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vsqrt">
+      <UniqueIdentifier>{67ca7917-5102-444e-b9cf-9d409301fd04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vsqrt\gen">
+      <UniqueIdentifier>{9347aeb9-3688-438b-b43c-67bfa19b4bb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-velu">
+      <UniqueIdentifier>{6cfb38bd-416f-4c7c-928b-d6a420421b44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-velu\gen">
+      <UniqueIdentifier>{65e0db5b-1084-4b54-a192-d935c685ea6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vlrelu">
+      <UniqueIdentifier>{e9ff2b8b-7fb3-43b2-bed3-4c24579c76c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vlrelu\gen">
+      <UniqueIdentifier>{ba30a566-0e13-4ed5-833b-2bb0ad3e7169}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vrnd">
+      <UniqueIdentifier>{874d9d19-a8f8-4041-bda0-c1068b67be25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vrnd\gen">
+      <UniqueIdentifier>{e4002728-ee89-4a8a-a6a7-2a748a3e944b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\xx-copy">
+      <UniqueIdentifier>{7fd4aef8-4754-4530-9603-edd0251a60f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\x8-zip">
+      <UniqueIdentifier>{36b4fda2-2f55-477c-ab20-905253fd161c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\x32-zip">
+      <UniqueIdentifier>{76b27531-a502-418d-873d-9221653b6ccf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\tables">
+      <UniqueIdentifier>{a1c56a4d-37f9-48b5-a57a-80e7f5c3aba7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qu8-dwconv">
+      <UniqueIdentifier>{55285810-7abd-450c-853a-67362567da05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qu8-dwconv\gen">
+      <UniqueIdentifier>{d226c907-f8f5-47de-85aa-1c24a41a5418}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qs8-dwconv">
+      <UniqueIdentifier>{764a7712-eac7-4e6c-84e0-765e85b3497e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qs8-dwconv\gen">
+      <UniqueIdentifier>{63a4d6ab-6d5c-4335-a41d-20cf09666c29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qc8-dwconv">
+      <UniqueIdentifier>{bd11085b-6a07-48eb-a0bb-1c6d06506f3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qc8-dwconv\gen">
+      <UniqueIdentifier>{5f8ecdc5-4fd2-4c0a-a478-5b9bd247b89a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qu8-gemm">
+      <UniqueIdentifier>{e8278588-6e06-48f3-99b7-65c317d9bdbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qu8-gemm\gen">
+      <UniqueIdentifier>{8c9ce210-6805-4973-883b-b66f55564eca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qs8-gemm">
+      <UniqueIdentifier>{f12cd9b8-9020-47f1-8617-228e7f7901f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qs8-gemm\gen">
+      <UniqueIdentifier>{6df1c19b-a097-4140-9c7b-4698e4f5ef48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qc8-gemm">
+      <UniqueIdentifier>{f69145f9-d03a-424f-a85c-20861b84b653}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qc8-gemm\gen">
+      <UniqueIdentifier>{f28f85a5-522f-4321-853d-17b01f0cc23b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qu8-igemm">
+      <UniqueIdentifier>{3db50b94-87a7-49d8-aa57-cc6b63f70d63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qu8-igemm\gen">
+      <UniqueIdentifier>{041751ad-e431-4d95-a5eb-88c8df8171a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qs8-igemm">
+      <UniqueIdentifier>{dd29caec-fa39-4979-95ab-1e51c7e415b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qs8-igemm\gen">
+      <UniqueIdentifier>{4411d89f-3192-4c2e-a0be-f71cd210f04d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qc8-igemm">
+      <UniqueIdentifier>{c1215328-afd9-4124-853d-a76a9dd68faf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qc8-igemm\gen">
+      <UniqueIdentifier>{e17c4311-49e6-4444-a68f-05e7ee3f12dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qu8-vadd">
+      <UniqueIdentifier>{9489180d-9885-4229-a40b-b9a574845239}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qu8-vadd\gen">
+      <UniqueIdentifier>{f43f6694-317f-467f-ad2d-d67ec22cc4b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qu8-vaddc">
+      <UniqueIdentifier>{067f7bd4-3411-46db-b2a1-0cced7aa42c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\qu8-vaddc\gen">
+      <UniqueIdentifier>{a7b8b267-0428-4d04-9aba-60b3be11e70c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vclamp">
+      <UniqueIdentifier>{a94f942e-4690-44cd-9642-9a9668fca7ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vclamp\gen">
+      <UniqueIdentifier>{13b892aa-ce4f-478c-9478-ba8523033d28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vhswish">
+      <UniqueIdentifier>{827809b8-524f-40a3-ba62-5dfc0018cdcd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vhswish\gen">
+      <UniqueIdentifier>{a24eb83b-7c89-4137-8ac2-43f77a14858e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vsigmoid">
+      <UniqueIdentifier>{73e1c22c-23f5-4a8f-8f25-e5e0139623dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\f32-vsigmoid\gen">
+      <UniqueIdentifier>{db4beda9-db08-41cb-a756-66da4ec184ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XNNPACK\u8-vclamp">
+      <UniqueIdentifier>{1a88683c-9d6d-402d-9687-878889fc4901}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include=".\src\f32-igemm\gen\1x8-minmax-sse-load1.c">
+      <Filter>XNNPACK\f32-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-gemm\gen\1x8-minmax-sse-load1.c">
+      <Filter>XNNPACK\f32-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-igemm\gen\1x16-minmax-avx512f-broadcast.c">
+      <Filter>XNNPACK\f32-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-igemm\gen\1x16-minmax-avx-broadcast.c">
+      <Filter>XNNPACK\f32-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-gemm\gen\1x16-minmax-avx512f-broadcast.c">
+      <Filter>XNNPACK\f32-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-gemm\gen\1x16-minmax-avx-broadcast.c">
+      <Filter>XNNPACK\f32-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-igemm\gen\1x16-minmax-fma3-broadcast.c">
+      <Filter>XNNPACK\f32-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-gemm\gen\1x16-minmax-fma3-broadcast.c">
+      <Filter>XNNPACK\f32-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-gemm\gen\1x16s4-minmax-fma3-broadcast.c">
+      <Filter>XNNPACK\f32-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-igemm\gen\1x16s4-minmax-fma3-broadcast.c">
+      <Filter>XNNPACK\f32-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv2d-chw\gen\3x3p1-minmax-sse-2x4-acc2.c">
+      <Filter>XNNPACK\f32-dwconv2d-chw\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv2d-chw\gen\3x3p1-minmax-ssse3-2x4-acc2.c">
+      <Filter>XNNPACK\f32-dwconv2d-chw\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-conv-hwc2chw\3x3s2p1c3x4-sse-2x2.c">
+      <Filter>XNNPACK\f32-conv-hwc2chw</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv2d-chw\gen\3x3s2p1-minmax-sse-1x4-acc3.c">
+      <Filter>XNNPACK\f32-dwconv2d-chw\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-gemm\gen\4x2c4-minmax-sse.c">
+      <Filter>XNNPACK\f32-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-igemm\gen\4x2c4-minmax-sse.c">
+      <Filter>XNNPACK\f32-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-gemm\gen\4x8-minmax-sse-load1.c">
+      <Filter>XNNPACK\f32-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-gemm\gen\4x16s4-minmax-fma3-broadcast.c">
+      <Filter>XNNPACK\f32-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-igemm\gen\4x8-minmax-sse-load1.c">
+      <Filter>XNNPACK\f32-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-igemm\gen\4x16s4-minmax-fma3-broadcast.c">
+      <Filter>XNNPACK\f32-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-argmaxpool\4x-sse2-c4.c">
+      <Filter>XNNPACK\f32-argmaxpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv2d-chw\gen\5x5p2-minmax-sse-4x4.c">
+      <Filter>XNNPACK\f32-dwconv2d-chw\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv2d-chw\gen\5x5s2p2-minmax-sse-2x4.c">
+      <Filter>XNNPACK\f32-dwconv2d-chw\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-igemm\gen\5x16-minmax-avx-broadcast.c">
+      <Filter>XNNPACK\f32-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-gemm\gen\5x16-minmax-avx-broadcast.c">
+      <Filter>XNNPACK\f32-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-gemm\gen\5x16-minmax-fma3-broadcast.c">
+      <Filter>XNNPACK\f32-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-igemm\gen\5x16-minmax-fma3-broadcast.c">
+      <Filter>XNNPACK\f32-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qu8-gavgpool\7p7x-minmax-sse2-c8.c">
+      <Filter>XNNPACK\qu8-gavgpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qs8-gavgpool\gen\7p7x-minmax-sse2-c8-acc2.c">
+      <Filter>XNNPACK\qs8-gavgpool\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qs8-gavgpool\gen\7p7x-minmax-sse41-c8-acc2.c">
+      <Filter>XNNPACK\qs8-gavgpool\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qs8-gavgpool\gen\7p7x-minmax-ssse3-c8-acc2.c">
+      <Filter>XNNPACK\qs8-gavgpool\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-igemm\gen\7x16-minmax-avx512f-broadcast.c">
+      <Filter>XNNPACK\f32-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-gemm\gen\7x16-minmax-avx512f-broadcast.c">
+      <Filter>XNNPACK\f32-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qu8-gavgpool\7x-minmax-sse2-c8.c">
+      <Filter>XNNPACK\qu8-gavgpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qs8-gavgpool\gen\7x-minmax-sse2-c8-acc2.c">
+      <Filter>XNNPACK\qs8-gavgpool\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qs8-gavgpool\gen\7x-minmax-sse41-c8-acc2.c">
+      <Filter>XNNPACK\qs8-gavgpool\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-gavgpool\7x-minmax-sse-c4.c">
+      <Filter>XNNPACK\f32-gavgpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qs8-gavgpool\gen\7x-minmax-ssse3-c8-acc2.c">
+      <Filter>XNNPACK\qs8-gavgpool\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qu8-avgpool\9p8x-minmax-sse2-c8.c">
+      <Filter>XNNPACK\qu8-avgpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\u8-maxpool\9p8x-minmax-sse2-c16.c">
+      <Filter>XNNPACK\u8-maxpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-maxpool\9p8x-minmax-sse-c4.c">
+      <Filter>XNNPACK\f32-maxpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-avgpool\9p8x-minmax-sse-c4.c">
+      <Filter>XNNPACK\f32-avgpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-argmaxpool\9p8x-sse2-c4.c">
+      <Filter>XNNPACK\f32-argmaxpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qu8-avgpool\9x-minmax-sse2-c8.c">
+      <Filter>XNNPACK\qu8-avgpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-avgpool\9x-minmax-sse-c4.c">
+      <Filter>XNNPACK\f32-avgpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-argmaxpool\9x-sse2-c4.c">
+      <Filter>XNNPACK\f32-argmaxpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\abs.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\add2.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\allocator.c">
+      <Filter>XNNPACK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpuinfo\src\api.c">
+      <Filter>third_party\cpu_info</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\argmax-pooling-2d.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\argmax-pooling-nhwc.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\average-pooling-2d.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\average-pooling-nhwc.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-prelu\gen\avx-2x16.c">
+      <Filter>XNNPACK\f32-prelu\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-prelu\gen\avx512f-2x16.c">
+      <Filter>XNNPACK\f32-prelu\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vsqrt\gen\avx-sqrt-x8.c">
+      <Filter>XNNPACK\f32-vsqrt\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\bankers-rounding.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\binary-elementwise-nd.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vmulcaddc\gen\c4-minmax-sse-2x.c">
+      <Filter>XNNPACK\f32-vmulcaddc\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpuinfo\src\cache.c">
+      <Filter>third_party\cpu_info</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\ceiling.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\clamp.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\clog\deps\clog\src\clog.c">
+      <Filter>third_party\clog</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\constant-pad-nd.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\convolution-2d.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\convolution-nchw.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\convolution-nhwc.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\deconvolution-2d.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\deconvolution-nhwc.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\depth-to-space.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\depth-to-space-nchw2nhwc.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\depth-to-space-nhwc.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\depthwise-convolution-2d.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpuinfo\src\x86\cache\descriptor.c">
+      <Filter>third_party\cpu_info\x86\cache</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpuinfo\src\x86\cache\deterministic.c">
+      <Filter>third_party\cpu_info\x86\cache</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\divide.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\elu.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\tables\exp2minus-k-over-16.c">
+      <Filter>XNNPACK\tables</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\tables\exp2minus-k-over-64.c">
+      <Filter>XNNPACK\tables</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pthreadpool\src\fastpath.c">
+      <Filter>third_party\pthreadpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\floor.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\fully-connected.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\fully-connected-nc.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\global-average-pooling-2d.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\global-average-pooling-ncw.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\global-average-pooling-nwc.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\hardswish.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\indirection.c">
+      <Filter>XNNPACK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpuinfo\src\x86\info.c">
+      <Filter>third_party\cpu_info\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpuinfo\src\x86\windows\init.c">
+      <Filter>third_party\cpu_info\x86\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpuinfo\src\init.c">
+      <Filter>third_party\cpu_info</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpuinfo\src\x86\cache\init.c">
+      <Filter>third_party\cpu_info\x86\cache</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpuinfo\src\x86\init.c">
+      <Filter>third_party\cpu_info\x86</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\init.c">
+      <Filter>XNNPACK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpuinfo\src\x86\isa.c">
+      <Filter>third_party\cpu_info\x86</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\leaky-relu.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\maximum2.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\max-pooling-2d.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\max-pooling-nhwc.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\xx-copy\memcpy.c">
+      <Filter>XNNPACK\xx-copy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pthreadpool\src\memory.c">
+      <Filter>third_party\pthreadpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\memory-planner.c">
+      <Filter>XNNPACK</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\minimum2.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qs8-vadd\gen\minmax-avx-mul32-ld32-x8.c">
+      <Filter>XNNPACK\qs8-vadd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qs8-vaddc\gen\minmax-avx-mul32-ld32-x8.c">
+      <Filter>XNNPACK\qs8-vaddc\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qs8-vaddc\gen\minmax-sse2-mul16-ld64-x8.c">
+      <Filter>XNNPACK\qs8-vaddc\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qs8-vadd\gen\minmax-sse2-mul16-ld64-x8.c">
+      <Filter>XNNPACK\qs8-vadd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qs8-vaddc\gen\minmax-sse41-mul16-ld64-x8.c">
+      <Filter>XNNPACK\qs8-vaddc\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qs8-vadd\gen\minmax-sse41-mul16-ld64-x8.c">
+      <Filter>XNNPACK\qs8-vadd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qs8-vaddc\gen\minmax-xop-mul32-ld32-x8.c">
+      <Filter>XNNPACK\qs8-vaddc\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\qs8-vadd\gen\minmax-xop-mul32-ld32-x8.c">
+      <Filter>XNNPACK\qs8-vadd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\multiply2.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpuinfo\src\x86\name.c">
+      <Filter>third_party\cpu_info\x86</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\negate.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operator-delete.c">
+      <Filter>XNNPACK</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operator-run.c">
+      <Filter>XNNPACK</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\packing.c">
+      <Filter>XNNPACK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pthreadpool\src\portable-api.c">
+      <Filter>third_party\pthreadpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\prelu.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\prelu-nc.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\resize-bilinear-nchw.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\resize-bilinear-nhwc.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\runtime.c">
+      <Filter>XNNPACK</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\x32-depthtospace2d-chw2hwc\scalar.c">
+      <Filter>XNNPACK\x32-depthtospace2d-chw2hwc</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\x8-lut\scalar.c">
+      <Filter>XNNPACK\x8-lut</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\u8-lut32norm\scalar.c">
+      <Filter>XNNPACK\u8-lut32norm</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\sigmoid.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\softmax.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\softmax-nc.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\square.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\squared-difference.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\square-root.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-rmax\sse.c">
+      <Filter>XNNPACK\f32-rmax</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\x32-fill\sse.c">
+      <Filter>XNNPACK\x32-fill</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\x32-pad\sse.c">
+      <Filter>XNNPACK\x32-pad</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\u8-rmax\sse2.c">
+      <Filter>XNNPACK\u8-rmax</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\x32-unpool\sse2.c">
+      <Filter>XNNPACK\x32-unpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-prelu\gen\sse2-2x8.c">
+      <Filter>XNNPACK\f32-prelu\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-raddstoreexpminusmax\gen\sse2-p5-x20-acc2.c">
+      <Filter>XNNPACK\f32-raddstoreexpminusmax\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-prelu\gen\sse41-2x8.c">
+      <Filter>XNNPACK\f32-prelu\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-ibilinear\gen\sse-c8.c">
+      <Filter>XNNPACK\f32-ibilinear\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-ibilinear-chw\gen\sse-p8.c">
+      <Filter>XNNPACK\f32-ibilinear-chw\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vsqrt\gen\sse-sqrt-x4.c">
+      <Filter>XNNPACK\f32-vsqrt\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-gavgpool-cw\sse-x4.c">
+      <Filter>XNNPACK\f32-gavgpool-cw</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\static-constant-pad.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\static-reshape.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\static-resize-bilinear-2d.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph.c">
+      <Filter>XNNPACK</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\subtract.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\tensor.c">
+      <Filter>XNNPACK</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpuinfo\src\x86\topology.c">
+      <Filter>third_party\cpu_info\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpuinfo\src\x86\uarch.c">
+      <Filter>third_party\cpu_info\x86</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\unary-elementwise-nc.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\subgraph\unpooling-2d.c">
+      <Filter>XNNPACK\subgraph</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\operators\unpooling-nhwc.c">
+      <Filter>XNNPACK\operators</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv\gen\up8x4-minmax-sse.c">
+      <Filter>XNNPACK\f32-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv\gen\up8x9-minmax-sse.c">
+      <Filter>XNNPACK\f32-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv\gen\up8x25-minmax-avx.c">
+      <Filter>XNNPACK\f32-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv\gen\up8x25-minmax-fma3.c">
+      <Filter>XNNPACK\f32-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv\gen\up16x9-minmax-avx.c">
+      <Filter>XNNPACK\f32-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv\gen\up8x25-minmax-sse.c">
+      <Filter>XNNPACK\f32-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv\gen\up16x4-minmax-avx.c">
+      <Filter>XNNPACK\f32-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv\gen\up16x4-minmax-avx512f.c">
+      <Filter>XNNPACK\f32-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv\gen\up16x4-minmax-fma3.c">
+      <Filter>XNNPACK\f32-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv\gen\up16x9-minmax-avx512f.c">
+      <Filter>XNNPACK\f32-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv\gen\up16x25-minmax-avx512f.c">
+      <Filter>XNNPACK\f32-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vunary\gen\vabs-avx512f-x16.c">
+      <Filter>XNNPACK\f32-vunary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vunary\gen\vabs-avx-x16.c">
+      <Filter>XNNPACK\f32-vunary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vunary\gen\vabs-sse-x8.c">
+      <Filter>XNNPACK\f32-vunary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vadd-minmax-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vadd-minmax-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vadd-minmax-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vdiv-minmax-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vdivc-minmax-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vdivc-minmax-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vdivc-minmax-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vdiv-minmax-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vdiv-minmax-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-velu\gen\velu-avx2-rr1-lut4-p4-perm-x56.c">
+      <Filter>XNNPACK\f32-velu\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-velu\gen\velu-avx512f-rr1-lut16-p3-perm-x64.c">
+      <Filter>XNNPACK\f32-velu\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-velu\gen\velu-avx-rr2-lut4-p4-perm-x32.c">
+      <Filter>XNNPACK\f32-velu\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-velu\gen\velu-sse2-rr2-lut16-p3-x12.c">
+      <Filter>XNNPACK\f32-velu\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cpuinfo\src\x86\vendor.c">
+      <Filter>third_party\cpu_info\x86</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vlrelu\gen\vlrelu-avx512f-x16.c">
+      <Filter>XNNPACK\f32-vlrelu\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vlrelu\gen\vlrelu-avx-x16.c">
+      <Filter>XNNPACK\f32-vlrelu\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vlrelu\gen\vlrelu-sse41-x8.c">
+      <Filter>XNNPACK\f32-vlrelu\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vlrelu\gen\vlrelu-sse-x8.c">
+      <Filter>XNNPACK\f32-vlrelu\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vmax-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vmax-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vmaxc-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vmaxc-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vmaxc-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vmax-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vmin-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vmin-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vminc-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vminc-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vminc-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vmin-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vmul-minmax-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vmulc-minmax-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vmulc-minmax-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vmulc-minmax-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vmul-minmax-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vmul-minmax-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vunary\gen\vneg-avx512f-x16.c">
+      <Filter>XNNPACK\f32-vunary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vunary\gen\vneg-avx-x16.c">
+      <Filter>XNNPACK\f32-vunary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vunary\gen\vneg-sse-x8.c">
+      <Filter>XNNPACK\f32-vunary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vrdivc-minmax-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vrdivc-minmax-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vrdivc-minmax-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndu-avx512f-x16.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndd-avx512f-x16.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndd-avx-x16.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndd-sse2-x8.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndd-sse41-x8.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndne-avx512f-x16.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndne-avx-x16.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndne-sse2-x8.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndne-sse41-x8.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndz-sse41-x8.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndu-avx-x16.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndu-sse2-x8.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndu-sse41-x8.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndz-avx512f-x16.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndz-avx-x16.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vrnd\gen\vrndz-sse2-x8.c">
+      <Filter>XNNPACK\f32-vrnd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vrsubc-minmax-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vrsubc-minmax-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vrsubc-minmax-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vunary\gen\vsqr-avx-x16.c">
+      <Filter>XNNPACK\f32-vunary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vunary\gen\vsqr-avx512f-x16.c">
+      <Filter>XNNPACK\f32-vunary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vsqrdiff-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vsqrdiff-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vsqrdiffc-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vsqrdiffc-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vsqrdiffc-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vsqrdiff-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vsub-minmax-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vsubc-minmax-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vsubc-minmax-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vsubc-minmax-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vsub-minmax-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vsub-minmax-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vunary\gen\vsqr-sse-x8.c">
+      <Filter>XNNPACK\f32-vunary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\pthreadpool\src\windows.c">
+      <Filter>third_party\pthreadpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\x8-zip\x2-sse2.c">
+      <Filter>XNNPACK\x8-zip</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\x32-zip\x2-sse2.c">
+      <Filter>XNNPACK\x32-zip</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\x8-zip\x3-sse2.c">
+      <Filter>XNNPACK\x8-zip</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\x32-zip\x3-sse2.c">
+      <Filter>XNNPACK\x32-zip</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\x32-zip\x4-sse2.c">
+      <Filter>XNNPACK\x32-zip</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\x8-zip\x4-sse2.c">
+      <Filter>XNNPACK\x8-zip</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\x32-zip\xm-sse2.c">
+      <Filter>XNNPACK\x32-zip</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\x8-zip\xm-sse2.c">
+      <Filter>XNNPACK\x8-zip</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-pavgpool\9x-minmax-sse-c4.c">
+      <Filter>XNNPACK\f32-pavgpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-pavgpool\9p8x-minmax-sse-c4.c">
+      <Filter>XNNPACK\f32-pavgpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-gavgpool\7p7x-minmax-sse-c4.c">
+      <Filter>XNNPACK\f32-gavgpool</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-spmm\gen\32x1-minmax-sse.c">
+      <Filter>XNNPACK\f32-spmm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vaddc-minmax-sse-x8.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vaddc-minmax-avx512f-x32.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-vbinary\gen\vaddc-minmax-avx-x16.c">
+      <Filter>XNNPACK\f32-vbinary\gen</Filter>
+    </ClCompile>
+    <ClCompile Include=".\src\f32-dwconv\gen\up16x9-minmax-fma3.c">
+      <Filter>XNNPACK\f32-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-dwconv\gen\up8x9-minmax-fp32-sse2-mul16.c">
+      <Filter>XNNPACK\qu8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-dwconv\gen\up8x9-minmax-fp32-sse41-mul16.c">
+      <Filter>XNNPACK\qu8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-dwconv\gen\up8x25-minmax-fp32-sse2-mul16.c">
+      <Filter>XNNPACK\qu8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-dwconv\gen\up8x25-minmax-fp32-sse41-mul16.c">
+      <Filter>XNNPACK\qu8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-dwconv\gen\up16x9-minmax-fp32-avx2-mul32.c">
+      <Filter>XNNPACK\qu8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-dwconv\gen\up16x9-minmax-fp32-avx-mul32.c">
+      <Filter>XNNPACK\qu8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-dwconv\gen\up16x9-minmax-fp32-xop-mul32.c">
+      <Filter>XNNPACK\qu8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-dwconv\gen\up16x25-minmax-fp32-avx2-mul32.c">
+      <Filter>XNNPACK\qu8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-dwconv\gen\up16x25-minmax-fp32-avx-mul32.c">
+      <Filter>XNNPACK\qu8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-dwconv\gen\up16x25-minmax-fp32-xop-mul32.c">
+      <Filter>XNNPACK\qu8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-dwconv\gen\up32x9-minmax-fp32-avx512skx-mul32.c">
+      <Filter>XNNPACK\qu8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-dwconv\gen\up32x25-minmax-fp32-avx512skx-mul32.c">
+      <Filter>XNNPACK\qu8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-dwconv\gen\up8x9-minmax-fp32-sse2-mul16.c">
+      <Filter>XNNPACK\qs8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-dwconv\gen\up8x9-minmax-fp32-sse41-mul16.c">
+      <Filter>XNNPACK\qs8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-dwconv\gen\up16x9-minmax-fp32-avx2-mul32.c">
+      <Filter>XNNPACK\qs8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-dwconv\gen\up16x9-minmax-fp32-avx-mul32.c">
+      <Filter>XNNPACK\qs8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-dwconv\gen\up16x9-minmax-fp32-xop-mul32.c">
+      <Filter>XNNPACK\qs8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-dwconv\gen\up8x25-minmax-gemmlowp-sse2-mul16.c">
+      <Filter>XNNPACK\qs8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-dwconv\gen\up8x25-minmax-gemmlowp-sse41-mul16.c">
+      <Filter>XNNPACK\qs8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-dwconv\gen\up16x25-minmax-fp32-avx-mul32.c">
+      <Filter>XNNPACK\qs8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-dwconv\gen\up16x25-minmax-fp32-xop-mul32.c">
+      <Filter>XNNPACK\qs8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-dwconv\gen\up32x9-minmax-fp32-avx512skx-mul32.c">
+      <Filter>XNNPACK\qs8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-dwconv\gen\up8x25-minmax-fp32-sse2-mul16.c">
+      <Filter>XNNPACK\qs8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-dwconv\gen\up8x25-minmax-fp32-sse41-mul16.c">
+      <Filter>XNNPACK\qs8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-dwconv\gen\up16x25-minmax-fp32-avx2-mul32.c">
+      <Filter>XNNPACK\qs8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-dwconv\gen\up32x25-minmax-fp32-avx512skx-mul32.c">
+      <Filter>XNNPACK\qs8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-dwconv\gen\up8x9-minmax-fp32-sse2-mul16.c">
+      <Filter>XNNPACK\qc8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-dwconv\gen\up8x9-minmax-fp32-sse41-mul16.c">
+      <Filter>XNNPACK\qc8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-dwconv\gen\up16x9-minmax-fp32-avx2-mul32.c">
+      <Filter>XNNPACK\qc8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-dwconv\gen\up16x9-minmax-fp32-avx-mul32.c">
+      <Filter>XNNPACK\qc8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-dwconv\gen\up16x9-minmax-fp32-xop-mul32.c">
+      <Filter>XNNPACK\qc8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-dwconv\gen\up8x25-minmax-fp32-sse2-mul16.c">
+      <Filter>XNNPACK\qc8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-dwconv\gen\up8x25-minmax-fp32-sse41-mul16.c">
+      <Filter>XNNPACK\qc8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-dwconv\gen\up16x25-minmax-fp32-avx2-mul32.c">
+      <Filter>XNNPACK\qc8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-dwconv\gen\up16x25-minmax-fp32-avx-mul32.c">
+      <Filter>XNNPACK\qc8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-dwconv\gen\up16x25-minmax-fp32-xop-mul32.c">
+      <Filter>XNNPACK\qc8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-dwconv\gen\up32x9-minmax-fp32-avx512skx-mul32.c">
+      <Filter>XNNPACK\qc8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-dwconv\gen\up32x25-minmax-fp32-avx512skx-mul32.c">
+      <Filter>XNNPACK\qc8-dwconv\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-gemm\gen\1x4c8-minmax-fp32-sse2-ld64.c">
+      <Filter>XNNPACK\qu8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-gemm\gen\1x4c8-minmax-fp32-sse41-ld64.c">
+      <Filter>XNNPACK\qu8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-gemm\gen\1x4c8-minmax-fp32-xop-ld64.c">
+      <Filter>XNNPACK\qu8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-gemm\gen\2x4c8-minmax-fp32-xop-ld64.c">
+      <Filter>XNNPACK\qu8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-gemm\gen\3x4c8-minmax-fp32-sse2-ld64.c">
+      <Filter>XNNPACK\qu8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-gemm\gen\3x4c8-minmax-fp32-sse41-ld64.c">
+      <Filter>XNNPACK\qu8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-gemm\gen\1x4c8-minmax-fp32-avx-ld128.c">
+      <Filter>XNNPACK\qu8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-gemm\gen\1x8c8-minmax-fp32-avx2.c">
+      <Filter>XNNPACK\qu8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-gemm\gen\1x16c8-minmax-fp32-avx512skx.c">
+      <Filter>XNNPACK\qu8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-gemm\gen\2x4c8-minmax-fp32-avx-ld128.c">
+      <Filter>XNNPACK\qu8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-gemm\gen\3x8c8-minmax-fp32-avx2.c">
+      <Filter>XNNPACK\qu8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-gemm\gen\4x16c8-minmax-fp32-avx512skx.c">
+      <Filter>XNNPACK\qu8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-gemm\gen\1x4c8-minmax-fp32-sse2-ld64.c">
+      <Filter>XNNPACK\qs8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-gemm\gen\1x4c8-minmax-fp32-sse41-ld64.c">
+      <Filter>XNNPACK\qs8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-gemm\gen\1x4c8-minmax-fp32-xop-ld64.c">
+      <Filter>XNNPACK\qs8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-gemm\gen\2x4c8-minmax-fp32-xop-ld64.c">
+      <Filter>XNNPACK\qs8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-gemm\gen\3x4c8-minmax-fp32-sse2-ld64.c">
+      <Filter>XNNPACK\qs8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-gemm\gen\3x4c8-minmax-fp32-sse41-ld64.c">
+      <Filter>XNNPACK\qs8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-gemm\gen\1x4c8-minmax-fp32-avx-ld128.c">
+      <Filter>XNNPACK\qs8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-gemm\gen\2x4c8-minmax-fp32-avx-ld128.c">
+      <Filter>XNNPACK\qs8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-gemm\gen\1x8c8-minmax-fp32-avx2.c">
+      <Filter>XNNPACK\qs8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-gemm\gen\1x16c8-minmax-fp32-avx512skx.c">
+      <Filter>XNNPACK\qs8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-gemm\gen\3x8c8-xw-minmax-fp32-avx2.c">
+      <Filter>XNNPACK\qs8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-gemm\gen\4x16c8-minmax-fp32-avx512skx.c">
+      <Filter>XNNPACK\qs8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-gemm\gen\1x4c8-minmax-fp32-avx-ld128.c">
+      <Filter>XNNPACK\qc8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-gemm\gen\1x4c8-minmax-fp32-sse2-ld64.c">
+      <Filter>XNNPACK\qc8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-gemm\gen\1x4c8-minmax-fp32-sse41-ld64.c">
+      <Filter>XNNPACK\qc8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-gemm\gen\1x4c8-minmax-fp32-xop-ld64.c">
+      <Filter>XNNPACK\qc8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-gemm\gen\2x4c8-minmax-fp32-xop-ld64.c">
+      <Filter>XNNPACK\qc8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-gemm\gen\3x4c8-minmax-fp32-sse2-ld64.c">
+      <Filter>XNNPACK\qc8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-gemm\gen\3x4c8-minmax-fp32-sse41-ld64.c">
+      <Filter>XNNPACK\qc8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-gemm\gen\3x8c8-minmax-fp32-avx2.c">
+      <Filter>XNNPACK\qs8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-gemm\gen\1x8c8-minmax-fp32-avx2.c">
+      <Filter>XNNPACK\qc8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-gemm\gen\1x16c8-minmax-fp32-avx512skx.c">
+      <Filter>XNNPACK\qc8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-gemm\gen\2x4c8-minmax-fp32-avx-ld128.c">
+      <Filter>XNNPACK\qc8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-gemm\gen\3x8c8-minmax-fp32-avx2.c">
+      <Filter>XNNPACK\qc8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-gemm\gen\4x16c8-minmax-fp32-avx512skx.c">
+      <Filter>XNNPACK\qc8-gemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-igemm\gen\1x4c8-minmax-fp32-avx-ld128.c">
+      <Filter>XNNPACK\qu8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-igemm\gen\1x4c8-minmax-fp32-sse2-ld64.c">
+      <Filter>XNNPACK\qu8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-igemm\gen\1x4c8-minmax-fp32-sse41-ld64.c">
+      <Filter>XNNPACK\qu8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-igemm\gen\1x4c8-minmax-fp32-xop-ld64.c">
+      <Filter>XNNPACK\qu8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-igemm\gen\1x8c8-minmax-fp32-avx2.c">
+      <Filter>XNNPACK\qu8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-igemm\gen\2x4c8-minmax-fp32-xop-ld64.c">
+      <Filter>XNNPACK\qu8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-igemm\gen\3x4c8-minmax-fp32-sse2-ld64.c">
+      <Filter>XNNPACK\qu8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-igemm\gen\3x4c8-minmax-fp32-sse41-ld64.c">
+      <Filter>XNNPACK\qu8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-igemm\gen\3x8c8-minmax-fp32-avx2.c">
+      <Filter>XNNPACK\qu8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-igemm\gen\1x16c8-minmax-fp32-avx512skx.c">
+      <Filter>XNNPACK\qu8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-igemm\gen\2x4c8-minmax-fp32-avx-ld128.c">
+      <Filter>XNNPACK\qu8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-igemm\gen\4x16c8-minmax-fp32-avx512skx.c">
+      <Filter>XNNPACK\qu8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-igemm\gen\1x4c8-minmax-fp32-avx-ld128.c">
+      <Filter>XNNPACK\qs8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-igemm\gen\1x4c8-minmax-fp32-sse2-ld64.c">
+      <Filter>XNNPACK\qs8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-igemm\gen\1x4c8-minmax-fp32-sse41-ld64.c">
+      <Filter>XNNPACK\qs8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-igemm\gen\1x4c8-minmax-fp32-xop-ld64.c">
+      <Filter>XNNPACK\qs8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-igemm\gen\1x8c8-minmax-fp32-avx2.c">
+      <Filter>XNNPACK\qs8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-igemm\gen\1x16c8-minmax-fp32-avx512skx.c">
+      <Filter>XNNPACK\qs8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-igemm\gen\2x4c8-minmax-fp32-avx-ld128.c">
+      <Filter>XNNPACK\qs8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-igemm\gen\2x4c8-minmax-fp32-xop-ld64.c">
+      <Filter>XNNPACK\qs8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-igemm\gen\3x4c8-minmax-fp32-sse2-ld64.c">
+      <Filter>XNNPACK\qs8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-igemm\gen\3x4c8-minmax-fp32-sse41-ld64.c">
+      <Filter>XNNPACK\qs8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-igemm\gen\4x16c8-minmax-fp32-avx512skx.c">
+      <Filter>XNNPACK\qs8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-igemm\gen\3x8c8-minmax-fp32-avx2.c">
+      <Filter>XNNPACK\qs8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-igemm\gen\1x4c8-minmax-fp32-avx-ld128.c">
+      <Filter>XNNPACK\qc8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-igemm\gen\1x4c8-minmax-fp32-sse2-ld64.c">
+      <Filter>XNNPACK\qc8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-igemm\gen\1x4c8-minmax-fp32-sse41-ld64.c">
+      <Filter>XNNPACK\qc8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-igemm\gen\1x4c8-minmax-fp32-xop-ld64.c">
+      <Filter>XNNPACK\qc8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-igemm\gen\1x8c8-minmax-fp32-avx2.c">
+      <Filter>XNNPACK\qc8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-igemm\gen\1x16c8-minmax-fp32-avx512skx.c">
+      <Filter>XNNPACK\qc8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-igemm\gen\2x4c8-minmax-fp32-avx-ld128.c">
+      <Filter>XNNPACK\qc8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-igemm\gen\2x4c8-minmax-fp32-xop-ld64.c">
+      <Filter>XNNPACK\qc8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-igemm\gen\3x4c8-minmax-fp32-sse2-ld64.c">
+      <Filter>XNNPACK\qc8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-igemm\gen\3x4c8-minmax-fp32-sse41-ld64.c">
+      <Filter>XNNPACK\qc8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-igemm\gen\3x8c8-minmax-fp32-avx2.c">
+      <Filter>XNNPACK\qc8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qc8-igemm\gen\4x16c8-minmax-fp32-avx512skx.c">
+      <Filter>XNNPACK\qc8-igemm\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\params-init.c">
+      <Filter>XNNPACK</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-vadd\gen\minmax-avx2-mul32-ld64-x16.c">
+      <Filter>XNNPACK\qu8-vadd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-vadd\gen\minmax-avx512skx-mul32-ld128-x16.c">
+      <Filter>XNNPACK\qu8-vadd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-vadd\gen\minmax-avx-mul32-ld32-x8.c">
+      <Filter>XNNPACK\qu8-vadd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-vadd\gen\minmax-sse2-mul16-ld64-x8.c">
+      <Filter>XNNPACK\qu8-vadd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-vadd\gen\minmax-sse41-mul16-ld64-x8.c">
+      <Filter>XNNPACK\qu8-vadd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-vadd\gen\minmax-xop-mul32-ld32-x8.c">
+      <Filter>XNNPACK\qu8-vadd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-vaddc\gen\minmax-avx2-mul32-ld64-x16.c">
+      <Filter>XNNPACK\qu8-vaddc\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-vaddc\gen\minmax-avx512skx-mul32-ld128-x16.c">
+      <Filter>XNNPACK\qu8-vaddc\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-vaddc\gen\minmax-avx-mul32-ld32-x8.c">
+      <Filter>XNNPACK\qu8-vaddc\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-vaddc\gen\minmax-sse2-mul16-ld64-x8.c">
+      <Filter>XNNPACK\qu8-vaddc\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-vaddc\gen\minmax-sse41-mul16-ld64-x8.c">
+      <Filter>XNNPACK\qu8-vaddc\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qu8-vaddc\gen\minmax-xop-mul32-ld32-x8.c">
+      <Filter>XNNPACK\qu8-vaddc\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-vadd\gen\minmax-avx2-mul32-ld64-x16.c">
+      <Filter>XNNPACK\qs8-vadd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-vadd\gen\minmax-avx512skx-mul32-ld128-x16.c">
+      <Filter>XNNPACK\qs8-vadd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-vadd\gen\minmax-avx512skx-mul32-ld128-x32.c">
+      <Filter>XNNPACK\qs8-vadd\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-vaddc\gen\minmax-avx2-mul32-ld64-x16.c">
+      <Filter>XNNPACK\qs8-vaddc\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qs8-vaddc\gen\minmax-avx512skx-mul32-ld128-x16.c">
+      <Filter>XNNPACK\qs8-vaddc\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\f32-vclamp\gen\vclamp-avx512f-x16.c">
+      <Filter>XNNPACK\f32-vclamp\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\f32-vclamp\gen\vclamp-avx-x16.c">
+      <Filter>XNNPACK\f32-vclamp\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\f32-vclamp\gen\vclamp-sse-x8.c">
+      <Filter>XNNPACK\f32-vclamp\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\f32-vhswish\gen\vhswish-avx512f-x16.c">
+      <Filter>XNNPACK\f32-vhswish\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\f32-vhswish\gen\vhswish-avx-x16.c">
+      <Filter>XNNPACK\f32-vhswish\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\f32-vhswish\gen\vhswish-fma3-x16.c">
+      <Filter>XNNPACK\f32-vhswish\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\f32-vhswish\gen\vhswish-sse-x8.c">
+      <Filter>XNNPACK\f32-vhswish\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\f32-vsigmoid\gen\vsigmoid-avx2-rr1-p5-div-x40.c">
+      <Filter>XNNPACK\f32-vsigmoid\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\f32-vsigmoid\gen\vsigmoid-avx512f-rr2-lut32-p2-perm2-scalef-div-x64.c">
+      <Filter>XNNPACK\f32-vsigmoid\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\f32-vsigmoid\gen\vsigmoid-avx-rr2-p5-nr2-x40.c">
+      <Filter>XNNPACK\f32-vsigmoid\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\f32-vsigmoid\gen\vsigmoid-sse2-lut64-p2-div-x8.c">
+      <Filter>XNNPACK\f32-vsigmoid\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\f32-vsigmoid\gen\vsigmoid-sse41-lut64-p2-div-x8.c">
+      <Filter>XNNPACK\f32-vsigmoid\gen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\u8-vclamp\sse2-x64.c">
+      <Filter>XNNPACK\u8-vclamp</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

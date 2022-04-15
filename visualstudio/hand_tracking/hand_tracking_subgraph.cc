@@ -4,7 +4,7 @@
 #include "mediapipe/framework/subgraph.h"
 #include "mediapipe/framework/calculator_graph.h"
 
-char const* root_graph_pbtxt = "./face_mesh_desktop_live.pbtxt";
+char const* root_graph_pbtxt = "hand_tracking_desktop_live.pbtxt";
 
 //
 // read graph config from .pbtxt
@@ -40,41 +40,17 @@ struct class_name : public Subgraph {                                           
 };                                                                                   \
 REGISTER_MEDIAPIPE_GRAPH(class_name)
 
+//
+// root graph: hand_tracking_desktop_live.pbtxt
+DEFINE_SUBGRAPH(HandLandmarkTrackingCpu, "hand_landmark_tracking_cpu.pbtxt");
+  DEFINE_SUBGRAPH(PalmDetectionCpu, "palm_detection_cpu.pbtxt");
+    DEFINE_SUBGRAPH(PalmDetectionModelLoader, "palm_detection_model_loader.pbtxt");
+  DEFINE_SUBGRAPH(PalmDetectionDetectionToRoi, "palm_detection_detection_to_roi.pbtxt");
+  DEFINE_SUBGRAPH(HandLandmarkCpu, "hand_landmark_cpu.pbtxt");
+    DEFINE_SUBGRAPH(HandLandmarkModelLoader, "hand_landmark_model_loader.pbtxt");
+  DEFINE_SUBGRAPH(HandLandmarkLandmarksToRoi, "hand_landmark_landmarks_to_roi.pbtxt");
 
-#if !MEDIAPIPE_DISABLE_GPU
-DEFINE_SUBGRAPH(FaceLandmarkFrontGpu, "face_landmark_front_gpu.pbtxt");
-DEFINE_SUBGRAPH(FaceLandmarkGpu, "face_landmark_gpu.pbtxt");
-DEFINE_SUBGRAPH(FaceDetectionFrontGpu, "face_detection_front_gpu.pbtxt");
-DEFINE_SUBGRAPH(FaceRendererGpu, "face_renderer_gpu.pbtxt");
-#endif
-
-DEFINE_SUBGRAPH(FaceLandmarkFrontCpu, "face_landmark_front_cpu.pbtxt");
-DEFINE_SUBGRAPH(FaceDetectionShortRangeCpu, "face_detection_short_range_cpu.pbtxt");
-DEFINE_SUBGRAPH(FaceDetectionFrontDetectionToRoi, "face_detection_front_detection_to_roi.pbtxt");
-DEFINE_SUBGRAPH(FaceLandmarkCpu, "face_landmark_cpu.pbtxt");
-DEFINE_SUBGRAPH(FaceLandmarkLandmarksToRoi, "face_landmark_landmarks_to_roi.pbtxt");
-DEFINE_SUBGRAPH(FaceDetectionShortRangeCommon, "face_detection_short_range_common.pbtxt");
-DEFINE_SUBGRAPH(FaceLandmarksModelLoader, "face_landmarks_model_loader.pbtxt");
-DEFINE_SUBGRAPH(TensorsToFaceLandmarks, "tensors_to_face_landmarks.pbtxt");
-DEFINE_SUBGRAPH(TensorsToFaceLandmarksWithAttention, "tensors_to_face_landmarks_with_attention.pbtxt");
-DEFINE_SUBGRAPH(FaceGeometryFromLandmarks, "face_geometry_from_landmarks.pbtxt");
-DEFINE_SUBGRAPH(FaceLandmarksSmoothing, "face_landmarks_smoothing.pbtxt");
-DEFINE_SUBGRAPH(FaceRendererCpu, "face_renderer_cpu.pbtxt");
-
-#if 0
-// quick debug/test
-struct FaceLandmarksSmoothing : public Subgraph {
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(SubgraphOptions const&) override {
-    CalculatorGraphConfig config;
-    if (read_config_from_pbtxt(config, "face_landmarks_smoothing.pbtxt")) {
-      return config;
-    }
-    return absl::InternalError("Could not parse subgraph.");
-  }
-};
-REGISTER_MEDIAPIPE_GRAPH(FaceLandmarksSmoothing);
-#endif
-
+DEFINE_SUBGRAPH(HandRendererSubgraph, "hand_renderer_cpu.pbtxt");
 
 // to load calculator graph
 absl::Status load_calculator_graph(mediapipe::CalculatorGraph& graph) {

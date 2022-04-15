@@ -41,12 +41,7 @@
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_cpu.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_gl.cc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_classification_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_detections_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_floats_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_landmarks_calculator.cc" />
@@ -60,11 +55,14 @@
     <ClCompile Include="..\..\mediapipe\calculators\util\collection_has_min_size_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\detections_to_rects_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\detections_to_render_data_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\detection_letterbox_removal_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\detection_projection_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\labels_to_render_data_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_refinement_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_smoothing_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_to_detection_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_to_render_data_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmark_letterbox_removal_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\landmark_projection_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\local_file_contents_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\non_max_suppression_calculator.cc" />
@@ -77,25 +75,16 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\world_landmark_projection_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\framework\stream_handler\default_input_stream_handler.cc" />
     <ClCompile Include="..\..\mediapipe\framework\stream_handler\immediate_input_stream_handler.cc" />
     <ClCompile Include="..\..\mediapipe\framework\stream_handler\in_order_output_stream_handler.cc" />
     <ClCompile Include="..\..\mediapipe\framework\tool\switch_container.cc" />
     <ClCompile Include="..\..\mediapipe\framework\tool\switch_demux_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\framework\tool\switch_mux_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\graphs\face_mesh\calculators\face_landmarks_to_render_data_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\modules\face_geometry\effect_renderer_calculator.cc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\modules\face_geometry\env_generator_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\modules\face_geometry\geometry_pipeline_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\hand_landmark\calculators\hand_landmarks_to_rect_calculator.cc" />
     <ClCompile Include="..\demo_run_graph_main.cc" />
-    <ClCompile Include="face_mesh2.cc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="face_mesh_subgraph.cc" />
+    <ClCompile Include="hand_tracking_subgraph.cc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\third_party\abseil\absl.vcxproj">
@@ -120,9 +109,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{0FE8078A-D6AD-459A-AB44-AEE95FA0FDF2}</ProjectGuid>
-    <RootNamespace>facemesh2</RootNamespace>
+    <ProjectGuid>{223E21EF-60B9-4C24-969B-BF1971E55B68}</ProjectGuid>
+    <RootNamespace>hands2</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>hands_tracking</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

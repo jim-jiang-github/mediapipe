@@ -172,6 +172,7 @@
     <ClCompile Include="calculators\core\split_vector_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\image_to_tensor_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\inference_calculator.pb.cc" />
+    <ClCompile Include="calculators\tensor\tensors_to_classification_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\tensors_to_detections_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\tensors_to_floats_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\tensors_to_landmarks_calculator.pb.cc" />
@@ -183,6 +184,7 @@
     <ClCompile Include="calculators\util\collection_has_min_size_calculator.pb.cc" />
     <ClCompile Include="calculators\util\detections_to_rects_calculator.pb.cc" />
     <ClCompile Include="calculators\util\detections_to_render_data_calculator.pb.cc" />
+    <ClCompile Include="calculators\util\labels_to_render_data_calculator.pb.cc" />
     <ClCompile Include="calculators\util\landmarks_refinement_calculator.pb.cc" />
     <ClCompile Include="calculators\util\landmarks_smoothing_calculator.pb.cc" />
     <ClCompile Include="calculators\util\landmarks_to_detection_calculator.pb.cc" />
@@ -328,6 +330,7 @@
     <ClInclude Include="calculators\core\flow_limiter_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\image_to_tensor_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\inference_calculator.pb.h" />
+    <ClInclude Include="calculators\tensor\tensors_to_classification_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\tensors_to_detections_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\tensors_to_floats_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\tensors_to_landmarks_calculator.pb.h" />
@@ -339,6 +342,7 @@
     <ClInclude Include="calculators\util\collection_has_min_size_calculator.pb.h" />
     <ClInclude Include="calculators\util\detections_to_rects_calculator.pb.h" />
     <ClInclude Include="calculators\util\detections_to_render_data_calculator.pb.h" />
+    <ClInclude Include="calculators\util\labels_to_render_data_calculator.pb.h" />
     <ClInclude Include="calculators\util\landmarks_refinement_calculator.pb.h" />
     <ClInclude Include="calculators\util\landmarks_smoothing_calculator.pb.h" />
     <ClInclude Include="calculators\util\landmarks_to_detection_calculator.pb.h" />

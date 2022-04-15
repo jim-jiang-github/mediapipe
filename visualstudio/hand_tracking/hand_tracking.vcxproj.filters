@@ -13,11 +13,6 @@
     <ClCompile Include="..\..\mediapipe\framework\stream_handler\default_input_stream_handler.cc">
       <Filter>framework\stream_handler</Filter>
     </ClCompile>
-    <ClCompile Include="face_mesh2.cc" />
-    <ClCompile Include="..\..\mediapipe\graphs\face_mesh\calculators\face_landmarks_to_render_data_calculator.cc">
-      <Filter>graphs\face_mesh\calculators</Filter>
-    </ClCompile>
-    <ClCompile Include="face_mesh_subgraph.cc" />
     <ClCompile Include="..\..\mediapipe\framework\stream_handler\immediate_input_stream_handler.cc">
       <Filter>framework\stream_handler</Filter>
     </ClCompile>
@@ -26,15 +21,6 @@
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\framework\tool\switch_mux_calculator.cc">
       <Filter>framework\tool</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\modules\face_geometry\geometry_pipeline_calculator.cc">
-      <Filter>modules\face_geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\modules\face_geometry\env_generator_calculator.cc">
-      <Filter>modules\face_geometry</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\modules\face_geometry\effect_renderer_calculator.cc">
-      <Filter>modules\face_geometry</Filter>
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\calculators\core\constant_side_packet_calculator.cc">
       <Filter>calculators\core</Filter>
@@ -76,9 +62,6 @@
       <Filter>calculators\tensor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_cpu.cc">
-      <Filter>calculators\tensor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_gl.cc">
       <Filter>calculators\tensor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_detections_calculator.cc">
@@ -159,6 +142,25 @@
     <ClCompile Include="..\..\mediapipe\framework\tool\switch_container.cc">
       <Filter>framework\tool</Filter>
     </ClCompile>
+    <ClCompile Include="hand_tracking_subgraph.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\hand_landmark\calculators\hand_landmarks_to_rect_calculator.cc">
+      <Filter>modules\hand_landmark</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\detection_letterbox_removal_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_classification_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\world_landmark_projection_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\labels_to_render_data_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmark_letterbox_removal_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
     <ClCompile Include="..\demo_run_graph_main.cc" />
   </ItemGroup>
   <ItemGroup>
@@ -176,15 +178,6 @@
     </Filter>
     <Filter Include="calculators\core">
       <UniqueIdentifier>{1e6c472e-5129-44a1-ac87-c6b459884aab}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="graphs">
-      <UniqueIdentifier>{8ca3212b-2bdd-4397-a80e-8306473f761a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="graphs\face_mesh">
-      <UniqueIdentifier>{c2f86d9f-8378-4055-8d2f-e15af1519421}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="graphs\face_mesh\calculators">
-      <UniqueIdentifier>{1bff813e-881b-4f34-a067-cb5bd683bc3c}</UniqueIdentifier>
     </Filter>
     <Filter Include="calculators\image">
       <UniqueIdentifier>{8521d7aa-2beb-4fe5-a501-a4d07d5b807b}</UniqueIdentifier>
@@ -207,8 +200,8 @@
     <Filter Include="modules">
       <UniqueIdentifier>{b0ce2acf-bf38-433a-bb09-1bc5c2a60866}</UniqueIdentifier>
     </Filter>
-    <Filter Include="modules\face_geometry">
-      <UniqueIdentifier>{ae76cfd3-5b33-4aee-8f20-36356fe21e9d}</UniqueIdentifier>
+    <Filter Include="modules\hand_landmark">
+      <UniqueIdentifier>{17287cc4-2a9f-446c-84b9-62a4caa81f07}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

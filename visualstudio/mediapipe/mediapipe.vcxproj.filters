@@ -600,6 +600,12 @@
     <ClCompile Include="..\..\mediapipe\util\filtering\relative_velocity_filter.cc">
       <Filter>util\filtering</Filter>
     </ClCompile>
+    <ClCompile Include="calculators\tensor\tensors_to_classification_calculator.pb.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\labels_to_render_data_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\mediapipe\framework\tool\options_util.h">
@@ -1003,6 +1009,12 @@
     </ClInclude>
     <ClInclude Include="..\..\mediapipe\util\filtering\relative_velocity_filter.h">
       <Filter>util\filtering</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\tensor\tensors_to_classification_calculator.pb.h">
+      <Filter>calculators\tensor</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\labels_to_render_data_calculator.pb.h">
+      <Filter>calculators\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

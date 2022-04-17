@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\clog\deps\clog\src\clog.c" />
+    <ClCompile Include="..\clog\src\clog.c" />
     <ClCompile Include="..\cpuinfo\src\api.c" />
     <ClCompile Include="..\cpuinfo\src\cache.c" />
     <ClCompile Include="..\cpuinfo\src\init.c" />
@@ -535,7 +535,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>./include;./src;../FP16/include;../pthreadpool/include;../FXdiv/include;../cpuinfo/include;../cpuinfo/src;../clog/deps/clog/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;./src;../FP16/include;../pthreadpool/include;../FXdiv/include;../cpuinfo/include;../cpuinfo/src;../clog/include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4146;4267</DisableSpecificWarnings>
       <LanguageStandard>Default</LanguageStandard>
       <ObjectFileName>$(IntDir)xnnpack\%(RelativeDir)</ObjectFileName>
@@ -556,7 +556,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>./include;./src;../FP16/include;../pthreadpool/include;../FXdiv/include;../cpuinfo/include;../cpuinfo/src;../clog/deps/clog/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;./src;../FP16/include;../pthreadpool/include;../FXdiv/include;../cpuinfo/include;../cpuinfo/src;../clog/include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4146;4267</DisableSpecificWarnings>
       <LanguageStandard>Default</LanguageStandard>
       <ObjectFileName>$(IntDir)xnnpack\%(RelativeDir)</ObjectFileName>

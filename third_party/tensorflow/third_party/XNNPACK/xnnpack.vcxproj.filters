@@ -495,9 +495,6 @@
     <ClCompile Include=".\src\subgraph\clamp.c">
       <Filter>XNNPACK\subgraph</Filter>
     </ClCompile>
-    <ClCompile Include="..\clog\deps\clog\src\clog.c">
-      <Filter>third_party\clog</Filter>
-    </ClCompile>
     <ClCompile Include=".\src\operators\constant-pad-nd.c">
       <Filter>XNNPACK\operators</Filter>
     </ClCompile>
@@ -1520,6 +1517,9 @@
     </ClCompile>
     <ClCompile Include="src\u8-vclamp\sse2-x64.c">
       <Filter>XNNPACK\u8-vclamp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\clog\src\clog.c">
+      <Filter>third_party\clog</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

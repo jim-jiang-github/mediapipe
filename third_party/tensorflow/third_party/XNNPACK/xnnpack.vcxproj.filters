@@ -10,9 +10,6 @@
     <Filter Include="third_party">
       <UniqueIdentifier>{45a8d065-5642-4868-95e1-4594648ab560}</UniqueIdentifier>
     </Filter>
-    <Filter Include="third_party\clog">
-      <UniqueIdentifier>{f566592f-3a62-4d8e-9642-760f37fbed0d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="third_party\pthreadpool">
       <UniqueIdentifier>{6da83bbc-fc91-4843-8a52-7cfd39e516ec}</UniqueIdentifier>
     </Filter>
@@ -304,6 +301,9 @@
     <Filter Include="XNNPACK\u8-vclamp">
       <UniqueIdentifier>{1a88683c-9d6d-402d-9687-878889fc4901}</UniqueIdentifier>
     </Filter>
+    <Filter Include="third_party\clog">
+      <UniqueIdentifier>{2b552f81-30a5-4738-a9e1-260f1c65a0c9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include=".\src\f32-igemm\gen\1x8-minmax-sse-load1.c">
@@ -494,9 +494,6 @@
     </ClCompile>
     <ClCompile Include=".\src\subgraph\clamp.c">
       <Filter>XNNPACK\subgraph</Filter>
-    </ClCompile>
-    <ClCompile Include="..\clog\deps\clog\src\clog.c">
-      <Filter>third_party\clog</Filter>
     </ClCompile>
     <ClCompile Include=".\src\operators\constant-pad-nd.c">
       <Filter>XNNPACK\operators</Filter>
@@ -1520,6 +1517,9 @@
     </ClCompile>
     <ClCompile Include="src\u8-vclamp\sse2-x64.c">
       <Filter>XNNPACK\u8-vclamp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\clog\src\clog.c">
+      <Filter>third_party\clog</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

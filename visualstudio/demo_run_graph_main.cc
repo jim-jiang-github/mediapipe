@@ -1,6 +1,18 @@
+// Copyright 2019 The MediaPipe Authors.
 //
-// taken from ./mediapipe/mediapipe/examples/desktop/demo_run_graph_main.cc
-// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// An example of sending OpenCV webcam frames into a MediaPipe graph.
 #include <cstdlib>
 
 #include "absl/flags/flag.h"
@@ -15,16 +27,15 @@
 #include "mediapipe/framework/port/parse_text_proto.h"
 #include "mediapipe/framework/port/status.h"
 
+// forward declaration
+absl::Status load_calculator_graph(mediapipe::CalculatorGraph& graph, char const* config_file);
+
 constexpr char kInputStream[] = "input_video";
 constexpr char kOutputStream[] = "output_video";
 constexpr char kWindowName[] = "MediaPipe";
 
-///////////////////////////////////////////////////////////////////////////////
-// calculator graph to be implemented
-namespace mediapipe {
-absl::Status load_calculator_graph(mediapipe::CalculatorGraph& graph);
-}
-
+ABSL_FLAG(std::string, calculator_graph_config_file, "",
+          "Name of file containing text format CalculatorGraphConfig proto.");
 ABSL_FLAG(std::string, input_video_path, "",
           "Full path of video to load. "
           "If not provided, attempt to use a webcam.");
@@ -33,9 +44,14 @@ ABSL_FLAG(std::string, output_video_path, "",
           "If not provided, show result in a window.");
 
 absl::Status RunMPPGraph() {
+  std::string calculator_graph_config_contents;
+  mediapipe::file::GetContents(
+      absl::GetFlag(FLAGS_calculator_graph_config_file),
+      &calculator_graph_config_contents);
+
   LOG(INFO) << "Initialize the calculator graph.";
   mediapipe::CalculatorGraph graph;
-  MP_RETURN_IF_ERROR(load_calculator_graph(graph));
+  MP_RETURN_IF_ERROR(load_calculator_graph(graph, calculator_graph_config_contents.c_str()));
 
   LOG(INFO) << "Initialize the camera or load the video.";
   cv::VideoCapture capture;
@@ -91,8 +107,8 @@ absl::Status RunMPPGraph() {
     camera_frame.copyTo(input_frame_mat);
 
     // Send image packet into the graph.
-    size_t frame_timestamp_us = (size_t)
-        ((double)cv::getTickCount() / (double)cv::getTickFrequency() * 1e6);
+    size_t frame_timestamp_us =
+        (double)cv::getTickCount() / (double)cv::getTickFrequency() * 1e6;
     MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(
         kInputStream, mediapipe::Adopt(input_frame.release())
                           .At(mediapipe::Timestamp(frame_timestamp_us))));

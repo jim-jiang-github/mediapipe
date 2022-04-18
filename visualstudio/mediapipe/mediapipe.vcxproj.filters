@@ -606,6 +606,30 @@
     <ClCompile Include="calculators\util\labels_to_render_data_calculator.pb.cc">
       <Filter>calculators\util</Filter>
     </ClCompile>
+    <ClCompile Include="calculators\tflite\tflite_tensors_to_segmentation_calculator.pb.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\image\image_transformation_calculator.pb.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="gpu\scale_mode.pb.cc">
+      <Filter>gpu</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\tflite\tflite_converter_calculator.pb.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\tflite\tflite_inference_calculator.pb.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\image\recolor_calculator.pb.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\image\set_alpha_calculator.pb.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\stream_handler\fixed_size_input_stream_handler.pb.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\mediapipe\framework\tool\options_util.h">
@@ -1015,6 +1039,30 @@
     </ClInclude>
     <ClInclude Include="calculators\util\labels_to_render_data_calculator.pb.h">
       <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\tflite\tflite_tensors_to_segmentation_calculator.pb.h">
+      <Filter>calculators\tflite</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\image\image_transformation_calculator.pb.h">
+      <Filter>calculators\image</Filter>
+    </ClInclude>
+    <ClInclude Include="gpu\scale_mode.pb.h">
+      <Filter>gpu</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\tflite\tflite_converter_calculator.pb.h">
+      <Filter>calculators\tflite</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\tflite\tflite_inference_calculator.pb.h">
+      <Filter>calculators\tflite</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\image\recolor_calculator.pb.h">
+      <Filter>calculators\image</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\image\set_alpha_calculator.pb.h">
+      <Filter>calculators\image</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\stream_handler\fixed_size_input_stream_handler.pb.h">
+      <Filter>framework\stream_handler</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

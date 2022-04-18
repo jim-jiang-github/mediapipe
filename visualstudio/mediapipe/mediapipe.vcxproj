@@ -170,6 +170,9 @@
     <ClCompile Include="calculators\core\flow_limiter_calculator.pb.cc" />
     <ClCompile Include="calculators\core\gate_calculator.pb.cc" />
     <ClCompile Include="calculators\core\split_vector_calculator.pb.cc" />
+    <ClCompile Include="calculators\image\image_transformation_calculator.pb.cc" />
+    <ClCompile Include="calculators\image\recolor_calculator.pb.cc" />
+    <ClCompile Include="calculators\image\set_alpha_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\image_to_tensor_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\inference_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\tensors_to_classification_calculator.pb.cc" />
@@ -177,8 +180,11 @@
     <ClCompile Include="calculators\tensor\tensors_to_floats_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\tensors_to_landmarks_calculator.pb.cc" />
     <ClCompile Include="calculators\tflite\ssd_anchors_calculator.pb.cc" />
+    <ClCompile Include="calculators\tflite\tflite_converter_calculator.pb.cc" />
     <ClCompile Include="calculators\tflite\tflite_custom_op_resolver_calculator.pb.cc" />
+    <ClCompile Include="calculators\tflite\tflite_inference_calculator.pb.cc" />
     <ClCompile Include="calculators\tflite\tflite_tensors_to_detections_calculator.pb.cc" />
+    <ClCompile Include="calculators\tflite\tflite_tensors_to_segmentation_calculator.pb.cc" />
     <ClCompile Include="calculators\util\annotation_overlay_calculator.pb.cc" />
     <ClCompile Include="calculators\util\association_calculator.pb.cc" />
     <ClCompile Include="calculators\util\collection_has_min_size_calculator.pb.cc" />
@@ -214,6 +220,7 @@
     <ClCompile Include="framework\status_handler.pb.cc" />
     <ClCompile Include="framework\stream_handler.pb.cc" />
     <ClCompile Include="framework\stream_handler\default_input_stream_handler.pb.cc" />
+    <ClCompile Include="framework\stream_handler\fixed_size_input_stream_handler.pb.cc" />
     <ClCompile Include="framework\stream_handler\sync_set_input_stream_handler.pb.cc" />
     <ClCompile Include="framework\thread_pool_executor.pb.cc" />
     <ClCompile Include="framework\tool\calculator_graph_template.pb.cc" />
@@ -221,6 +228,7 @@
     <ClCompile Include="framework\tool\packet_generator_wrapper_calculator.pb.cc" />
     <ClCompile Include="framework\tool\switch_container.pb.cc" />
     <ClCompile Include="gpu\gpu_origin.pb.cc" />
+    <ClCompile Include="gpu\scale_mode.pb.cc" />
     <ClCompile Include="modules\face_geometry\effect_renderer_calculator.pb.cc" />
     <ClCompile Include="modules\face_geometry\env_generator_calculator.pb.cc" />
     <ClCompile Include="modules\face_geometry\geometry_pipeline_calculator.pb.cc" />
@@ -328,6 +336,9 @@
     <ClInclude Include="calculators\core\concatenate_vector_calculator.pb.h" />
     <ClInclude Include="calculators\core\constant_side_packet_calculator.pb.h" />
     <ClInclude Include="calculators\core\flow_limiter_calculator.pb.h" />
+    <ClInclude Include="calculators\image\image_transformation_calculator.pb.h" />
+    <ClInclude Include="calculators\image\recolor_calculator.pb.h" />
+    <ClInclude Include="calculators\image\set_alpha_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\image_to_tensor_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\inference_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\tensors_to_classification_calculator.pb.h" />
@@ -335,8 +346,11 @@
     <ClInclude Include="calculators\tensor\tensors_to_floats_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\tensors_to_landmarks_calculator.pb.h" />
     <ClInclude Include="calculators\tflite\ssd_anchors_calculator.pb.h" />
+    <ClInclude Include="calculators\tflite\tflite_converter_calculator.pb.h" />
     <ClInclude Include="calculators\tflite\tflite_custom_op_resolver_calculator.pb.h" />
+    <ClInclude Include="calculators\tflite\tflite_inference_calculator.pb.h" />
     <ClInclude Include="calculators\tflite\tflite_tensors_to_detections_calculator.pb.h" />
+    <ClInclude Include="calculators\tflite\tflite_tensors_to_segmentation_calculator.pb.h" />
     <ClInclude Include="calculators\util\annotation_overlay_calculator.pb.h" />
     <ClInclude Include="calculators\util\association_calculator.pb.h" />
     <ClInclude Include="calculators\util\collection_has_min_size_calculator.pb.h" />
@@ -372,6 +386,7 @@
     <ClInclude Include="framework\status_handler.pb.h" />
     <ClInclude Include="framework\stream_handler.pb.h" />
     <ClInclude Include="framework\stream_handler\default_input_stream_handler.pb.h" />
+    <ClInclude Include="framework\stream_handler\fixed_size_input_stream_handler.pb.h" />
     <ClInclude Include="framework\stream_handler\sync_set_input_stream_handler.pb.h" />
     <ClInclude Include="framework\thread_pool_executor.pb.h" />
     <ClInclude Include="framework\tool\calculator_graph_template.pb.h" />
@@ -379,6 +394,7 @@
     <ClInclude Include="framework\tool\packet_generator_wrapper_calculator.pb.h" />
     <ClInclude Include="framework\tool\switch_container.pb.h" />
     <ClInclude Include="gpu\gpu_origin.pb.h" />
+    <ClInclude Include="gpu\scale_mode.pb.h" />
     <ClInclude Include="modules\face_geometry\effect_renderer_calculator.pb.h" />
     <ClInclude Include="modules\face_geometry\env_generator_calculator.pb.h" />
     <ClInclude Include="modules\face_geometry\geometry_pipeline_calculator.pb.h" />

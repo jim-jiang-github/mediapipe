@@ -63,7 +63,7 @@ node {
   output_stream: "TENSORS:detection_tensors"
   options: {
     [mediapipe.InferenceCalculatorOptions.ext] {
-      model_path: "./models/face_detection_short_range.tflite"
+      model_path: "../../mediapipe/modules/face_detection/face_detection_short_range.tflite"
       delegate { xnnpack {} }
     }
   }

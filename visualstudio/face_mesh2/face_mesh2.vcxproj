@@ -240,7 +240,8 @@
       <AdditionalDependencies>opencv_world410d.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)..\third_party\opencv\x64\opencv_world410d.dll $(TargetDir)opencv_world410d.dll</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -266,7 +267,8 @@
       <AdditionalDependencies>opencv_world410.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)..\third_party\opencv\x64\opencv_world410.dll $(TargetDir)opencv_world410.dll</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

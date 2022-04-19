@@ -172,13 +172,16 @@
     <ClCompile Include="calculators\core\split_vector_calculator.pb.cc" />
     <ClCompile Include="calculators\image\image_transformation_calculator.pb.cc" />
     <ClCompile Include="calculators\image\recolor_calculator.pb.cc" />
+    <ClCompile Include="calculators\image\segmentation_smoothing_calculator.pb.cc" />
     <ClCompile Include="calculators\image\set_alpha_calculator.pb.cc" />
+    <ClCompile Include="calculators\image\warp_affine_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\image_to_tensor_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\inference_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\tensors_to_classification_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\tensors_to_detections_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\tensors_to_floats_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\tensors_to_landmarks_calculator.pb.cc" />
+    <ClCompile Include="calculators\tensor\tensors_to_segmentation_calculator.pb.cc" />
     <ClCompile Include="calculators\tflite\ssd_anchors_calculator.pb.cc" />
     <ClCompile Include="calculators\tflite\tflite_converter_calculator.pb.cc" />
     <ClCompile Include="calculators\tflite\tflite_custom_op_resolver_calculator.pb.cc" />
@@ -199,8 +202,12 @@
     <ClCompile Include="calculators\util\local_file_contents_calculator.pb.cc" />
     <ClCompile Include="calculators\util\non_max_suppression_calculator.pb.cc" />
     <ClCompile Include="calculators\util\rect_to_render_data_calculator.pb.cc" />
+    <ClCompile Include="calculators\util\rect_to_render_scale_calculator.pb.cc" />
     <ClCompile Include="calculators\util\rect_transformation_calculator.pb.cc" />
+    <ClCompile Include="calculators\util\refine_landmarks_from_heatmap_calculator.pb.cc" />
     <ClCompile Include="calculators\util\thresholding_calculator.pb.cc" />
+    <ClCompile Include="calculators\util\visibility_copy_calculator.pb.cc" />
+    <ClCompile Include="calculators\util\visibility_smoothing_calculator.pb.cc" />
     <ClCompile Include="framework\calculator.pb.cc" />
     <ClCompile Include="framework\calculator_options.pb.cc" />
     <ClCompile Include="framework\deps\proto_descriptor.pb.cc" />
@@ -338,13 +345,16 @@
     <ClInclude Include="calculators\core\flow_limiter_calculator.pb.h" />
     <ClInclude Include="calculators\image\image_transformation_calculator.pb.h" />
     <ClInclude Include="calculators\image\recolor_calculator.pb.h" />
+    <ClInclude Include="calculators\image\segmentation_smoothing_calculator.pb.h" />
     <ClInclude Include="calculators\image\set_alpha_calculator.pb.h" />
+    <ClInclude Include="calculators\image\warp_affine_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\image_to_tensor_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\inference_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\tensors_to_classification_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\tensors_to_detections_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\tensors_to_floats_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\tensors_to_landmarks_calculator.pb.h" />
+    <ClInclude Include="calculators\tensor\tensors_to_segmentation_calculator.pb.h" />
     <ClInclude Include="calculators\tflite\ssd_anchors_calculator.pb.h" />
     <ClInclude Include="calculators\tflite\tflite_converter_calculator.pb.h" />
     <ClInclude Include="calculators\tflite\tflite_custom_op_resolver_calculator.pb.h" />
@@ -365,8 +375,12 @@
     <ClInclude Include="calculators\util\local_file_contents_calculator.pb.h" />
     <ClInclude Include="calculators\util\non_max_suppression_calculator.pb.h" />
     <ClInclude Include="calculators\util\rect_to_render_data_calculator.pb.h" />
+    <ClInclude Include="calculators\util\rect_to_render_scale_calculator.pb.h" />
     <ClInclude Include="calculators\util\rect_transformation_calculator.pb.h" />
+    <ClInclude Include="calculators\util\refine_landmarks_from_heatmap_calculator.pb.h" />
     <ClInclude Include="calculators\util\thresholding_calculator.pb.h" />
+    <ClInclude Include="calculators\util\visibility_copy_calculator.pb.h" />
+    <ClInclude Include="calculators\util\visibility_smoothing_calculator.pb.h" />
     <ClInclude Include="framework\calculator.pb.h" />
     <ClInclude Include="framework\calculator_options.pb.h" />
     <ClInclude Include="framework\deps\proto_descriptor.pb.h" />
@@ -531,6 +545,9 @@
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(SolutionDir)..\third_party\opencv\x64\opencv_world410d.dll $(TargetDir)opencv_world410d.dll</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -555,6 +572,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(SolutionDir)..\third_party\opencv\x64\opencv_world410.dll $(TargetDir)opencv_world410.dll</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

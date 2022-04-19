@@ -630,6 +630,27 @@
     <ClCompile Include="framework\stream_handler\fixed_size_input_stream_handler.pb.cc">
       <Filter>framework\stream_handler</Filter>
     </ClCompile>
+    <ClCompile Include="calculators\util\rect_to_render_scale_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\visibility_smoothing_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\image\segmentation_smoothing_calculator.pb.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\refine_landmarks_from_heatmap_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\visibility_copy_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\tensor\tensors_to_segmentation_calculator.pb.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\image\warp_affine_calculator.pb.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\mediapipe\framework\tool\options_util.h">
@@ -1063,6 +1084,27 @@
     </ClInclude>
     <ClInclude Include="framework\stream_handler\fixed_size_input_stream_handler.pb.h">
       <Filter>framework\stream_handler</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\rect_to_render_scale_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\visibility_smoothing_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\image\segmentation_smoothing_calculator.pb.h">
+      <Filter>calculators\image</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\refine_landmarks_from_heatmap_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\visibility_copy_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\tensor\tensors_to_segmentation_calculator.pb.h">
+      <Filter>calculators\tensor</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\image\warp_affine_calculator.pb.h">
+      <Filter>calculators\image</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -31,21 +31,12 @@
     <ClCompile Include="..\..\mediapipe\calculators\core\split_vector_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\image\image_properties_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\image_to_tensor_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\image_to_tensor_converter_opencv.cc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\image_to_tensor_utils.cc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_cpu.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_gl.cc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_detections_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_floats_calculator.cc" />
@@ -71,12 +62,7 @@
     <ClCompile Include="..\..\mediapipe\calculators\util\rect_to_render_data_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\rect_transformation_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\thresholding_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\to_image_calculator.cc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\to_image_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\framework\stream_handler\default_input_stream_handler.cc" />
     <ClCompile Include="..\..\mediapipe\framework\stream_handler\immediate_input_stream_handler.cc" />
     <ClCompile Include="..\..\mediapipe\framework\stream_handler\in_order_output_stream_handler.cc" />
@@ -90,12 +76,7 @@
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\modules\face_geometry\env_generator_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\modules\face_geometry\geometry_pipeline_calculator.cc" />
-    <ClCompile Include="..\demo_run_graph_main.cc" />
-    <ClCompile Include="face_mesh2.cc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="face_mesh_subgraph.cc" />
+    <ClCompile Include="face_mesh.cc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\third_party\abseil\absl.vcxproj">

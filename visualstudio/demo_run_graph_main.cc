@@ -1,3 +1,8 @@
+//
+// taken from ./mediapipe/examples/desktop/demo_run_graph_main.cc
+// program entry point.
+//
+
 // Copyright 2019 The MediaPipe Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -107,8 +112,8 @@ absl::Status RunMPPGraph() {
     camera_frame.copyTo(input_frame_mat);
 
     // Send image packet into the graph.
-    size_t frame_timestamp_us =
-        (double)cv::getTickCount() / (double)cv::getTickFrequency() * 1e6;
+    size_t frame_timestamp_us = (size_t)
+        ((double)cv::getTickCount() / (double)cv::getTickFrequency() * 1e6);
     MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(
         kInputStream, mediapipe::Adopt(input_frame.release())
                           .At(mediapipe::Timestamp(frame_timestamp_us))));

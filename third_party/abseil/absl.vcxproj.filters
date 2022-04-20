@@ -294,6 +294,9 @@
     <ClCompile Include=".\absl\time\internal\cctz\src\zone_info_source.cc">
       <Filter>time\internal\cctz\src</Filter>
     </ClCompile>
+    <ClCompile Include="absl\synchronization\blocking_counter.cc">
+      <Filter>synchronization</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".\absl\flags\flag.h">
@@ -304,6 +307,9 @@
     </ClInclude>
     <ClInclude Include=".\absl\base\options.h">
       <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="absl\synchronization\blocking_counter.h">
+      <Filter>synchronization</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

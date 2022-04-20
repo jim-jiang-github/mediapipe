@@ -95,11 +95,13 @@
     <ClCompile Include=".\absl\time\internal\cctz\src\zone_info_source.cc" />
     <ClCompile Include=".\absl\time\time.cc" />
     <ClCompile Include=".\absl\types\bad_optional_access.cc" />
+    <ClCompile Include="absl\synchronization\blocking_counter.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".\absl\base\options.h" />
     <ClInclude Include=".\absl\flags\flag.h" />
     <ClInclude Include=".\absl\flags\internal\flag.h" />
+    <ClInclude Include="absl\synchronization\blocking_counter.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

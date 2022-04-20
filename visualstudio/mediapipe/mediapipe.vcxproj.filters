@@ -82,6 +82,12 @@
     <Filter Include="util\filtering">
       <UniqueIdentifier>{0fdcfda2-481c-42cc-bcee-3ce066d08c00}</UniqueIdentifier>
     </Filter>
+    <Filter Include="calculators\video">
+      <UniqueIdentifier>{0d6c1704-db63-4d22-ba35-4e91aff944db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util\tracking">
+      <UniqueIdentifier>{a2e6667a-3542-4323-becc-6cfb76d62d22}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\mediapipe\framework\deps\status_builder.cc">
@@ -651,6 +657,76 @@
     <ClCompile Include="calculators\image\warp_affine_calculator.pb.cc">
       <Filter>calculators\image</Filter>
     </ClCompile>
+    <ClCompile Include="calculators\video\box_detector_calculator.pb.cc">
+      <Filter>calculators\video</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\box_detector.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\box_tracker.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\tracking.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\motion_models.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\region_flow.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\flow_packager.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\camera_motion.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\tracking.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\motion_models.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\measure_time.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\box_detector.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\tracking_visualization_utilities.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\box_tracker.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\timed_box_list_id_to_label_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\timed_box_list_to_render_data_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\video\opencv_video_encoder_calculator.pb.cc">
+      <Filter>calculators\video</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\image\feature_detector_calculator.pb.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\affine_transformation_runner_opencv.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\image\opencv_encoded_image_to_image_frame_calculator.pb.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\image_to_tensor_utils.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\image_to_tensor_converter_opencv.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\demo_run_graph_main.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\mediapipe\framework\tool\options_util.h">
@@ -1104,6 +1180,63 @@
       <Filter>calculators\tensor</Filter>
     </ClInclude>
     <ClInclude Include="calculators\image\warp_affine_calculator.pb.h">
+      <Filter>calculators\image</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\video\box_detector_calculator.pb.h">
+      <Filter>calculators\video</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\box_detector.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\box_tracker.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\tracking.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\motion_models.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\region_flow.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\flow_packager.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\camera_motion.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\tracking.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\motion_models.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\measure_time.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\box_detector.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\tracking_visualization_utilities.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\box_tracker.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\timed_box_list_id_to_label_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\timed_box_list_to_render_data_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\video\opencv_video_encoder_calculator.pb.h">
+      <Filter>calculators\video</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\image\feature_detector_calculator.pb.h">
+      <Filter>calculators\image</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\image\opencv_encoded_image_to_image_frame_calculator.pb.h">
       <Filter>calculators\image</Filter>
     </ClInclude>
   </ItemGroup>

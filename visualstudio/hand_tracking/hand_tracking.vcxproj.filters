@@ -1,12 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_tensors_to_floats_calculator.cc">
-      <Filter>util\tflite</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_tensors_to_detections_calculator.cc">
-      <Filter>util\tflite</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\mediapipe\framework\stream_handler\in_order_output_stream_handler.cc">
       <Filter>framework\stream_handler</Filter>
     </ClCompile>
@@ -25,9 +19,6 @@
     <ClCompile Include="..\..\mediapipe\calculators\core\constant_side_packet_calculator.cc">
       <Filter>calculators\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\mediapipe\calculators\core\concatenate_vector_calculator.cc">
-      <Filter>calculators\core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\mediapipe\calculators\core\begin_loop_calculator.cc">
       <Filter>calculators\core</Filter>
     </ClCompile>
@@ -38,9 +29,6 @@
       <Filter>calculators\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\calculators\core\gate_calculator.cc">
-      <Filter>calculators\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\calculators\core\packet_presence_calculator.cc">
       <Filter>calculators\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\calculators\core\previous_loopback_calculator.cc">
@@ -56,12 +44,6 @@
       <Filter>calculators\image</Filter>
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\calculators\tensor\image_to_tensor_calculator.cc">
-      <Filter>calculators\tensor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator.cc">
-      <Filter>calculators\tensor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_cpu.cc">
       <Filter>calculators\tensor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_detections_calculator.cc">
@@ -91,9 +73,6 @@
     <ClCompile Include="..\..\mediapipe\calculators\util\collection_has_min_size_calculator.cc">
       <Filter>calculators\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\mediapipe\calculators\util\detection_projection_calculator.cc">
-      <Filter>calculators\util</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\mediapipe\calculators\util\detections_to_rects_calculator.cc">
       <Filter>calculators\util</Filter>
     </ClCompile>
@@ -101,15 +80,6 @@
       <Filter>calculators\util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\calculators\util\landmark_projection_calculator.cc">
-      <Filter>calculators\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_refinement_calculator.cc">
-      <Filter>calculators\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_smoothing_calculator.cc">
-      <Filter>calculators\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_to_detection_calculator.cc">
       <Filter>calculators\util</Filter>
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_to_render_data_calculator.cc">
@@ -130,19 +100,7 @@
     <ClCompile Include="..\..\mediapipe\calculators\util\thresholding_calculator.cc">
       <Filter>calculators\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\mediapipe\calculators\util\to_image_calculator.cc">
-      <Filter>calculators\util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\image_to_tensor_converter_opencv.cc">
-      <Filter>calculators\tensor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\image_to_tensor_utils.cc">
-      <Filter>calculators\tensor</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\framework\tool\switch_container.cc">
-      <Filter>framework\tool</Filter>
-    </ClCompile>
-    <ClCompile Include="hand_tracking_subgraph.cc" />
+    <ClCompile Include="hand_tracking.cc" />
     <ClCompile Include="..\..\mediapipe\modules\hand_landmark\calculators\hand_landmarks_to_rect_calculator.cc">
       <Filter>modules\hand_landmark</Filter>
     </ClCompile>
@@ -161,15 +119,14 @@
     <ClCompile Include="..\..\mediapipe\calculators\util\landmark_letterbox_removal_calculator.cc">
       <Filter>calculators\util</Filter>
     </ClCompile>
-    <ClCompile Include="..\demo_run_graph_main.cc" />
+    <ClCompile Include="..\..\mediapipe\framework\tool\switch_container.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_cpu.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="util">
-      <UniqueIdentifier>{66ad313b-3e7e-4338-a5bf-05c68b38c758}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="util\tflite">
-      <UniqueIdentifier>{3dcb1bd3-8fe3-4a15-8f48-f2c823c9932f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="calculators">
       <UniqueIdentifier>{5554f012-a93b-4655-93f3-aec895921213}</UniqueIdentifier>
     </Filter>

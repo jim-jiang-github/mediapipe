@@ -112,6 +112,7 @@ node {
   node_options: {
     [type.googleapis.com/mediapipe.TfLiteInferenceCalculatorOptions] {
       model_path: "../../mediapipe/models/hair_segmentation.tflite"
+      delegate { xnnpack {} }
     }
   }
 }

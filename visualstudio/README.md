@@ -1,14 +1,1 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿Greeting from andre :-)
-
-It took me almost 3 weeks to make face mesh build on Visual Studio before i can test and debug easily. I'd like to share this for anyone who may be interested, and hopefully save your valuable time. Kudos to mediapipe team for sharing us this fastastic work.
-
-Before open up Visual Studio 2019 and make the build, go ./third_party/opencv/x64 and unzip 2 chunky dlls (github 50MB size limit). Have fun!.
-
-**Now you know everything i know**
-
-
-
-
-
-
-
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿Greeting from andre :-)It took me almost 3 weeks to make face mesh build on Visual Studio before I can test and debug easily. So I'd like to share this to anyone who is going to do the same thing like I did. Would be glad if this saves your precious time. Many thanks to mediapipe team for sharing this fantastic work so I can have lot of fun.Before open up Visual Studio 2019 and make the build, install PowerShell if you haven't yet. Have fun!.**Now you know everything I know**

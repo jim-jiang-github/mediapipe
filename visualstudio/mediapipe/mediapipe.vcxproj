@@ -545,7 +545,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)..\third_party\opencv\x64\opencv_world410d.dll $(TargetDir)opencv_world410d.dll</Command>
+      <Command>powershell Expand-Archive -Force "$(SolutionDir)..\third_party\opencv\x64\opencv_world410d.zip" -DestinationPath "$(SolutionDir)bin\x64\Debug"</Command>
+      <Message>unzip DLLs...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -572,7 +573,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(SolutionDir)..\third_party\opencv\x64\opencv_world410.dll $(TargetDir)opencv_world410.dll</Command>
+      <Command>powershell Expand-Archive -Force "$(SolutionDir)..\third_party\opencv\x64\opencv_world410.zip" -DestinationPath "$(SolutionDir)bin\x64\Release"</Command>
+      <Message>unzip DLLs...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

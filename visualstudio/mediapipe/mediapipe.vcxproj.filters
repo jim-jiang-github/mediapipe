@@ -88,6 +88,12 @@
     <Filter Include="util\tracking">
       <UniqueIdentifier>{a2e6667a-3542-4323-becc-6cfb76d62d22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="modules\holistic_landmark">
+      <UniqueIdentifier>{e49395e7-483e-4bae-8b30-edc9a87d20ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modules\holistic_landmark\calculators">
+      <UniqueIdentifier>{8ccdad2a-ba12-41ca-bc8b-ff541fb14073}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\mediapipe\framework\deps\status_builder.cc">
@@ -727,6 +733,9 @@
       <Filter>calculators\tensor</Filter>
     </ClCompile>
     <ClCompile Include="..\demo_run_graph_main.cc" />
+    <ClCompile Include="modules\holistic_landmark\calculators\roi_tracking_calculator.pb.cc">
+      <Filter>modules\holistic_landmark\calculators</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\mediapipe\framework\tool\options_util.h">
@@ -1238,6 +1247,9 @@
     </ClInclude>
     <ClInclude Include="calculators\image\opencv_encoded_image_to_image_frame_calculator.pb.h">
       <Filter>calculators\image</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\holistic_landmark\calculators\roi_tracking_calculator.pb.h">
+      <Filter>modules\holistic_landmark\calculators</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

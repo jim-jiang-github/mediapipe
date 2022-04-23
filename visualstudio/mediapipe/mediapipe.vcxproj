@@ -233,6 +233,7 @@
     <ClCompile Include="modules\face_geometry\protos\face_geometry.pb.cc" />
     <ClCompile Include="modules\face_geometry\protos\geometry_pipeline_metadata.pb.cc" />
     <ClCompile Include="modules\face_geometry\protos\mesh_3d.pb.cc" />
+    <ClCompile Include="modules\holistic_landmark\calculators\roi_tracking_calculator.pb.cc" />
     <ClCompile Include="util\color.pb.cc" />
     <ClCompile Include="util\render_data.pb.cc" />
     <ClCompile Include="util\tracking\box_detector.pb.cc" />
@@ -408,6 +409,7 @@
     <ClInclude Include="modules\face_geometry\protos\face_geometry.pb.h" />
     <ClInclude Include="modules\face_geometry\protos\geometry_pipeline_metadata.pb.h" />
     <ClInclude Include="modules\face_geometry\protos\mesh_3d.pb.h" />
+    <ClInclude Include="modules\holistic_landmark\calculators\roi_tracking_calculator.pb.h" />
     <ClInclude Include="util\color.pb.h" />
     <ClInclude Include="util\render_data.pb.h" />
     <ClInclude Include="util\tracking\box_detector.pb.h" />

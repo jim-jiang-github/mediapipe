@@ -1,0 +1,236 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\in_order_output_stream_handler.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\default_input_stream_handler.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\immediate_input_stream_handler.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\switch_demux_calculator.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\switch_mux_calculator.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\constant_side_packet_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\flow_limiter_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\gate_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\packet_presence_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\previous_loopback_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\split_vector_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\image_properties_calculator.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\image_to_tensor_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_cpu.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_detections_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_floats_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_landmarks_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\ssd_anchors_calculator.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_model_calculator.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\annotation_overlay_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\detections_to_rects_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\detections_to_render_data_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmark_projection_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_smoothing_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_to_detection_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_to_render_data_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\local_file_contents_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\non_max_suppression_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\rect_to_render_data_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\rect_transformation_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\thresholding_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\switch_container.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\detection_letterbox_removal_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\world_landmark_projection_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmark_letterbox_removal_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\recolor_calculator.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\fixed_size_input_stream_handler.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\rect_to_render_scale_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\merge_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\visibility_smoothing_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\segmentation_smoothing_calculator.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\from_image_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\split_proto_list_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\alignment_points_to_rects_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\refine_landmarks_from_heatmap_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\visibility_copy_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_segmentation_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\warp_affine_calculator.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\inverse_matrix_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="holistic_tracking.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\holistic_landmark\calculators\hand_detections_from_pose_to_rects_calculator.cc">
+      <Filter>modules\holistic_landmark\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\side_packet_to_stream_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\set_landmark_visibility_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\concatenate_proto_list_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\concatenate_vector_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\hand_landmark\calculators\hand_landmarks_to_rect_calculator.cc">
+      <Filter>modules\hand_landmark\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\holistic_landmark\calculators\roi_tracking_calculator.cc">
+      <Filter>modules\holistic_landmark\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_classification_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\to_image_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_custom_op_resolver_calculator.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmark_visibility_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\detection_projection_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_refinement_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="calculators">
+      <UniqueIdentifier>{5554f012-a93b-4655-93f3-aec895921213}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="calculators\util">
+      <UniqueIdentifier>{4c18f273-9c3b-4def-8b0b-5059f90ea0d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="calculators\core">
+      <UniqueIdentifier>{1e6c472e-5129-44a1-ac87-c6b459884aab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="calculators\image">
+      <UniqueIdentifier>{8521d7aa-2beb-4fe5-a501-a4d07d5b807b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="calculators\tensor">
+      <UniqueIdentifier>{3a256aad-7cce-4fe5-8d68-a20632745ca9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="calculators\tflite">
+      <UniqueIdentifier>{3168ea7c-bebf-4387-bba0-d1d40340bb42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework">
+      <UniqueIdentifier>{dabe6ca6-7689-42c7-88c8-dbf466308b85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\stream_handler">
+      <UniqueIdentifier>{46d86e2b-d069-41ef-b5ae-bf7b799d1848}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\tool">
+      <UniqueIdentifier>{bc0431b0-7696-4a98-b2af-9f2eebc816e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modules">
+      <UniqueIdentifier>{544ebda2-dc4d-489c-9a16-f9eaa0a53340}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modules\holistic_landmark">
+      <UniqueIdentifier>{adcd7416-0826-4c82-96ec-7203efa1db69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modules\holistic_landmark\calculators">
+      <UniqueIdentifier>{fea297de-1c23-4b97-a9ad-6ddfc4e99c55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modules\hand_landmark">
+      <UniqueIdentifier>{7e78a272-fd22-4d57-a617-07cc22bb6a54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modules\hand_landmark\calculators">
+      <UniqueIdentifier>{fc54702c-86a6-4e88-9f5c-eea8b12d7765}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

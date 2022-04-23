@@ -94,6 +94,15 @@
     <Filter Include="modules\holistic_landmark\calculators">
       <UniqueIdentifier>{8ccdad2a-ba12-41ca-bc8b-ff541fb14073}</UniqueIdentifier>
     </Filter>
+    <Filter Include="graphs">
+      <UniqueIdentifier>{dca9dbaa-1187-4edf-bab7-60611d2f5a45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="graphs\iris_tracking">
+      <UniqueIdentifier>{0b0a33a4-8faf-404e-97f7-a1843deccdc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="graphs\iris_tracking\calculators">
+      <UniqueIdentifier>{f0e3f3aa-b47d-4355-bdbc-f2929ded3147}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\mediapipe\framework\deps\status_builder.cc">
@@ -736,6 +745,21 @@
     <ClCompile Include="modules\holistic_landmark\calculators\roi_tracking_calculator.pb.cc">
       <Filter>modules\holistic_landmark\calculators</Filter>
     </ClCompile>
+    <ClCompile Include="graphs\iris_tracking\calculators\iris_to_depth_calculator.pb.cc">
+      <Filter>graphs\iris_tracking\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="graphs\iris_tracking\calculators\iris_to_render_data_calculator.pb.cc">
+      <Filter>graphs\iris_tracking\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\util\detection_label_id_to_text_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\tflite\tflite_tensors_to_landmarks_calculator.pb.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\image\image_cropping_calculator.pb.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\mediapipe\framework\tool\options_util.h">
@@ -1250,6 +1274,21 @@
     </ClInclude>
     <ClInclude Include="modules\holistic_landmark\calculators\roi_tracking_calculator.pb.h">
       <Filter>modules\holistic_landmark\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="graphs\iris_tracking\calculators\iris_to_depth_calculator.pb.h">
+      <Filter>graphs\iris_tracking\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="graphs\iris_tracking\calculators\iris_to_render_data_calculator.pb.h">
+      <Filter>graphs\iris_tracking\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\util\detection_label_id_to_text_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\tflite\tflite_tensors_to_landmarks_calculator.pb.h">
+      <Filter>calculators\tflite</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\image\image_cropping_calculator.pb.h">
+      <Filter>calculators\image</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\in_order_output_stream_handler.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\default_input_stream_handler.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\immediate_input_stream_handler.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\flow_limiter_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\fixed_size_input_stream_handler.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="face_detection.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\annotation_overlay_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\detections_to_render_data_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\to_image_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\image_to_tensor_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_cpu.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\ssd_anchors_calculator.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_detections_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\non_max_suppression_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\detection_projection_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="calculators">
+      <UniqueIdentifier>{5554f012-a93b-4655-93f3-aec895921213}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="calculators\core">
+      <UniqueIdentifier>{1e6c472e-5129-44a1-ac87-c6b459884aab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="calculators\tflite">
+      <UniqueIdentifier>{3168ea7c-bebf-4387-bba0-d1d40340bb42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework">
+      <UniqueIdentifier>{dabe6ca6-7689-42c7-88c8-dbf466308b85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="framework\stream_handler">
+      <UniqueIdentifier>{46d86e2b-d069-41ef-b5ae-bf7b799d1848}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="calculators\util">
+      <UniqueIdentifier>{3aea09f2-5b2a-41cf-9b35-1110fc038011}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="calculators\tensor">
+      <UniqueIdentifier>{802996d8-54b5-4dd4-b800-6bb52c7a0f20}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

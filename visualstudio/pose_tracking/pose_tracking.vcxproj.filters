@@ -149,6 +149,9 @@
     <ClCompile Include="..\..\mediapipe\calculators\util\inverse_matrix_calculator.cc">
       <Filter>calculators\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\mediapipe\calculators\util\detection_label_id_to_text_calculator.pb.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="calculators">
@@ -178,5 +181,10 @@
     <Filter Include="framework\tool">
       <UniqueIdentifier>{bc0431b0-7696-4a98-b2af-9f2eebc816e5}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\mediapipe\calculators\util\detection_label_id_to_text_calculator.pb.h">
+      <Filter>calculators\util</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -14,7 +14,7 @@ DEFINE_SUBGRAPH(FaceRendererGpu, "../../mediapipe/graphs/face_mesh/subgraphs/fac
 #endif
 
 DEFINE_SUBGRAPH(FaceLandmarkFrontCpu, "../../mediapipe/modules/face_landmark/face_landmark_front_cpu.pbtxt");
-DEFINE_SUBGRAPH(FaceDetectionShortRangeCpu, "face_detection_short_range_cpu.pbtxt"); // ../../mediapipe/modules/face_detection
+DEFINE_SUBGRAPH(FaceDetectionShortRangeCpu, "../face_detection/face_detection_short_range_cpu.pbtxt"); // ../../mediapipe/modules/face_detection
 DEFINE_SUBGRAPH(FaceDetectionFrontDetectionToRoi, "../../mediapipe/modules/face_landmark/face_detection_front_detection_to_roi.pbtxt");
 DEFINE_SUBGRAPH(FaceLandmarkCpu, "../../mediapipe/modules/face_landmark/face_landmark_cpu.pbtxt");
 DEFINE_SUBGRAPH(FaceLandmarkLandmarksToRoi, "../../mediapipe/modules/face_landmark/face_landmark_landmarks_to_roi.pbtxt");

@@ -155,6 +155,7 @@
     <ClCompile Include="calculators\core\gate_calculator.pb.cc" />
     <ClCompile Include="calculators\core\split_vector_calculator.pb.cc" />
     <ClCompile Include="calculators\image\feature_detector_calculator.pb.cc" />
+    <ClCompile Include="calculators\image\image_cropping_calculator.pb.cc" />
     <ClCompile Include="calculators\image\image_transformation_calculator.pb.cc" />
     <ClCompile Include="calculators\image\opencv_encoded_image_to_image_frame_calculator.pb.cc" />
     <ClCompile Include="calculators\image\recolor_calculator.pb.cc" />
@@ -173,12 +174,14 @@
     <ClCompile Include="calculators\tflite\tflite_custom_op_resolver_calculator.pb.cc" />
     <ClCompile Include="calculators\tflite\tflite_inference_calculator.pb.cc" />
     <ClCompile Include="calculators\tflite\tflite_tensors_to_detections_calculator.pb.cc" />
+    <ClCompile Include="calculators\tflite\tflite_tensors_to_landmarks_calculator.pb.cc" />
     <ClCompile Include="calculators\tflite\tflite_tensors_to_segmentation_calculator.pb.cc" />
     <ClCompile Include="calculators\util\annotation_overlay_calculator.pb.cc" />
     <ClCompile Include="calculators\util\association_calculator.pb.cc" />
     <ClCompile Include="calculators\util\collection_has_min_size_calculator.pb.cc" />
     <ClCompile Include="calculators\util\detections_to_rects_calculator.pb.cc" />
     <ClCompile Include="calculators\util\detections_to_render_data_calculator.pb.cc" />
+    <ClCompile Include="calculators\util\detection_label_id_to_text_calculator.pb.cc" />
     <ClCompile Include="calculators\util\labels_to_render_data_calculator.pb.cc" />
     <ClCompile Include="calculators\util\landmarks_refinement_calculator.pb.cc" />
     <ClCompile Include="calculators\util\landmarks_smoothing_calculator.pb.cc" />
@@ -226,6 +229,8 @@
     <ClCompile Include="framework\tool\switch_container.pb.cc" />
     <ClCompile Include="gpu\gpu_origin.pb.cc" />
     <ClCompile Include="gpu\scale_mode.pb.cc" />
+    <ClCompile Include="graphs\iris_tracking\calculators\iris_to_depth_calculator.pb.cc" />
+    <ClCompile Include="graphs\iris_tracking\calculators\iris_to_render_data_calculator.pb.cc" />
     <ClCompile Include="modules\face_geometry\effect_renderer_calculator.pb.cc" />
     <ClCompile Include="modules\face_geometry\env_generator_calculator.pb.cc" />
     <ClCompile Include="modules\face_geometry\geometry_pipeline_calculator.pb.cc" />
@@ -331,6 +336,7 @@
     <ClInclude Include="calculators\core\constant_side_packet_calculator.pb.h" />
     <ClInclude Include="calculators\core\flow_limiter_calculator.pb.h" />
     <ClInclude Include="calculators\image\feature_detector_calculator.pb.h" />
+    <ClInclude Include="calculators\image\image_cropping_calculator.pb.h" />
     <ClInclude Include="calculators\image\image_transformation_calculator.pb.h" />
     <ClInclude Include="calculators\image\opencv_encoded_image_to_image_frame_calculator.pb.h" />
     <ClInclude Include="calculators\image\recolor_calculator.pb.h" />
@@ -349,12 +355,14 @@
     <ClInclude Include="calculators\tflite\tflite_custom_op_resolver_calculator.pb.h" />
     <ClInclude Include="calculators\tflite\tflite_inference_calculator.pb.h" />
     <ClInclude Include="calculators\tflite\tflite_tensors_to_detections_calculator.pb.h" />
+    <ClInclude Include="calculators\tflite\tflite_tensors_to_landmarks_calculator.pb.h" />
     <ClInclude Include="calculators\tflite\tflite_tensors_to_segmentation_calculator.pb.h" />
     <ClInclude Include="calculators\util\annotation_overlay_calculator.pb.h" />
     <ClInclude Include="calculators\util\association_calculator.pb.h" />
     <ClInclude Include="calculators\util\collection_has_min_size_calculator.pb.h" />
     <ClInclude Include="calculators\util\detections_to_rects_calculator.pb.h" />
     <ClInclude Include="calculators\util\detections_to_render_data_calculator.pb.h" />
+    <ClInclude Include="calculators\util\detection_label_id_to_text_calculator.pb.h" />
     <ClInclude Include="calculators\util\labels_to_render_data_calculator.pb.h" />
     <ClInclude Include="calculators\util\landmarks_refinement_calculator.pb.h" />
     <ClInclude Include="calculators\util\landmarks_smoothing_calculator.pb.h" />
@@ -402,6 +410,8 @@
     <ClInclude Include="framework\tool\switch_container.pb.h" />
     <ClInclude Include="gpu\gpu_origin.pb.h" />
     <ClInclude Include="gpu\scale_mode.pb.h" />
+    <ClInclude Include="graphs\iris_tracking\calculators\iris_to_depth_calculator.pb.h" />
+    <ClInclude Include="graphs\iris_tracking\calculators\iris_to_render_data_calculator.pb.h" />
     <ClInclude Include="modules\face_geometry\effect_renderer_calculator.pb.h" />
     <ClInclude Include="modules\face_geometry\env_generator_calculator.pb.h" />
     <ClInclude Include="modules\face_geometry\geometry_pipeline_calculator.pb.h" />

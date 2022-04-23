@@ -19,34 +19,39 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\mediapipe\calculators\core\begin_loop_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\core\clip_detection_vector_size_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\core\concatenate_proto_list_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\core\constant_side_packet_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\core\end_loop_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\core\flow_limiter_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\core\gate_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\core\merge_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\core\packet_presence_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\core\previous_loopback_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\core\side_packet_to_stream_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\core\split_proto_list_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\core\split_vector_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\image\image_cropping_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\image\image_properties_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\image\recolor_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\image\segmentation_smoothing_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\image\warp_affine_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\image\image_transformation_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\image_to_tensor_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_cpu.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_detections_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_floats_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_landmarks_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_segmentation_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tflite\ssd_anchors_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_converter_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_custom_op_resolver_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_inference_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_model_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\alignment_points_to_rects_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_tensors_to_landmarks_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\annotation_overlay_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\association_norm_rect_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\collection_has_min_size_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\detections_to_rects_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\detections_to_render_data_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\detection_letterbox_removal_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\from_image_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\inverse_matrix_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_smoothing_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\detection_label_id_to_text_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\detection_projection_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_refinement_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_to_detection_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_to_render_data_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\landmark_letterbox_removal_calculator.cc" />
@@ -54,13 +59,9 @@
     <ClCompile Include="..\..\mediapipe\calculators\util\local_file_contents_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\non_max_suppression_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\rect_to_render_data_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\rect_to_render_scale_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\rect_transformation_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\refine_landmarks_from_heatmap_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\util\thresholding_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\visibility_copy_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\visibility_smoothing_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\world_landmark_projection_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\to_image_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\framework\stream_handler\default_input_stream_handler.cc" />
     <ClCompile Include="..\..\mediapipe\framework\stream_handler\fixed_size_input_stream_handler.cc" />
     <ClCompile Include="..\..\mediapipe\framework\stream_handler\immediate_input_stream_handler.cc" />
@@ -68,8 +69,10 @@
     <ClCompile Include="..\..\mediapipe\framework\tool\switch_container.cc" />
     <ClCompile Include="..\..\mediapipe\framework\tool\switch_demux_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\framework\tool\switch_mux_calculator.cc" />
-    <ClCompile Include="..\mediapipe\calculators\util\detection_label_id_to_text_calculator.pb.cc" />
-    <ClCompile Include="pose_tracking.cc" />
+    <ClCompile Include="..\..\mediapipe\graphs\face_mesh\calculators\face_landmarks_to_render_data_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\graphs\iris_tracking\calculators\iris_to_render_data_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\graphs\iris_tracking\calculators\update_face_landmarks_calculator.cc" />
+    <ClCompile Include="iris_tracking.cc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\third_party\abseil\absl.vcxproj">
@@ -91,16 +94,13 @@
       <Project>{e3c083bf-698d-456a-b5b5-82a6839a4ccc}</Project>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\mediapipe\calculators\util\detection_label_id_to_text_calculator.pb.h" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{F4A954D6-BA2C-4B97-8191-D0AEB08D3AC9}</ProjectGuid>
+    <ProjectGuid>{27B3A85D-E1F1-474E-976B-BD33BDC0D462}</ProjectGuid>
     <RootNamespace>mediapipe</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>pose_tracking_cpu</ProjectName>
+    <ProjectName>iris_tracking</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

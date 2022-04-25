@@ -847,7 +847,7 @@ template <int C, class FilterWeightMultiplier>
 void PushPullFiltering<C, FilterWeightMultiplier>::PerformPushPullImpl(
     const int readout_level, const cv::Mat* input_frame,
     std::vector<cv::Mat*>* mip_map_ptr) {
-  const float* filter_weights;
+  const float* filter_weights = nullptr;
   int num_filter_elems;
   switch (filter_type_) {
     case BINOMIAL_3X3:

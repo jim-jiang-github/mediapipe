@@ -760,6 +760,96 @@
     <ClCompile Include="calculators\image\image_cropping_calculator.pb.cc">
       <Filter>calculators\image</Filter>
     </ClCompile>
+    <ClCompile Include="calculators\core\packet_resampler_calculator.pb.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\video\tracked_detection_manager_calculator.pb.cc">
+      <Filter>calculators\video</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\video\motion_analysis_calculator.pb.cc">
+      <Filter>calculators\video</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\video\flow_packager_calculator.pb.cc">
+      <Filter>calculators\video</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\video\box_tracker_calculator.pb.cc">
+      <Filter>calculators\video</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\tracked_detection_manager_config.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\motion_analysis.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\motion_estimation.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\motion_saliency.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\region_flow_computation.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\tone_estimation.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\tone_models.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\frame_selection.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\frame_selection_solution_evaluator.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="util\tracking\push_pull_filtering.pb.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\tracked_detection.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\tracked_detection_manager.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\motion_analysis.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\motion_estimation.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\flow_packager.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\camera_motion.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\motion_saliency.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\parallel_invoker.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\region_flow.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\region_flow_computation.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\image_util.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\streaming_buffer.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\region_flow_visualization.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\tone_estimation.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\tracking\tone_models.cc">
+      <Filter>util\tracking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\mediapipe\framework\tool\options_util.h">
@@ -1289,6 +1379,96 @@
     </ClInclude>
     <ClInclude Include="calculators\image\image_cropping_calculator.pb.h">
       <Filter>calculators\image</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\core\packet_resampler_calculator.pb.h">
+      <Filter>calculators\core</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\video\tracked_detection_manager_calculator.pb.h">
+      <Filter>calculators\video</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\video\motion_analysis_calculator.pb.h">
+      <Filter>calculators\video</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\video\flow_packager_calculator.pb.h">
+      <Filter>calculators\video</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\video\box_tracker_calculator.pb.h">
+      <Filter>calculators\video</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\tracked_detection_manager_config.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\motion_analysis.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\motion_estimation.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\motion_saliency.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\region_flow_computation.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\tone_estimation.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\tone_models.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\frame_selection.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\frame_selection_solution_evaluator.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="util\tracking\push_pull_filtering.pb.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\tracked_detection.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\tracked_detection_manager.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\motion_analysis.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\motion_estimation.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\flow_packager.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\camera_motion.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\motion_saliency.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\parallel_invoker.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\region_flow.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\region_flow_computation.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\image_util.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\streaming_buffer.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\region_flow_visualization.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\tone_estimation.h">
+      <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\tracking\tone_models.h">
+      <Filter>util\tracking</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

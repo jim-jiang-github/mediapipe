@@ -134,8 +134,25 @@
     <ClCompile Include="..\..\mediapipe\util\tflite\tflite_model_loader.cc" />
     <ClCompile Include="..\..\mediapipe\util\tracking\box_detector.cc" />
     <ClCompile Include="..\..\mediapipe\util\tracking\box_tracker.cc" />
+    <ClCompile Include="..\..\mediapipe\util\tracking\camera_motion.cc" />
+    <ClCompile Include="..\..\mediapipe\util\tracking\flow_packager.cc" />
+    <ClCompile Include="..\..\mediapipe\util\tracking\image_util.cc" />
     <ClCompile Include="..\..\mediapipe\util\tracking\measure_time.cc" />
+    <ClCompile Include="..\..\mediapipe\util\tracking\motion_analysis.cc" />
+    <ClCompile Include="..\..\mediapipe\util\tracking\motion_estimation.cc">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="..\..\mediapipe\util\tracking\motion_models.cc" />
+    <ClCompile Include="..\..\mediapipe\util\tracking\motion_saliency.cc" />
+    <ClCompile Include="..\..\mediapipe\util\tracking\parallel_invoker.cc" />
+    <ClCompile Include="..\..\mediapipe\util\tracking\region_flow.cc" />
+    <ClCompile Include="..\..\mediapipe\util\tracking\region_flow_computation.cc" />
+    <ClCompile Include="..\..\mediapipe\util\tracking\region_flow_visualization.cc" />
+    <ClCompile Include="..\..\mediapipe\util\tracking\streaming_buffer.cc" />
+    <ClCompile Include="..\..\mediapipe\util\tracking\tone_estimation.cc" />
+    <ClCompile Include="..\..\mediapipe\util\tracking\tone_models.cc" />
+    <ClCompile Include="..\..\mediapipe\util\tracking\tracked_detection.cc" />
+    <ClCompile Include="..\..\mediapipe\util\tracking\tracked_detection_manager.cc" />
     <ClCompile Include="..\..\mediapipe\util\tracking\tracking.cc" />
     <ClCompile Include="..\..\mediapipe\util\tracking\tracking_visualization_utilities.cc" />
     <ClCompile Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\mediapipe\landmarks_to_transform_matrix.cc" />
@@ -153,6 +170,7 @@
     <ClCompile Include="calculators\core\constant_side_packet_calculator.pb.cc" />
     <ClCompile Include="calculators\core\flow_limiter_calculator.pb.cc" />
     <ClCompile Include="calculators\core\gate_calculator.pb.cc" />
+    <ClCompile Include="calculators\core\packet_resampler_calculator.pb.cc" />
     <ClCompile Include="calculators\core\split_vector_calculator.pb.cc" />
     <ClCompile Include="calculators\image\feature_detector_calculator.pb.cc" />
     <ClCompile Include="calculators\image\image_cropping_calculator.pb.cc" />
@@ -200,7 +218,11 @@
     <ClCompile Include="calculators\util\visibility_copy_calculator.pb.cc" />
     <ClCompile Include="calculators\util\visibility_smoothing_calculator.pb.cc" />
     <ClCompile Include="calculators\video\box_detector_calculator.pb.cc" />
+    <ClCompile Include="calculators\video\box_tracker_calculator.pb.cc" />
+    <ClCompile Include="calculators\video\flow_packager_calculator.pb.cc" />
+    <ClCompile Include="calculators\video\motion_analysis_calculator.pb.cc" />
     <ClCompile Include="calculators\video\opencv_video_encoder_calculator.pb.cc" />
+    <ClCompile Include="calculators\video\tracked_detection_manager_calculator.pb.cc" />
     <ClCompile Include="framework\calculator.pb.cc" />
     <ClCompile Include="framework\calculator_options.pb.cc" />
     <ClCompile Include="framework\deps\proto_descriptor.pb.cc" />
@@ -245,8 +267,18 @@
     <ClCompile Include="util\tracking\box_tracker.pb.cc" />
     <ClCompile Include="util\tracking\camera_motion.pb.cc" />
     <ClCompile Include="util\tracking\flow_packager.pb.cc" />
+    <ClCompile Include="util\tracking\frame_selection.pb.cc" />
+    <ClCompile Include="util\tracking\frame_selection_solution_evaluator.pb.cc" />
+    <ClCompile Include="util\tracking\motion_analysis.pb.cc" />
+    <ClCompile Include="util\tracking\motion_estimation.pb.cc" />
     <ClCompile Include="util\tracking\motion_models.pb.cc" />
+    <ClCompile Include="util\tracking\motion_saliency.pb.cc" />
+    <ClCompile Include="util\tracking\push_pull_filtering.pb.cc" />
     <ClCompile Include="util\tracking\region_flow.pb.cc" />
+    <ClCompile Include="util\tracking\region_flow_computation.pb.cc" />
+    <ClCompile Include="util\tracking\tone_estimation.pb.cc" />
+    <ClCompile Include="util\tracking\tone_models.pb.cc" />
+    <ClCompile Include="util\tracking\tracked_detection_manager_config.pb.cc" />
     <ClCompile Include="util\tracking\tracking.pb.cc" />
     <ClInclude Include="..\..\mediapipe\framework\api2\node.h" />
     <ClInclude Include="..\..\mediapipe\framework\api2\packet.h" />
@@ -318,8 +350,23 @@
     <ClInclude Include="..\..\mediapipe\util\tflite\tflite_model_loader.h" />
     <ClInclude Include="..\..\mediapipe\util\tracking\box_detector.h" />
     <ClInclude Include="..\..\mediapipe\util\tracking\box_tracker.h" />
+    <ClInclude Include="..\..\mediapipe\util\tracking\camera_motion.h" />
+    <ClInclude Include="..\..\mediapipe\util\tracking\flow_packager.h" />
+    <ClInclude Include="..\..\mediapipe\util\tracking\image_util.h" />
     <ClInclude Include="..\..\mediapipe\util\tracking\measure_time.h" />
+    <ClInclude Include="..\..\mediapipe\util\tracking\motion_analysis.h" />
+    <ClInclude Include="..\..\mediapipe\util\tracking\motion_estimation.h" />
     <ClInclude Include="..\..\mediapipe\util\tracking\motion_models.h" />
+    <ClInclude Include="..\..\mediapipe\util\tracking\motion_saliency.h" />
+    <ClInclude Include="..\..\mediapipe\util\tracking\parallel_invoker.h" />
+    <ClInclude Include="..\..\mediapipe\util\tracking\region_flow.h" />
+    <ClInclude Include="..\..\mediapipe\util\tracking\region_flow_computation.h" />
+    <ClInclude Include="..\..\mediapipe\util\tracking\region_flow_visualization.h" />
+    <ClInclude Include="..\..\mediapipe\util\tracking\streaming_buffer.h" />
+    <ClInclude Include="..\..\mediapipe\util\tracking\tone_estimation.h" />
+    <ClInclude Include="..\..\mediapipe\util\tracking\tone_models.h" />
+    <ClInclude Include="..\..\mediapipe\util\tracking\tracked_detection.h" />
+    <ClInclude Include="..\..\mediapipe\util\tracking\tracked_detection_manager.h" />
     <ClInclude Include="..\..\mediapipe\util\tracking\tracking.h" />
     <ClInclude Include="..\..\mediapipe\util\tracking\tracking_visualization_utilities.h" />
     <ClInclude Include="..\..\third_party\tensorflow\tensorflow\lite\delegates\gpu\common\mediapipe\landmarks_to_transform_matrix.h" />
@@ -335,6 +382,7 @@
     <ClInclude Include="calculators\core\concatenate_vector_calculator.pb.h" />
     <ClInclude Include="calculators\core\constant_side_packet_calculator.pb.h" />
     <ClInclude Include="calculators\core\flow_limiter_calculator.pb.h" />
+    <ClInclude Include="calculators\core\packet_resampler_calculator.pb.h" />
     <ClInclude Include="calculators\image\feature_detector_calculator.pb.h" />
     <ClInclude Include="calculators\image\image_cropping_calculator.pb.h" />
     <ClInclude Include="calculators\image\image_transformation_calculator.pb.h" />
@@ -381,7 +429,11 @@
     <ClInclude Include="calculators\util\visibility_copy_calculator.pb.h" />
     <ClInclude Include="calculators\util\visibility_smoothing_calculator.pb.h" />
     <ClInclude Include="calculators\video\box_detector_calculator.pb.h" />
+    <ClInclude Include="calculators\video\box_tracker_calculator.pb.h" />
+    <ClInclude Include="calculators\video\flow_packager_calculator.pb.h" />
+    <ClInclude Include="calculators\video\motion_analysis_calculator.pb.h" />
     <ClInclude Include="calculators\video\opencv_video_encoder_calculator.pb.h" />
+    <ClInclude Include="calculators\video\tracked_detection_manager_calculator.pb.h" />
     <ClInclude Include="framework\calculator.pb.h" />
     <ClInclude Include="framework\calculator_options.pb.h" />
     <ClInclude Include="framework\deps\proto_descriptor.pb.h" />
@@ -426,8 +478,18 @@
     <ClInclude Include="util\tracking\box_tracker.pb.h" />
     <ClInclude Include="util\tracking\camera_motion.pb.h" />
     <ClInclude Include="util\tracking\flow_packager.pb.h" />
+    <ClInclude Include="util\tracking\frame_selection.pb.h" />
+    <ClInclude Include="util\tracking\frame_selection_solution_evaluator.pb.h" />
+    <ClInclude Include="util\tracking\motion_analysis.pb.h" />
+    <ClInclude Include="util\tracking\motion_estimation.pb.h" />
     <ClInclude Include="util\tracking\motion_models.pb.h" />
+    <ClInclude Include="util\tracking\motion_saliency.pb.h" />
+    <ClInclude Include="util\tracking\push_pull_filtering.pb.h" />
     <ClInclude Include="util\tracking\region_flow.pb.h" />
+    <ClInclude Include="util\tracking\region_flow_computation.pb.h" />
+    <ClInclude Include="util\tracking\tone_estimation.pb.h" />
+    <ClInclude Include="util\tracking\tone_models.pb.h" />
+    <ClInclude Include="util\tracking\tracked_detection_manager_config.pb.h" />
     <ClInclude Include="util\tracking\tracking.pb.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -540,7 +602,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GLOG_STATIC_DEFINE;HAVE_CXX11_ATOMIC;NOMINMAX;MEDIAPIPE_DISABLE_GPU=1;M_PI=3.14159265358979323846;_DEBUG;_LIB;_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLOG_STATIC_DEFINE;HAVE_CXX11_ATOMIC;NOMINMAX;MEDIAPIPE_DISABLE_GPU=1;M_PI=3.14159265358979323846;_LIB;_WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -567,7 +629,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GLOG_STATIC_DEFINE;HAVE_CXX11_ATOMIC;NOMINMAX;MEDIAPIPE_DISABLE_GPU=1;M_PI=3.14159265358979323846;NDEBUG;_LIB;_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLOG_STATIC_DEFINE;HAVE_CXX11_ATOMIC;NOMINMAX;MEDIAPIPE_DISABLE_GPU=1;M_PI=3.14159265358979323846;_LIB;_WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>

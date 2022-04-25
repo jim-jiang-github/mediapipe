@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\mediapipe\calculators\core\flow_limiter_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\core\packet_resampler_calculator.cc">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\previous_loopback_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\image\image_transformation_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\ssd_anchors_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_converter_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_inference_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_tensors_to_detections_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\annotation_overlay_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\detections_to_render_data_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\detections_to_timed_box_list_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\detection_label_id_to_text_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\detection_unique_id_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\util\non_max_suppression_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\video\box_tracker_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\video\flow_packager_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\video\motion_analysis_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\video\tracked_detection_manager_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\default_input_stream_handler.cc" />
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\fixed_size_input_stream_handler.cc" />
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\immediate_input_stream_handler.cc" />
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\in_order_output_stream_handler.cc" />
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\sync_set_input_stream_handler.cc" />
+    <ClCompile Include="object_tracking.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\third_party\abseil\absl.vcxproj">
+      <Project>{f5bed556-0db6-4d2a-a6f1-09727ffdc8fd}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\third_party\glog\glog.vcxproj">
+      <Project>{d352abc3-e2b8-498d-850e-2714070172bd}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\third_party\tensorflow\tensorflow-lite.vcxproj">
+      <Project>{f9a7fa78-25d1-4739-844f-1930e2e3bf14}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\third_party\tensorflow\third_party\protobuf\protobuf.vcxproj">
+      <Project>{724082b1-2b49-40ce-9db8-a8fde10f9e7e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\third_party\tensorflow\third_party\XNNPACK\xnnpack.vcxproj">
+      <Project>{3ca1e958-347b-4f73-a0af-8f450bcdf9a2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\mediapipe\mediapipe.vcxproj">
+      <Project>{e3c083bf-698d-456a-b5b5-82a6839a4ccc}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{329BD402-08DD-4099-90C5-C9CDE2E7D7EB}</ProjectGuid>
+    <RootNamespace>mediapipe</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>object_tracking</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\intermediate\VS$(VisualStudioVersion)\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediate\VS$(VisualStudioVersion)\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\intermediate\VS$(VisualStudioVersion)\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediate\VS$(VisualStudioVersion)\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediate\$(VisualStudioVersion)\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediate\$(VisualStudioVersion)\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../../;../../third_party/abseil;$(OPENCV_ROOT)\modules\core\include;$(OPENCV_ROOT)\modules\highgui\include;$(OPENCV_ROOT)\modules\imgproc\include;$(OPENCV_ROOT)\modules\video\include;$(OPENCV_ROOT)\modules\videoio\include;$(OPENCV_ROOT)\modules\optflow\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../../;../../third_party/abseil;$(OPENCV_ROOT)\modules\core\include;$(OPENCV_ROOT)\modules\highgui\include;$(OPENCV_ROOT)\modules\imgproc\include;$(OPENCV_ROOT)\modules\video\include;$(OPENCV_ROOT)\modules\videoio\include;$(OPENCV_ROOT)\modules\optflow\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>TFL_STATIC_LIBRARY_BUILD;GLOG_STATIC_DEFINE;HAVE_CXX11_ATOMIC;MEDIAPIPE_DISABLE_GPU=1;M_PI=3.14159265358979323846;_CRT_SECURE_NO_WARNINGS;_WIN32;_CONSOLE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../;../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/tensorflow;../../third_party/tensorflow/third_party/protobuf/src;../../third_party/tensorflow/third_party/FP16/include;../../third_party/tensorflow/third_party/eigen3;../../third_party/tensorflow/third_party/flatbuffers/include;../../third_party/tensorflow/third_party/gemmlowp;../../third_party/opencv/include</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)_\_\%(RelativeDir)</ObjectFileName>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\..\third_party\opencv\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_world410d.lib</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>TFL_STATIC_LIBRARY_BUILD;GLOG_STATIC_DEFINE;HAVE_CXX11_ATOMIC;MEDIAPIPE_DISABLE_GPU=1;M_PI=3.14159265358979323846;_CRT_SECURE_NO_WARNINGS;_WIN32;_CONSOLE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>../;../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/tensorflow;../../third_party/tensorflow/third_party/protobuf/src;../../third_party/tensorflow/third_party/FP16/include;../../third_party/tensorflow/third_party/eigen3;../../third_party/tensorflow/third_party/flatbuffers/include;../../third_party/tensorflow/third_party/gemmlowp;../../third_party/opencv/include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
+      <ObjectFileName>$(IntDir)_\_\%(RelativeDir)</ObjectFileName>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>..\..\third_party\opencv\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_world410.lib</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

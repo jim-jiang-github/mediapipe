@@ -35,6 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rd_party", "3rd_party", "{
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "iris_tracking", "iris_tracking\iris_tracking.vcxproj", "{27B3A85D-E1F1-474E-976B-BD33BDC0D462}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "object_tracking", "object_tracking\object_tracking.vcxproj", "{329BD402-08DD-4099-90C5-C9CDE2E7D7EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -155,6 +157,14 @@ Global
 		{27B3A85D-E1F1-474E-976B-BD33BDC0D462}.Release|x64.Build.0 = Release|x64
 		{27B3A85D-E1F1-474E-976B-BD33BDC0D462}.Release|x86.ActiveCfg = Release|Win32
 		{27B3A85D-E1F1-474E-976B-BD33BDC0D462}.Release|x86.Build.0 = Release|Win32
+		{329BD402-08DD-4099-90C5-C9CDE2E7D7EB}.Debug|x64.ActiveCfg = Debug|x64
+		{329BD402-08DD-4099-90C5-C9CDE2E7D7EB}.Debug|x64.Build.0 = Debug|x64
+		{329BD402-08DD-4099-90C5-C9CDE2E7D7EB}.Debug|x86.ActiveCfg = Debug|Win32
+		{329BD402-08DD-4099-90C5-C9CDE2E7D7EB}.Debug|x86.Build.0 = Debug|Win32
+		{329BD402-08DD-4099-90C5-C9CDE2E7D7EB}.Release|x64.ActiveCfg = Release|x64
+		{329BD402-08DD-4099-90C5-C9CDE2E7D7EB}.Release|x64.Build.0 = Release|x64
+		{329BD402-08DD-4099-90C5-C9CDE2E7D7EB}.Release|x86.ActiveCfg = Release|Win32
+		{329BD402-08DD-4099-90C5-C9CDE2E7D7EB}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -173,6 +183,7 @@ Global
 		{0FE8078A-D6AD-459A-AB44-AEE95FA0FDF2} = {591B6909-4A71-4D32-AF57-B2DB32DA4818}
 		{C9179CF5-357B-486F-B669-C3C4B695984F} = {591B6909-4A71-4D32-AF57-B2DB32DA4818}
 		{27B3A85D-E1F1-474E-976B-BD33BDC0D462} = {591B6909-4A71-4D32-AF57-B2DB32DA4818}
+		{329BD402-08DD-4099-90C5-C9CDE2E7D7EB} = {591B6909-4A71-4D32-AF57-B2DB32DA4818}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {74F172CA-98CC-4AF9-B2B1-E3D441C5B751}

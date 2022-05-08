@@ -297,6 +297,9 @@
     <ClCompile Include="absl\synchronization\blocking_counter.cc">
       <Filter>synchronization</Filter>
     </ClCompile>
+    <ClCompile Include="absl\types\bad_any_cast.cc">
+      <Filter>types</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".\absl\flags\flag.h">

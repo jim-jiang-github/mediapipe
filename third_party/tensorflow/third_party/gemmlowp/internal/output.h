@@ -173,8 +173,20 @@ struct OutputStageEvalBufferImpl<OutputStageScaleInt32ByFixedPointAndExponent,
                           result_offset_after_shift);
     }
     return output;
-  }
-
+  } // linking error here...? visual studio 2019 ver.16.11.13. A suspicious compiler BUG? (Win32 | Release only)
+    // change 'tensorflow-lite' project settings | C/C++ | Optimization to 'Disabled(/Od)' can work around this.
+//
+// 1>------ Build started: Project: face_detection, Configuration: Release Win32 ------
+// 1>Generating code
+// 1>D:\git\mediapipe\third_party\tensorflow\third_party\gemmlowp\internal\output.h(176): fatal error C1001: Internal compiler error.
+// 1>(compiler file 'D:\a\_work\1\s\src\vctools\Compiler\Utc\src\p2\main.c', line 213)
+// 1> To work around this problem, try simplifying or changing the program near the locations listed above.
+// 1>If possible please provide a repro here: https://developercommunity.visualstudio.com
+// 1>Please choose the Technical Support command on the Visual C++
+// 1> Help menu, or open the Technical Support help file for more information
+// 1>
+// 1>Done building project "face_detection.vcxproj" -- FAILED.
+//
   const OutputStage& output_stage;
   int left_shift;
   int right_shift;

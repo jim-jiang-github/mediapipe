@@ -741,7 +741,6 @@
     <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator.cc">
       <Filter>calculators\tensor</Filter>
     </ClCompile>
-    <ClCompile Include="..\demo_run_graph_main.cc" />
     <ClCompile Include="modules\holistic_landmark\calculators\roi_tracking_calculator.pb.cc">
       <Filter>modules\holistic_landmark\calculators</Filter>
     </ClCompile>

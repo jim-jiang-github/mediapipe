@@ -112,15 +112,17 @@ absl::Status RunMPPGraph() {
     camera_frame.copyTo(input_frame_mat);
 
     // Send image packet into the graph.
-    size_t frame_timestamp_us = (size_t)
-        ((double)cv::getTickCount() / (double)cv::getTickFrequency() * 1e6);
+    int64_t const frame_timestamp_us = (int64_t) ((double)cv::getTickCount() / (double)cv::getTickFrequency() * 1e6);
     MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(
         kInputStream, mediapipe::Adopt(input_frame.release())
                           .At(mediapipe::Timestamp(frame_timestamp_us))));
 
     // Get the graph result packet, or stop if that fails.
     mediapipe::Packet packet;
-    if (!poller.Next(&packet)) break;
+    if (!poller.Next(&packet)) {
+      break;
+    }
+
     auto& output_frame = packet.Get<mediapipe::ImageFrame>();
 
     // Convert back to opencv for display or saving.

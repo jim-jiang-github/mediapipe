@@ -267,9 +267,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediate\$(VisualStudioVersion)\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)bin\intermediate\$(VisualStudioVersion)\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -285,10 +289,13 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLOG_STATIC_DEFINE;NOMINMAX;_CRT_SECURE_NO_WARNINGS;FARMHASH_NO_BUILTIN_EXPECT;TFL_STATIC_LIBRARY_BUILD;TFLITE_BUILD_WITH_XNNPACK_DELEGATE;__PRETTY_FUNCTION__=__FUNCSIG__;_WIN32;_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>./;./third_party/protobuf/src;./third_party/flatbuffers/include;./third_party/ruy;./third_party/eigen3;./third_party/farmhash/src;./third_party/gemmlowp;./third_party/XNNPACK/include;./third_party/XNNPACK/src;./third_party/FP16/include;./third_party/pthreadpool/include;./third_party/FXdiv/include;./third_party/cpuinfo/include;./third_party/clog/deps/clog/include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ObjectFileName>$(IntDir)lite\%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -302,10 +309,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLOG_STATIC_DEFINE;NOMINMAX;_CRT_SECURE_NO_WARNINGS;FARMHASH_NO_BUILTIN_EXPECT;TFL_STATIC_LIBRARY_BUILD;TFLITE_BUILD_WITH_XNNPACK_DELEGATE;__PRETTY_FUNCTION__=__FUNCSIG__;_WIN32;_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>./;./third_party/protobuf/src;./third_party/flatbuffers/include;./third_party/ruy;./third_party/eigen3;./third_party/farmhash/src;./third_party/gemmlowp;./third_party/XNNPACK/include;./third_party/XNNPACK/src;./third_party/FP16/include;./third_party/pthreadpool/include;./third_party/FXdiv/include;./third_party/cpuinfo/include;./third_party/clog/deps/clog/include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <ObjectFileName>$(IntDir)lite\%(RelativeDir)</ObjectFileName>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -314,6 +326,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

@@ -329,6 +329,8 @@ class TextFormat::Parser::ParserImpl {
     } else {
       error_collector_->AddError(line, col, message);
     }
+    printf("protobuf: Error parsing text-format %s line:%d col:%d\n",
+           root_message_type_->full_name().c_str(), line+1, col+1);
   }
 
   void ReportWarning(int line, int col, const std::string& message) {
@@ -402,8 +404,8 @@ class TextFormat::Parser::ParserImpl {
     int start_line = cur.line;
     int start_column = cur.column;
 
-    const FieldDescriptor* any_type_url_field;
-    const FieldDescriptor* any_value_field;
+    const FieldDescriptor* any_type_url_field = nullptr;
+    const FieldDescriptor* any_value_field = nullptr;
     if (internal::GetAnyFieldDescriptors(*message, &any_type_url_field,
                                          &any_value_field) &&
         TryConsume("[")) {

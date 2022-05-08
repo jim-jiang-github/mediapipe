@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31019.35
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "face_mesh", "face_mesh\face_mesh.vcxproj", "{0FE8078A-D6AD-459A-AB44-AEE95FA0FDF2}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mediapipe", "mediapipe\mediapipe.vcxproj", "{E3C083BF-698D-456A-B5B5-82A6839A4CCC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xnnpack", "..\third_party\tensorflow\third_party\XNNPACK\xnnpack.vcxproj", "{3CA1E958-347B-4F73-A0AF-8F450BCDF9A2}"
@@ -26,8 +28,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "template_matching", "template_matching\template_matching.vcxproj", "{23B9EFBA-5D7A-47C0-ACFC-0C1477952288}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "holistic_tracking", "holistic_tracking\holistic_tracking.vcxproj", "{8215A5D9-D121-4743-9354-F3D6FAB07A89}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "face_mesh", "face_mesh\face_mesh.vcxproj", "{0FE8078A-D6AD-459A-AB44-AEE95FA0FDF2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "face_detection", "face_detection\face_detection.vcxproj", "{C9179CF5-357B-486F-B669-C3C4B695984F}"
 EndProject

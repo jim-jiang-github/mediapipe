@@ -146,8 +146,9 @@ absl::Status RunMPPGraph() {
   }
 
   LOG(INFO) << "Shutting down.";
+  cv::destroyAllWindows();
   if (writer.isOpened()) writer.release();
-  MP_RETURN_IF_ERROR(graph.CloseInputStream(kInputStream));
+  MP_RETURN_IF_ERROR(graph.CloseAllInputStreams());
   return graph.WaitUntilDone();
 }
 

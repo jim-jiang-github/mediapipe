@@ -448,8 +448,8 @@ class TemplateParser::Parser::ParserImpl {
     int start_line = tokenizer_.current().line;
     int start_column = tokenizer_.current().column;
 
-    const FieldDescriptor* any_type_url_field;
-    const FieldDescriptor* any_value_field;
+    const FieldDescriptor* any_type_url_field = nullptr;
+    const FieldDescriptor* any_value_field = nullptr;
     if (internal::GetAnyFieldDescriptors(*message, &any_type_url_field,
                                          &any_value_field) &&
         TryConsume("[")) {

@@ -103,6 +103,15 @@
     <Filter Include="graphs\iris_tracking\calculators">
       <UniqueIdentifier>{f0e3f3aa-b47d-4355-bdbc-f2929ded3147}</UniqueIdentifier>
     </Filter>
+    <Filter Include="graphs\face_mesh">
+      <UniqueIdentifier>{d97e91d0-2655-41bd-8c87-7e7a1ec97e44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="graphs\face_mesh\calculators">
+      <UniqueIdentifier>{8e1267c6-2aab-4b4b-8fa8-12fbe8674fb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modules\hand_landmark">
+      <UniqueIdentifier>{29fe2b9e-ff1a-460e-8a72-d9fcb188f650}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\mediapipe\framework\deps\status_builder.cc">
@@ -848,6 +857,309 @@
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\util\tracking\tone_models.cc">
       <Filter>util\tracking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\flow_limiter_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\image_to_tensor_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_cpu.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_detections_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\ssd_anchors_calculator.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\annotation_overlay_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\detection_projection_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\detections_to_render_data_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\non_max_suppression_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\to_image_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\default_input_stream_handler.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\fixed_size_input_stream_handler.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\immediate_input_stream_handler.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\in_order_output_stream_handler.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\begin_loop_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\clip_vector_size_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\concatenate_vector_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\constant_side_packet_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\end_loop_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\gate_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\packet_presence_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\previous_loopback_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\split_vector_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\image_properties_calculator.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_gl.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_floats_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_landmarks_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_custom_op_resolver_calculator.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_model_calculator.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_tensors_to_detections_calculator.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_tensors_to_floats_calculator.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\thresholding_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\rect_transformation_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\rect_to_render_data_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\local_file_contents_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_to_render_data_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_to_detection_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_smoothing_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_refinement_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmark_projection_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\detections_to_rects_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\collection_has_min_size_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\association_norm_rect_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\switch_container.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\switch_demux_calculator.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\tool\switch_mux_calculator.cc">
+      <Filter>framework\tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\graphs\face_mesh\calculators\face_landmarks_to_render_data_calculator.cc">
+      <Filter>graphs\face_mesh\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\face_geometry\effect_renderer_calculator.cc">
+      <Filter>modules\face_geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\face_geometry\env_generator_calculator.cc">
+      <Filter>modules\face_geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\face_geometry\geometry_pipeline_calculator.cc">
+      <Filter>modules\face_geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\image_transformation_calculator.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\recolor_calculator.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\set_alpha_calculator.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_tensors_to_segmentation_calculator.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_inference_calculator.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_converter_calculator.cc">
+      <Filter>calculators\tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\world_landmark_projection_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmark_letterbox_removal_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\labels_to_render_data_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\detection_letterbox_removal_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\hand_landmark\calculators\hand_landmarks_to_rect_calculator.cc">
+      <Filter>modules\hand_landmark</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\holistic_landmark\calculators\hand_detections_from_pose_to_rects_calculator.cc">
+      <Filter>modules\holistic_landmark\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\holistic_landmark\calculators\roi_tracking_calculator.cc">
+      <Filter>modules\holistic_landmark\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\visibility_smoothing_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\visibility_copy_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\set_landmark_visibility_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\refine_landmarks_from_heatmap_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\rect_to_render_scale_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\landmark_visibility_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\inverse_matrix_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\from_image_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\alignment_points_to_rects_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_segmentation_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_classification_calculator.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\warp_affine_calculator.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\segmentation_smoothing_calculator.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\concatenate_proto_list_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\split_proto_list_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\side_packet_to_stream_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\merge_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\graphs\iris_tracking\calculators\iris_to_render_data_calculator.cc">
+      <Filter>graphs\iris_tracking\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\graphs\iris_tracking\calculators\update_face_landmarks_calculator.cc">
+      <Filter>graphs\iris_tracking\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\detection_label_id_to_text_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\image_cropping_calculator.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\clip_detection_vector_size_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\video\box_tracker_calculator.cc">
+      <Filter>calculators\video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\video\flow_packager_calculator.cc">
+      <Filter>calculators\video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\video\motion_analysis_calculator.cc">
+      <Filter>calculators\video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\video\tracked_detection_manager_calculator.cc">
+      <Filter>calculators\video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\detection_unique_id_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\detections_to_timed_box_list_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\core\packet_resampler_calculator.cc">
+      <Filter>calculators\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\video\opencv_video_encoder_calculator.cc">
+      <Filter>calculators\video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\video\opencv_video_decoder_calculator.cc">
+      <Filter>calculators\video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\video\box_detector_calculator.cc">
+      <Filter>calculators\video</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\timed_box_list_to_render_data_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\timed_box_list_id_to_label_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\util\local_file_pattern_contents_calculator.cc">
+      <Filter>calculators\util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\feature_detector_calculator.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\opencv_encoded_image_to_image_frame_calculator.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_tensors_to_landmarks_calculator.cc">
+      <Filter>calculators\tflite</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

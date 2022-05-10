@@ -19,56 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\mediapipe\calculators\core\constant_side_packet_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\core\flow_limiter_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\core\gate_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\core\merge_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\core\packet_presence_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\core\previous_loopback_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\core\split_proto_list_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\core\split_vector_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\image\image_properties_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\image\recolor_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\image\segmentation_smoothing_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\image\warp_affine_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\image_to_tensor_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_cpu.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_detections_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_floats_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_landmarks_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_segmentation_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\tflite\ssd_anchors_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_model_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\alignment_points_to_rects_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\annotation_overlay_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\detections_to_rects_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\detections_to_render_data_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\detection_letterbox_removal_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\from_image_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\inverse_matrix_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_smoothing_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_to_detection_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\landmarks_to_render_data_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\landmark_letterbox_removal_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\landmark_projection_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\local_file_contents_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\non_max_suppression_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\rect_to_render_data_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\rect_to_render_scale_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\rect_transformation_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\refine_landmarks_from_heatmap_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\thresholding_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\visibility_copy_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\visibility_smoothing_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\calculators\util\world_landmark_projection_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\framework\stream_handler\default_input_stream_handler.cc" />
-    <ClCompile Include="..\..\mediapipe\framework\stream_handler\fixed_size_input_stream_handler.cc" />
-    <ClCompile Include="..\..\mediapipe\framework\stream_handler\immediate_input_stream_handler.cc" />
-    <ClCompile Include="..\..\mediapipe\framework\stream_handler\in_order_output_stream_handler.cc" />
-    <ClCompile Include="..\..\mediapipe\framework\tool\switch_container.cc" />
-    <ClCompile Include="..\..\mediapipe\framework\tool\switch_demux_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\framework\tool\switch_mux_calculator.cc" />
-    <ClCompile Include="..\mediapipe\calculators\util\detection_label_id_to_text_calculator.pb.cc" />
     <ClCompile Include="pose_tracking.cc" />
   </ItemGroup>
   <ItemGroup>
@@ -91,9 +41,6 @@
       <Project>{e3c083bf-698d-456a-b5b5-82a6839a4ccc}</Project>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\mediapipe\calculators\util\detection_label_id_to_text_calculator.pb.h" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -103,6 +50,9 @@
     <ProjectName>pose_tracking_cpu</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
@@ -171,9 +121,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>TFL_STATIC_LIBRARY_BUILD;GLOG_STATIC_DEFINE;MEDIAPIPE_DISABLE_GPU=1;M_PI=3.14159265358979323846;_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CONSOLE;_WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TFL_STATIC_LIBRARY_BUILD;GLOG_STATIC_DEFINE;MEDIAPIPE_DISABLE_GPU=1;_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CONSOLE;_WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../;../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/tensorflow;../../third_party/tensorflow/third_party/protobuf/src;../../third_party/tensorflow/third_party/FP16/include;../../third_party/tensorflow/third_party/eigen3;../../third_party/tensorflow/third_party/flatbuffers/include;../../third_party/tensorflow/third_party/gemmlowp;../../third_party/opencv/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/tensorflow/third_party/protobuf/src</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -181,6 +131,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>opencv_world410d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\third_party\opencv\x86</AdditionalLibraryDirectories>
+      <AdditionalOptions>/WHOLEARCHIVE:mediapipe.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -189,9 +140,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>TFL_STATIC_LIBRARY_BUILD;GLOG_STATIC_DEFINE;MEDIAPIPE_DISABLE_GPU=1;M_PI=3.14159265358979323846;_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CONSOLE;_WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TFL_STATIC_LIBRARY_BUILD;GLOG_STATIC_DEFINE;MEDIAPIPE_DISABLE_GPU=1;_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CONSOLE;_WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../;../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/tensorflow;../../third_party/tensorflow/third_party/protobuf/src;../../third_party/tensorflow/third_party/FP16/include;../../third_party/tensorflow/third_party/eigen3;../../third_party/tensorflow/third_party/flatbuffers/include;../../third_party/tensorflow/third_party/gemmlowp;../../third_party/opencv/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/tensorflow/third_party/protobuf/src</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -202,27 +153,30 @@
       <AdditionalDependencies>opencv_world410.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\third_party\opencv\x86</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <AdditionalOptions>/WHOLEARCHIVE:mediapipe.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>TFL_STATIC_LIBRARY_BUILD;GLOG_STATIC_DEFINE;MEDIAPIPE_DISABLE_GPU=1;M_PI=3.14159265358979323846;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TFL_STATIC_LIBRARY_BUILD;GLOG_STATIC_DEFINE;MEDIAPIPE_DISABLE_GPU=1;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../;../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/tensorflow;../../third_party/tensorflow/third_party/protobuf/src;../../third_party/tensorflow/third_party/FP16/include;../../third_party/tensorflow/third_party/eigen3;../../third_party/tensorflow/third_party/flatbuffers/include;../../third_party/tensorflow/third_party/gemmlowp;../../third_party/opencv/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/tensorflow/third_party/protobuf/src</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
-      <ObjectFileName>$(IntDir)_\_\%(RelativeDir)</ObjectFileName>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\third_party\opencv\x64</AdditionalLibraryDirectories>
       <AdditionalDependencies>opencv_world410d.lib</AdditionalDependencies>
+      <AdditionalOptions>/WHOLEARCHIVE:mediapipe.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -235,13 +189,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>TFL_STATIC_LIBRARY_BUILD;GLOG_STATIC_DEFINE;MEDIAPIPE_DISABLE_GPU=1;M_PI=3.14159265358979323846;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TFL_STATIC_LIBRARY_BUILD;GLOG_STATIC_DEFINE;MEDIAPIPE_DISABLE_GPU=1;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../;../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/tensorflow;../../third_party/tensorflow/third_party/protobuf/src;../../third_party/tensorflow/third_party/FP16/include;../../third_party/tensorflow/third_party/eigen3;../../third_party/tensorflow/third_party/flatbuffers/include;../../third_party/tensorflow/third_party/gemmlowp;../../third_party/opencv/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/tensorflow/third_party/protobuf/src</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
-      <ObjectFileName>$(IntDir)_\_\%(RelativeDir)</ObjectFileName>
-      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -250,6 +205,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\third_party\opencv\x64</AdditionalLibraryDirectories>
       <AdditionalDependencies>opencv_world410.lib</AdditionalDependencies>
+      <AdditionalOptions>/WHOLEARCHIVE:mediapipe.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
       <Command>

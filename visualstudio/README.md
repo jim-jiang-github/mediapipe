@@ -23,3 +23,4 @@ Before open up Visual Studio 2019 and make the build, install PowerShell if you 
       1>
       1>Done building project "face_detection.vcxproj" -- FAILED.
       ``` 
+ - 2022/05/10 Add **live_demo**, all-in-one demo. Also, mediapipe.lib now become a monolithic static library!!!

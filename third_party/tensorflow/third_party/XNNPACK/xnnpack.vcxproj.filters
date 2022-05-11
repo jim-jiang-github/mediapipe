@@ -453,9 +453,6 @@
     <ClCompile Include=".\src\allocator.c">
       <Filter>XNNPACK</Filter>
     </ClCompile>
-    <ClCompile Include="..\cpuinfo\src\api.c">
-      <Filter>third_party\cpu_info</Filter>
-    </ClCompile>
     <ClCompile Include=".\src\subgraph\argmax-pooling-2d.c">
       <Filter>XNNPACK\subgraph</Filter>
     </ClCompile>
@@ -485,9 +482,6 @@
     </ClCompile>
     <ClCompile Include=".\src\f32-vmulcaddc\gen\c4-minmax-sse-2x.c">
       <Filter>XNNPACK\f32-vmulcaddc\gen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\cpuinfo\src\cache.c">
-      <Filter>third_party\cpu_info</Filter>
     </ClCompile>
     <ClCompile Include=".\src\subgraph\ceiling.c">
       <Filter>XNNPACK\subgraph</Filter>
@@ -525,12 +519,6 @@
     <ClCompile Include=".\src\subgraph\depthwise-convolution-2d.c">
       <Filter>XNNPACK\subgraph</Filter>
     </ClCompile>
-    <ClCompile Include="..\cpuinfo\src\x86\cache\descriptor.c">
-      <Filter>third_party\cpu_info\x86\cache</Filter>
-    </ClCompile>
-    <ClCompile Include="..\cpuinfo\src\x86\cache\deterministic.c">
-      <Filter>third_party\cpu_info\x86\cache</Filter>
-    </ClCompile>
     <ClCompile Include=".\src\subgraph\divide.c">
       <Filter>XNNPACK\subgraph</Filter>
     </ClCompile>
@@ -542,9 +530,6 @@
     </ClCompile>
     <ClCompile Include=".\src\tables\exp2minus-k-over-64.c">
       <Filter>XNNPACK\tables</Filter>
-    </ClCompile>
-    <ClCompile Include="..\pthreadpool\src\fastpath.c">
-      <Filter>third_party\pthreadpool</Filter>
     </ClCompile>
     <ClCompile Include=".\src\subgraph\floor.c">
       <Filter>XNNPACK\subgraph</Filter>
@@ -570,26 +555,8 @@
     <ClCompile Include=".\src\indirection.c">
       <Filter>XNNPACK</Filter>
     </ClCompile>
-    <ClCompile Include="..\cpuinfo\src\x86\info.c">
-      <Filter>third_party\cpu_info\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="..\cpuinfo\src\x86\windows\init.c">
-      <Filter>third_party\cpu_info\x86\windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\cpuinfo\src\init.c">
-      <Filter>third_party\cpu_info</Filter>
-    </ClCompile>
-    <ClCompile Include="..\cpuinfo\src\x86\cache\init.c">
-      <Filter>third_party\cpu_info\x86\cache</Filter>
-    </ClCompile>
-    <ClCompile Include="..\cpuinfo\src\x86\init.c">
-      <Filter>third_party\cpu_info\x86</Filter>
-    </ClCompile>
     <ClCompile Include=".\src\init.c">
       <Filter>XNNPACK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\cpuinfo\src\x86\isa.c">
-      <Filter>third_party\cpu_info\x86</Filter>
     </ClCompile>
     <ClCompile Include=".\src\subgraph\leaky-relu.c">
       <Filter>XNNPACK\subgraph</Filter>
@@ -605,9 +572,6 @@
     </ClCompile>
     <ClCompile Include=".\src\xx-copy\memcpy.c">
       <Filter>XNNPACK\xx-copy</Filter>
-    </ClCompile>
-    <ClCompile Include="..\pthreadpool\src\memory.c">
-      <Filter>third_party\pthreadpool</Filter>
     </ClCompile>
     <ClCompile Include=".\src\memory-planner.c">
       <Filter>XNNPACK</Filter>
@@ -642,9 +606,6 @@
     <ClCompile Include=".\src\subgraph\multiply2.c">
       <Filter>XNNPACK\subgraph</Filter>
     </ClCompile>
-    <ClCompile Include="..\cpuinfo\src\x86\name.c">
-      <Filter>third_party\cpu_info\x86</Filter>
-    </ClCompile>
     <ClCompile Include=".\src\subgraph\negate.c">
       <Filter>XNNPACK\subgraph</Filter>
     </ClCompile>
@@ -656,9 +617,6 @@
     </ClCompile>
     <ClCompile Include=".\src\packing.c">
       <Filter>XNNPACK</Filter>
-    </ClCompile>
-    <ClCompile Include="..\pthreadpool\src\portable-api.c">
-      <Filter>third_party\pthreadpool</Filter>
     </ClCompile>
     <ClCompile Include=".\src\subgraph\prelu.c">
       <Filter>XNNPACK\subgraph</Filter>
@@ -756,12 +714,6 @@
     <ClCompile Include=".\src\tensor.c">
       <Filter>XNNPACK</Filter>
     </ClCompile>
-    <ClCompile Include="..\cpuinfo\src\x86\topology.c">
-      <Filter>third_party\cpu_info\x86</Filter>
-    </ClCompile>
-    <ClCompile Include="..\cpuinfo\src\x86\uarch.c">
-      <Filter>third_party\cpu_info\x86</Filter>
-    </ClCompile>
     <ClCompile Include=".\src\operators\unary-elementwise-nc.c">
       <Filter>XNNPACK\operators</Filter>
     </ClCompile>
@@ -851,9 +803,6 @@
     </ClCompile>
     <ClCompile Include=".\src\f32-velu\gen\velu-sse2-rr2-lut16-p3-x12.c">
       <Filter>XNNPACK\f32-velu\gen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\cpuinfo\src\x86\vendor.c">
-      <Filter>third_party\cpu_info\x86</Filter>
     </ClCompile>
     <ClCompile Include=".\src\f32-vlrelu\gen\vlrelu-avx512f-x16.c">
       <Filter>XNNPACK\f32-vlrelu\gen</Filter>
@@ -1040,9 +989,6 @@
     </ClCompile>
     <ClCompile Include=".\src\f32-vunary\gen\vsqr-sse-x8.c">
       <Filter>XNNPACK\f32-vunary\gen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\pthreadpool\src\windows.c">
-      <Filter>third_party\pthreadpool</Filter>
     </ClCompile>
     <ClCompile Include=".\src\x8-zip\x2-sse2.c">
       <Filter>XNNPACK\x8-zip</Filter>
@@ -1518,8 +1464,62 @@
     <ClCompile Include="src\u8-vclamp\sse2-x64.c">
       <Filter>XNNPACK\u8-vclamp</Filter>
     </ClCompile>
-    <ClCompile Include="..\clog\src\clog.c">
+    <ClCompile Include="third_party\clog\src\clog.c">
       <Filter>third_party\clog</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\pthreadpool\src\fastpath.c">
+      <Filter>third_party\pthreadpool</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\pthreadpool\src\memory.c">
+      <Filter>third_party\pthreadpool</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\pthreadpool\src\portable-api.c">
+      <Filter>third_party\pthreadpool</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\pthreadpool\src\windows.c">
+      <Filter>third_party\pthreadpool</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\cpuinfo\src\api.c">
+      <Filter>third_party\cpu_info</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\cpuinfo\src\cache.c">
+      <Filter>third_party\cpu_info</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\cpuinfo\src\init.c">
+      <Filter>third_party\cpu_info</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\cpuinfo\src\x86\info.c">
+      <Filter>third_party\cpu_info\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\cpuinfo\src\x86\init.c">
+      <Filter>third_party\cpu_info\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\cpuinfo\src\x86\isa.c">
+      <Filter>third_party\cpu_info\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\cpuinfo\src\x86\name.c">
+      <Filter>third_party\cpu_info\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\cpuinfo\src\x86\topology.c">
+      <Filter>third_party\cpu_info\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\cpuinfo\src\x86\uarch.c">
+      <Filter>third_party\cpu_info\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\cpuinfo\src\x86\vendor.c">
+      <Filter>third_party\cpu_info\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\cpuinfo\src\x86\cache\descriptor.c">
+      <Filter>third_party\cpu_info\x86\cache</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\cpuinfo\src\x86\cache\deterministic.c">
+      <Filter>third_party\cpu_info\x86\cache</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\cpuinfo\src\x86\cache\init.c">
+      <Filter>third_party\cpu_info\x86\cache</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\cpuinfo\src\x86\windows\init.c">
+      <Filter>third_party\cpu_info\x86\windows</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

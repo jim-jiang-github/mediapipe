@@ -166,10 +166,7 @@
     <ClCompile Include=".\tensorflow\lite\simple_memory_arena.cc" />
     <ClCompile Include=".\tensorflow\lite\stderr_reporter.cc" />
     <ClCompile Include=".\tensorflow\lite\string_util.cc" />
-    <ClCompile Include=".\tensorflow\lite\tflite_with_xnnpack_optional.cc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include=".\tensorflow\lite\tflite_with_xnnpack_optional.cc" />
     <ClCompile Include=".\tensorflow\lite\util.cc" />
     <ClCompile Include=".\third_party\farmhash\src\farmhash.cc" />
     <ClCompile Include=".\third_party\fft2d\fftsg.c" />
@@ -293,7 +290,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>./;./third_party/protobuf/src;./third_party/flatbuffers/include;./third_party/ruy;./third_party/eigen3;./third_party/farmhash/src;./third_party/gemmlowp;./third_party/XNNPACK/include;./third_party/XNNPACK/src;./third_party/FP16/include;./third_party/pthreadpool/include;./third_party/FXdiv/include;./third_party/cpuinfo/include;./third_party/clog/deps/clog/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;./third_party/eigen3;./third_party/farmhash/src;./third_party/flatbuffers/include;./third_party/FP16/include;./third_party/gemmlowp;./third_party/ruy;./third_party/XNNPACK/include;./third_party/XNNPACK/third_party/FP16/include;./third_party/XNNPACK/third_party/pthreadpool/include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ObjectFileName>$(IntDir)lite\%(RelativeDir)</ObjectFileName>
     </ClCompile>
@@ -313,7 +310,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>./;./third_party/protobuf/src;./third_party/flatbuffers/include;./third_party/ruy;./third_party/eigen3;./third_party/farmhash/src;./third_party/gemmlowp;./third_party/XNNPACK/include;./third_party/XNNPACK/src;./third_party/FP16/include;./third_party/pthreadpool/include;./third_party/FXdiv/include;./third_party/cpuinfo/include;./third_party/clog/deps/clog/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;./third_party/eigen3;./third_party/farmhash/src;./third_party/flatbuffers/include;./third_party/FP16/include;./third_party/gemmlowp;./third_party/ruy;./third_party/XNNPACK/include;./third_party/XNNPACK/third_party/FP16/include;./third_party/XNNPACK/third_party/pthreadpool/include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ObjectFileName>$(IntDir)lite\%(RelativeDir)</ObjectFileName>
       <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -339,7 +336,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>./;./third_party/protobuf/src;./third_party/flatbuffers/include;./third_party/ruy;./third_party/eigen3;./third_party/farmhash/src;./third_party/gemmlowp;./third_party/XNNPACK/include;./third_party/XNNPACK/src;./third_party/FP16/include;./third_party/pthreadpool/include;./third_party/FXdiv/include;./third_party/cpuinfo/include;./third_party/clog/deps/clog/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;./third_party/eigen3;./third_party/farmhash/src;./third_party/flatbuffers/include;./third_party/gemmlowp;./third_party/ruy;./third_party/XNNPACK/include;./third_party/XNNPACK/third_party/FP16/include;./third_party/XNNPACK/third_party/pthreadpool/include</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)lite\%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>
@@ -359,7 +356,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>./;./third_party/protobuf/src;./third_party/flatbuffers/include;./third_party/ruy;./third_party/eigen3;./third_party/farmhash/src;./third_party/gemmlowp;./third_party/XNNPACK/include;./third_party/XNNPACK/src;./third_party/FP16/include;./third_party/pthreadpool/include;./third_party/FXdiv/include;./third_party/cpuinfo/include;./third_party/clog/deps/clog/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;./third_party/eigen3;./third_party/farmhash/src;./third_party/flatbuffers/include;./third_party/gemmlowp;./third_party/ruy;./third_party/XNNPACK/include;./third_party/XNNPACK/third_party/FP16/include;./third_party/XNNPACK/third_party/pthreadpool/include</AdditionalIncludeDirectories>
       <ObjectFileName>$(IntDir)lite\%(RelativeDir)</ObjectFileName>
     </ClCompile>
     <Link>

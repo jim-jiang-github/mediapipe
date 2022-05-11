@@ -19,25 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\clog\src\clog.c" />
-    <ClCompile Include="..\cpuinfo\src\api.c" />
-    <ClCompile Include="..\cpuinfo\src\cache.c" />
-    <ClCompile Include="..\cpuinfo\src\init.c" />
-    <ClCompile Include="..\cpuinfo\src\x86\cache\descriptor.c" />
-    <ClCompile Include="..\cpuinfo\src\x86\cache\deterministic.c" />
-    <ClCompile Include="..\cpuinfo\src\x86\cache\init.c" />
-    <ClCompile Include="..\cpuinfo\src\x86\info.c" />
-    <ClCompile Include="..\cpuinfo\src\x86\init.c" />
-    <ClCompile Include="..\cpuinfo\src\x86\isa.c" />
-    <ClCompile Include="..\cpuinfo\src\x86\name.c" />
-    <ClCompile Include="..\cpuinfo\src\x86\topology.c" />
-    <ClCompile Include="..\cpuinfo\src\x86\uarch.c" />
-    <ClCompile Include="..\cpuinfo\src\x86\vendor.c" />
-    <ClCompile Include="..\cpuinfo\src\x86\windows\init.c" />
-    <ClCompile Include="..\pthreadpool\src\fastpath.c" />
-    <ClCompile Include="..\pthreadpool\src\memory.c" />
-    <ClCompile Include="..\pthreadpool\src\portable-api.c" />
-    <ClCompile Include="..\pthreadpool\src\windows.c" />
     <ClCompile Include=".\src\allocator.c" />
     <ClCompile Include=".\src\f32-argmaxpool\4x-sse2-c4.c" />
     <ClCompile Include=".\src\f32-argmaxpool\9p8x-sse2-c4.c" />
@@ -424,6 +405,25 @@
     <ClCompile Include="src\qu8-vadd\gen\minmax-sse41-mul16-ld64-x8.c" />
     <ClCompile Include="src\qu8-vadd\gen\minmax-xop-mul32-ld32-x8.c" />
     <ClCompile Include="src\u8-vclamp\sse2-x64.c" />
+    <ClCompile Include="third_party\clog\src\clog.c" />
+    <ClCompile Include="third_party\cpuinfo\src\api.c" />
+    <ClCompile Include="third_party\cpuinfo\src\cache.c" />
+    <ClCompile Include="third_party\cpuinfo\src\init.c" />
+    <ClCompile Include="third_party\cpuinfo\src\x86\cache\descriptor.c" />
+    <ClCompile Include="third_party\cpuinfo\src\x86\cache\deterministic.c" />
+    <ClCompile Include="third_party\cpuinfo\src\x86\cache\init.c" />
+    <ClCompile Include="third_party\cpuinfo\src\x86\info.c" />
+    <ClCompile Include="third_party\cpuinfo\src\x86\init.c" />
+    <ClCompile Include="third_party\cpuinfo\src\x86\isa.c" />
+    <ClCompile Include="third_party\cpuinfo\src\x86\name.c" />
+    <ClCompile Include="third_party\cpuinfo\src\x86\topology.c" />
+    <ClCompile Include="third_party\cpuinfo\src\x86\uarch.c" />
+    <ClCompile Include="third_party\cpuinfo\src\x86\vendor.c" />
+    <ClCompile Include="third_party\cpuinfo\src\x86\windows\init.c" />
+    <ClCompile Include="third_party\pthreadpool\src\fastpath.c" />
+    <ClCompile Include="third_party\pthreadpool\src\memory.c" />
+    <ClCompile Include="third_party\pthreadpool\src\portable-api.c" />
+    <ClCompile Include="third_party\pthreadpool\src\windows.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -506,7 +506,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ObjectFileName>$(IntDir)xnnpack\%(RelativeDir)</ObjectFileName>
-      <AdditionalIncludeDirectories>./include;./src;../FP16/include;../pthreadpool/include;../FXdiv/include;../cpuinfo/include;../cpuinfo/src;../clog/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;./src;./third_party/clog/include;./third_party/cpuinfo/include;./third_party/cpuinfo/src;./third_party/FP16/include;./third_party/FXdiv/include;./third_party/pthreadpool/include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4146;4267</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -526,7 +526,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ObjectFileName>$(IntDir)xnnpack\%(RelativeDir)</ObjectFileName>
-      <AdditionalIncludeDirectories>./include;./src;../FP16/include;../pthreadpool/include;../FXdiv/include;../cpuinfo/include;../cpuinfo/src;../clog/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;./src;./third_party/clog/include;./third_party/cpuinfo/include;./third_party/cpuinfo/src;./third_party/FP16/include;./third_party/FXdiv/include;./third_party/pthreadpool/include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4146;4267</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -545,7 +545,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>./include;./src;../FP16/include;../pthreadpool/include;../FXdiv/include;../cpuinfo/include;../cpuinfo/src;../clog/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;./src;./third_party/clog/include;./third_party/cpuinfo/include;./third_party/cpuinfo/src;./third_party/FP16/include;./third_party/FXdiv/include;./third_party/pthreadpool/include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4146;4267</DisableSpecificWarnings>
       <LanguageStandard>Default</LanguageStandard>
       <ObjectFileName>$(IntDir)xnnpack\%(RelativeDir)</ObjectFileName>
@@ -566,7 +566,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>./include;./src;../FP16/include;../pthreadpool/include;../FXdiv/include;../cpuinfo/include;../cpuinfo/src;../clog/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;./src;./third_party/clog/include;./third_party/cpuinfo/include;./third_party/cpuinfo/src;./third_party/FP16/include;./third_party/FXdiv/include;./third_party/pthreadpool/include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4146;4267</DisableSpecificWarnings>
       <LanguageStandard>Default</LanguageStandard>
       <ObjectFileName>$(IntDir)xnnpack\%(RelativeDir)</ObjectFileName>

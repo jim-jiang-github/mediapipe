@@ -1,8 +1,10 @@
 #include "../calculator_graph_util.h"
 
 //
+// see discussion https://github.com/google/mediapipe/issues/1162#issuecomment-1123137462
+//
 // It's NOT pretty, but that's the way mediapipe subgraph system goes...
-// to load a calculator, you must register all subgraphs, all calculators before hand.
+// to load a calculator graph, you must register all subgraphs, all calculators before hand.
 // if you check REGISTER_MEDIAPIPE_GRAPH(), REGISTER_CALCULATOR() and REGISTER_INPUT_STREAM_HANDLER(),
 // local static dangling pointers are created to trigger registery work. Linker settings details below...
 namespace mediapipe {

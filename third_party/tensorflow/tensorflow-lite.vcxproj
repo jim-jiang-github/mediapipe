@@ -208,6 +208,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".\tensorflow\lite\c\common.h" />
+    <ClInclude Include="tensorflow\lite\c\c_api_types.h" />
     <ClInclude Include="tensorflow\lite\tools\optimize\sparsity\format_converter.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

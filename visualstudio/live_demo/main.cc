@@ -153,7 +153,7 @@ struct {
 constexpr int total_demos = (int) (sizeof(demo_collections)/sizeof(demo_collections[0]));
 
 // select graph
-int select_graph(mediapipe::CalculatorGraph&graph) {
+int select_graph(mediapipe::CalculatorGraph& graph) {
   printf("\nWhich demo would you like this time? We have...\n");
   for (int i=0; i<total_demos; ++i) {
     printf(" %2d) %s\n", i+1, demo_collections[i].demo);
@@ -265,6 +265,7 @@ int main(int argc, char** argv) {
 
   // window open up
   cv::namedWindow(window_title, /*flags=WINDOW_AUTOSIZE*/ 1);
+  error = 0;
 
   char text_buf[64];
   auto const time_start = std::chrono::system_clock::now();
@@ -273,7 +274,7 @@ int main(int argc, char** argv) {
   float frame_per_second = 0.0f;
 
   printf("\nAlright! Start grabbing and processing frames...\n");
-  for (int key(-1),frame_id(-1),error(0); key!=27; key=cv::waitKeyEx(1)) {
+  for (int key(-1),frame_id(-1); key!=27; key=cv::waitKeyEx(1)) {
 
     // TO-DO: you can actually change demo here...
     if ('1'<=key && key<=9) {

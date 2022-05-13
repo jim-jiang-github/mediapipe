@@ -638,5 +638,8 @@
     <ClInclude Include="tensorflow\lite\tools\optimize\sparsity\format_converter.h">
       <Filter>tflite\tools\optimize\sparsity</Filter>
     </ClInclude>
+    <ClInclude Include="tensorflow\lite\c\c_api_types.h">
+      <Filter>tflite\c</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

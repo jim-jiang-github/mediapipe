@@ -294,9 +294,6 @@ absl::Status InferenceCalculatorGlImpl::InitTFLiteGPURunner(
     CalculatorContext* cc) {
   ASSIGN_OR_RETURN(model_packet_, GetModelAsPacket(cc));
   const auto& model = *model_packet_.Get();
-  tflite::ops::builtin::BuiltinOpResolver op_resolver =
-      kSideInCustomOpResolver(cc).GetOr(
-          tflite::ops::builtin::BuiltinOpResolverWithoutDefaultDelegates());
 
   // Create runner
   tflite::gpu::InferenceOptions options;
@@ -335,8 +332,17 @@ absl::Status InferenceCalculatorGlImpl::InitTFLiteGPURunner(
       break;
     }
   }
-  MP_RETURN_IF_ERROR(tflite_gpu_runner_->InitializeWithModel(
-      model, op_resolver, /*allow_quant_ops=*/true));
+  if (kSideInOpResolver(cc).IsConnected()) {
+    const tflite::OpResolver& op_resolver = kSideInOpResolver(cc).Get();
+    MP_RETURN_IF_ERROR(tflite_gpu_runner_->InitializeWithModel(
+        model, op_resolver, /*allow_quant_ops=*/true));
+  } else {
+    tflite::ops::builtin::BuiltinOpResolver op_resolver =
+        kSideInCustomOpResolver(cc).GetOr(
+            tflite::ops::builtin::BuiltinOpResolverWithoutDefaultDelegates());
+    MP_RETURN_IF_ERROR(tflite_gpu_runner_->InitializeWithModel(
+        model, op_resolver, /*allow_quant_ops=*/true));
+  }
 
   // Create and bind OpenGL buffers for outputs.
   // The buffers are created once and their ids are passed to calculator outputs
@@ -358,11 +364,15 @@ absl::Status InferenceCalculatorGlImpl::InitTFLiteGPURunner(
 absl::Status InferenceCalculatorGlImpl::LoadModel(CalculatorContext* cc) {
   ASSIGN_OR_RETURN(model_packet_, GetModelAsPacket(cc));
   const auto& model = *model_packet_.Get();
-  tflite::ops::builtin::BuiltinOpResolver op_resolver =
-      kSideInCustomOpResolver(cc).GetOr(
-          tflite::ops::builtin::BuiltinOpResolverWithoutDefaultDelegates());
-
-  tflite::InterpreterBuilder(model, op_resolver)(&interpreter_);
+  if (kSideInOpResolver(cc).IsConnected()) {
+    const tflite::OpResolver& op_resolver = kSideInOpResolver(cc).Get();
+    tflite::InterpreterBuilder(model, op_resolver)(&interpreter_);
+  } else {
+    tflite::ops::builtin::BuiltinOpResolver op_resolver =
+        kSideInCustomOpResolver(cc).GetOr(
+            tflite::ops::builtin::BuiltinOpResolverWithoutDefaultDelegates());
+    tflite::InterpreterBuilder(model, op_resolver)(&interpreter_);
+  }
   RET_CHECK(interpreter_);
 
 #if defined(__EMSCRIPTEN__)

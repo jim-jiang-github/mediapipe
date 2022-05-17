@@ -1,4 +1,4 @@
-%cd%/protoc.exe --proto_path=../third_party/protobuf/src --proto_path=../ --cpp_out=./ ^
+%cd%/protoc.exe --proto_path=../third_party/protobuf/src --proto_path=../third_party/tensorflow --proto_path=../ --cpp_out=./ ^
 mediapipe/calculators/audio/mfcc_mel_calculators.proto ^
 mediapipe/calculators/audio/rational_factor_resample_calculator.proto ^
 mediapipe/calculators/audio/spectrogram_calculator.proto ^
@@ -16,7 +16,7 @@ mediapipe/calculators/core/packet_resampler_calculator.proto ^
 mediapipe/calculators/core/packet_thinner_calculator.proto ^
 mediapipe/calculators/core/quantize_float_vector_calculator.proto ^
 mediapipe/calculators/core/sequence_shift_calculator.proto ^
-mediapipe/calculators/core/split_vector_calculator.proto ^
+mediapipe/calculators/core/split_vector_calculator.proto  ^
 mediapipe/calculators/image/bilateral_filter_calculator.proto ^
 mediapipe/calculators/image/feature_detector_calculator.proto ^
 mediapipe/calculators/image/image_clone_calculator.proto ^
@@ -196,4 +196,4 @@ mediapipe/util/tracking/tracked_detection_manager_config.proto ^
 mediapipe/util/tracking/tracking.proto
 
 @echo off
-timeout /t 30
+timeout /t 15

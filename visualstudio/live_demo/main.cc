@@ -172,15 +172,16 @@ int select_graph(mediapipe::CalculatorGraph& graph) {
 
   mediapipe::CalculatorGraphConfig config;
   if (read_config_from_pbtxt(config, demo_collections[select_graph].pbtxt)) {
-    if (graph.Initialize(config).ok()) {
+    absl::Status const status = graph.Initialize(config);
+    if (status.ok()) {
       return select_graph;
     } else {
-      printf("[Error] %s \n", demo_collections[select_graph].pbtxt);
+      std::cout << "[Error] " << demo_collections[select_graph].pbtxt << "\n" << status.message() << "\n";
       return -1;
     }
   }
 
-  printf("[Error] %s \n", demo_collections[select_graph].pbtxt);
+  printf("[Error] %s file not exist or ill-format.\n", demo_collections[select_graph].pbtxt);
   return -2;
 }
 
@@ -227,7 +228,8 @@ int main(int argc, char** argv) {
   // need poller get output frame
   auto poller = graph.AddOutputStreamPoller(output_stream);
   if (!poller.ok()) {
-    printf("Calculator Graph is loaded, but failed to get output_stream!?\n");
+    std::cout << "Calculator Graph is loaded, but failed to get output_stream!?\n"
+              << poller.status().message() << "\n";
     return -2;
   }
 

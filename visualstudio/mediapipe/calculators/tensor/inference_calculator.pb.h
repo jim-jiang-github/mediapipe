@@ -688,6 +688,7 @@ class InferenceCalculatorOptions_Delegate_Nnapi PROTOBUF_FINAL :
   enum : int {
     kCacheDirFieldNumber = 1,
     kModelTokenFieldNumber = 2,
+    kAcceleratorNameFieldNumber = 3,
   };
   // optional string cache_dir = 1;
   bool has_cache_dir() const;
@@ -725,6 +726,24 @@ class InferenceCalculatorOptions_Delegate_Nnapi PROTOBUF_FINAL :
   std::string* _internal_mutable_model_token();
   public:
 
+  // optional string accelerator_name = 3;
+  bool has_accelerator_name() const;
+  private:
+  bool _internal_has_accelerator_name() const;
+  public:
+  void clear_accelerator_name();
+  const std::string& accelerator_name() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_accelerator_name(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_accelerator_name();
+  std::string* release_accelerator_name();
+  void set_allocated_accelerator_name(std::string* accelerator_name);
+  private:
+  const std::string& _internal_accelerator_name() const;
+  void _internal_set_accelerator_name(const std::string& value);
+  std::string* _internal_mutable_accelerator_name();
+  public:
+
   // @@protoc_insertion_point(class_scope:mediapipe.InferenceCalculatorOptions.Delegate.Nnapi)
  private:
   class _Internal;
@@ -736,6 +755,7 @@ class InferenceCalculatorOptions_Delegate_Nnapi PROTOBUF_FINAL :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr cache_dir_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr model_token_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr accelerator_name_;
   friend struct ::TableStruct_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto;
 };
 // -------------------------------------------------------------------
@@ -1751,6 +1771,63 @@ inline void InferenceCalculatorOptions_Delegate_Nnapi::set_allocated_model_token
   model_token_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), model_token,
       GetArena());
   // @@protoc_insertion_point(field_set_allocated:mediapipe.InferenceCalculatorOptions.Delegate.Nnapi.model_token)
+}
+
+// optional string accelerator_name = 3;
+inline bool InferenceCalculatorOptions_Delegate_Nnapi::_internal_has_accelerator_name() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool InferenceCalculatorOptions_Delegate_Nnapi::has_accelerator_name() const {
+  return _internal_has_accelerator_name();
+}
+inline void InferenceCalculatorOptions_Delegate_Nnapi::clear_accelerator_name() {
+  accelerator_name_.ClearToEmpty();
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline const std::string& InferenceCalculatorOptions_Delegate_Nnapi::accelerator_name() const {
+  // @@protoc_insertion_point(field_get:mediapipe.InferenceCalculatorOptions.Delegate.Nnapi.accelerator_name)
+  return _internal_accelerator_name();
+}
+template <typename ArgT0, typename... ArgT>
+PROTOBUF_ALWAYS_INLINE
+inline void InferenceCalculatorOptions_Delegate_Nnapi::set_accelerator_name(ArgT0&& arg0, ArgT... args) {
+ _has_bits_[0] |= 0x00000004u;
+ accelerator_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArena());
+  // @@protoc_insertion_point(field_set:mediapipe.InferenceCalculatorOptions.Delegate.Nnapi.accelerator_name)
+}
+inline std::string* InferenceCalculatorOptions_Delegate_Nnapi::mutable_accelerator_name() {
+  // @@protoc_insertion_point(field_mutable:mediapipe.InferenceCalculatorOptions.Delegate.Nnapi.accelerator_name)
+  return _internal_mutable_accelerator_name();
+}
+inline const std::string& InferenceCalculatorOptions_Delegate_Nnapi::_internal_accelerator_name() const {
+  return accelerator_name_.Get();
+}
+inline void InferenceCalculatorOptions_Delegate_Nnapi::_internal_set_accelerator_name(const std::string& value) {
+  _has_bits_[0] |= 0x00000004u;
+  accelerator_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline std::string* InferenceCalculatorOptions_Delegate_Nnapi::_internal_mutable_accelerator_name() {
+  _has_bits_[0] |= 0x00000004u;
+  return accelerator_name_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* InferenceCalculatorOptions_Delegate_Nnapi::release_accelerator_name() {
+  // @@protoc_insertion_point(field_release:mediapipe.InferenceCalculatorOptions.Delegate.Nnapi.accelerator_name)
+  if (!_internal_has_accelerator_name()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000004u;
+  return accelerator_name_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void InferenceCalculatorOptions_Delegate_Nnapi::set_allocated_accelerator_name(std::string* accelerator_name) {
+  if (accelerator_name != nullptr) {
+    _has_bits_[0] |= 0x00000004u;
+  } else {
+    _has_bits_[0] &= ~0x00000004u;
+  }
+  accelerator_name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), accelerator_name,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:mediapipe.InferenceCalculatorOptions.Delegate.Nnapi.accelerator_name)
 }
 
 // -------------------------------------------------------------------

@@ -51,7 +51,8 @@ PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT InferenceCalculatorOptions_Dele
 constexpr InferenceCalculatorOptions_Delegate_Nnapi::InferenceCalculatorOptions_Delegate_Nnapi(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : cache_dir_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
-  , model_token_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string){}
+  , model_token_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , accelerator_name_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string){}
 struct InferenceCalculatorOptions_Delegate_NnapiDefaultTypeInternal {
   constexpr InferenceCalculatorOptions_Delegate_NnapiDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -138,8 +139,10 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fcalculators_2ftens
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::mediapipe::InferenceCalculatorOptions_Delegate_Nnapi, cache_dir_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::InferenceCalculatorOptions_Delegate_Nnapi, model_token_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::InferenceCalculatorOptions_Delegate_Nnapi, accelerator_name_),
   0,
   1,
+  2,
   PROTOBUF_FIELD_OFFSET(::mediapipe::InferenceCalculatorOptions_Delegate_Xnnpack, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::InferenceCalculatorOptions_Delegate_Xnnpack, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -176,10 +179,10 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fcalculators_2ftens
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::mediapipe::InferenceCalculatorOptions_Delegate_TfLite)},
   { 5, 17, sizeof(::mediapipe::InferenceCalculatorOptions_Delegate_Gpu)},
-  { 24, 31, sizeof(::mediapipe::InferenceCalculatorOptions_Delegate_Nnapi)},
-  { 33, 39, sizeof(::mediapipe::InferenceCalculatorOptions_Delegate_Xnnpack)},
-  { 40, -1, sizeof(::mediapipe::InferenceCalculatorOptions_Delegate)},
-  { 50, 60, sizeof(::mediapipe::InferenceCalculatorOptions)},
+  { 24, 32, sizeof(::mediapipe::InferenceCalculatorOptions_Delegate_Nnapi)},
+  { 35, 41, sizeof(::mediapipe::InferenceCalculatorOptions_Delegate_Xnnpack)},
+  { 42, -1, sizeof(::mediapipe::InferenceCalculatorOptions_Delegate)},
+  { 52, 62, sizeof(::mediapipe::InferenceCalculatorOptions)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -194,12 +197,12 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 const char descriptor_table_protodef_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n7mediapipe/calculators/tensor/inference"
   "_calculator.proto\022\tmediapipe\032$mediapipe/"
-  "framework/calculator.proto\"\371\010\n\032Inference"
+  "framework/calculator.proto\"\223\t\n\032Inference"
   "CalculatorOptions\022\022\n\nmodel_path\030\001 \001(\t\022\032\n"
   "\007use_gpu\030\002 \001(\010:\005falseB\002\030\001\022\034\n\tuse_nnapi\030\003"
   " \001(\010:\005falseB\002\030\001\022\032\n\016cpu_num_thread\030\004 \001(\005:"
   "\002-1\022@\n\010delegate\030\005 \001(\0132..mediapipe.Infere"
-  "nceCalculatorOptions.Delegate\032\330\006\n\010Delega"
+  "nceCalculatorOptions.Delegate\032\362\006\n\010Delega"
   "te\022G\n\006tflite\030\001 \001(\01325.mediapipe.Inference"
   "CalculatorOptions.Delegate.TfLiteH\000\022A\n\003g"
   "pu\030\002 \001(\01322.mediapipe.InferenceCalculator"
@@ -218,21 +221,21 @@ const char descriptor_table_protodef_mediapipe_2fcalculators_2ftensor_2finferenc
   "InferenceUsage:\017SUSTAINED_SPEED\"&\n\003Api\022\007"
   "\n\003ANY\020\000\022\n\n\006OPENGL\020\001\022\n\n\006OPENCL\020\002\"N\n\016Infer"
   "enceUsage\022\017\n\013UNSPECIFIED\020\000\022\026\n\022FAST_SINGL"
-  "E_ANSWER\020\001\022\023\n\017SUSTAINED_SPEED\020\002\032/\n\005Nnapi"
+  "E_ANSWER\020\001\022\023\n\017SUSTAINED_SPEED\020\002\032I\n\005Nnapi"
   "\022\021\n\tcache_dir\030\001 \001(\t\022\023\n\013model_token\030\002 \001(\t"
-  "\032\"\n\007Xnnpack\022\027\n\013num_threads\030\001 \001(\005:\002-1B\n\n\010"
-  "delegate2T\n\003ext\022\034.mediapipe.CalculatorOp"
-  "tions\030\367\323\313\240\001 \001(\0132%.mediapipe.InferenceCal"
-  "culatorOptionsBA\n%com.google.mediapipe.c"
-  "alculator.protoB\030InferenceCalculatorProt"
-  "o"
+  "\022\030\n\020accelerator_name\030\003 \001(\t\032\"\n\007Xnnpack\022\027\n"
+  "\013num_threads\030\001 \001(\005:\002-1B\n\n\010delegate2T\n\003ex"
+  "t\022\034.mediapipe.CalculatorOptions\030\367\323\313\240\001 \001("
+  "\0132%.mediapipe.InferenceCalculatorOptions"
+  "BA\n%com.google.mediapipe.calculator.prot"
+  "oB\030InferenceCalculatorProto"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto_deps[1] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto = {
-  false, false, 1321, descriptor_table_protodef_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto, "mediapipe/calculators/tensor/inference_calculator.proto", 
+  false, false, 1347, descriptor_table_protodef_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto, "mediapipe/calculators/tensor/inference_calculator.proto", 
   &descriptor_table_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto_deps, 1, 6,
   schemas, file_default_instances, TableStruct_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto::offsets,
   file_level_metadata_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto, file_level_enum_descriptors_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto, file_level_service_descriptors_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto,
@@ -911,6 +914,9 @@ class InferenceCalculatorOptions_Delegate_Nnapi::_Internal {
   static void set_has_model_token(HasBits* has_bits) {
     (*has_bits)[0] |= 2u;
   }
+  static void set_has_accelerator_name(HasBits* has_bits) {
+    (*has_bits)[0] |= 4u;
+  }
 };
 
 InferenceCalculatorOptions_Delegate_Nnapi::InferenceCalculatorOptions_Delegate_Nnapi(::PROTOBUF_NAMESPACE_ID::Arena* arena)
@@ -933,12 +939,18 @@ InferenceCalculatorOptions_Delegate_Nnapi::InferenceCalculatorOptions_Delegate_N
     model_token_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_model_token(), 
       GetArena());
   }
+  accelerator_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (from._internal_has_accelerator_name()) {
+    accelerator_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_accelerator_name(), 
+      GetArena());
+  }
   // @@protoc_insertion_point(copy_constructor:mediapipe.InferenceCalculatorOptions.Delegate.Nnapi)
 }
 
 void InferenceCalculatorOptions_Delegate_Nnapi::SharedCtor() {
 cache_dir_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 model_token_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+accelerator_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 InferenceCalculatorOptions_Delegate_Nnapi::~InferenceCalculatorOptions_Delegate_Nnapi() {
@@ -951,6 +963,7 @@ void InferenceCalculatorOptions_Delegate_Nnapi::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
   cache_dir_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   model_token_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  accelerator_name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void InferenceCalculatorOptions_Delegate_Nnapi::ArenaDtor(void* object) {
@@ -970,12 +983,15 @@ void InferenceCalculatorOptions_Delegate_Nnapi::Clear() {
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000003u) {
+  if (cached_has_bits & 0x00000007u) {
     if (cached_has_bits & 0x00000001u) {
       cache_dir_.ClearNonDefaultToEmpty();
     }
     if (cached_has_bits & 0x00000002u) {
       model_token_.ClearNonDefaultToEmpty();
+    }
+    if (cached_has_bits & 0x00000004u) {
+      accelerator_name_.ClearNonDefaultToEmpty();
     }
   }
   _has_bits_.Clear();
@@ -1007,6 +1023,17 @@ const char* InferenceCalculatorOptions_Delegate_Nnapi::_InternalParse(const char
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           #ifndef NDEBUG
           ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "mediapipe.InferenceCalculatorOptions.Delegate.Nnapi.model_token");
+          #endif  // !NDEBUG
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // optional string accelerator_name = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+          auto str = _internal_mutable_accelerator_name();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          #ifndef NDEBUG
+          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "mediapipe.InferenceCalculatorOptions.Delegate.Nnapi.accelerator_name");
           #endif  // !NDEBUG
           CHK_(ptr);
         } else goto handle_unusual;
@@ -1062,6 +1089,16 @@ failure:
         2, this->_internal_model_token(), target);
   }
 
+  // optional string accelerator_name = 3;
+  if (cached_has_bits & 0x00000004u) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->_internal_accelerator_name().data(), static_cast<int>(this->_internal_accelerator_name().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
+      "mediapipe.InferenceCalculatorOptions.Delegate.Nnapi.accelerator_name");
+    target = stream->WriteStringMaybeAliased(
+        3, this->_internal_accelerator_name(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -1079,7 +1116,7 @@ size_t InferenceCalculatorOptions_Delegate_Nnapi::ByteSizeLong() const {
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000003u) {
+  if (cached_has_bits & 0x00000007u) {
     // optional string cache_dir = 1;
     if (cached_has_bits & 0x00000001u) {
       total_size += 1 +
@@ -1092,6 +1129,13 @@ size_t InferenceCalculatorOptions_Delegate_Nnapi::ByteSizeLong() const {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
           this->_internal_model_token());
+    }
+
+    // optional string accelerator_name = 3;
+    if (cached_has_bits & 0x00000004u) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_accelerator_name());
     }
 
   }
@@ -1127,12 +1171,15 @@ void InferenceCalculatorOptions_Delegate_Nnapi::MergeFrom(const InferenceCalcula
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 0x00000003u) {
+  if (cached_has_bits & 0x00000007u) {
     if (cached_has_bits & 0x00000001u) {
       _internal_set_cache_dir(from._internal_cache_dir());
     }
     if (cached_has_bits & 0x00000002u) {
       _internal_set_model_token(from._internal_model_token());
+    }
+    if (cached_has_bits & 0x00000004u) {
+      _internal_set_accelerator_name(from._internal_accelerator_name());
     }
   }
 }
@@ -1161,6 +1208,7 @@ void InferenceCalculatorOptions_Delegate_Nnapi::InternalSwap(InferenceCalculator
   swap(_has_bits_[0], other->_has_bits_[0]);
   cache_dir_.Swap(&other->cache_dir_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   model_token_.Swap(&other->model_token_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  accelerator_name_.Swap(&other->accelerator_name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata InferenceCalculatorOptions_Delegate_Nnapi::GetMetadata() const {

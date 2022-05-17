@@ -21,6 +21,7 @@ constexpr DetectionLabelIdToTextCalculatorOptions::DetectionLabelIdToTextCalcula
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : label_()
   , label_map_path_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , label_map_(nullptr)
   , keep_label_id_(false){}
 struct DetectionLabelIdToTextCalculatorOptionsDefaultTypeInternal {
   constexpr DetectionLabelIdToTextCalculatorOptionsDefaultTypeInternal()
@@ -45,12 +46,14 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fcalculators_2futil
   PROTOBUF_FIELD_OFFSET(::mediapipe::DetectionLabelIdToTextCalculatorOptions, label_map_path_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::DetectionLabelIdToTextCalculatorOptions, label_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::DetectionLabelIdToTextCalculatorOptions, keep_label_id_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::DetectionLabelIdToTextCalculatorOptions, label_map_),
   0,
   ~0u,
+  2,
   1,
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 8, sizeof(::mediapipe::DetectionLabelIdToTextCalculatorOptions)},
+  { 0, 9, sizeof(::mediapipe::DetectionLabelIdToTextCalculatorOptions)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -61,20 +64,22 @@ const char descriptor_table_protodef_mediapipe_2fcalculators_2futil_2fdetection_
   "\nFmediapipe/calculators/util/detection_l"
   "abel_id_to_text_calculator.proto\022\tmediap"
   "ipe\032$mediapipe/framework/calculator.prot"
-  "o\"\311\001\n\'DetectionLabelIdToTextCalculatorOp"
-  "tions\022\026\n\016label_map_path\030\001 \001(\t\022\r\n\005label\030\002"
-  " \003(\t\022\025\n\rkeep_label_id\030\003 \001(\0102`\n\003ext\022\034.med"
-  "iapipe.CalculatorOptions\030\260\213\216x \001(\01322.medi"
-  "apipe.DetectionLabelIdToTextCalculatorOp"
-  "tions"
+  "o\032\036mediapipe/util/label_map.proto\"\361\001\n\'De"
+  "tectionLabelIdToTextCalculatorOptions\022\026\n"
+  "\016label_map_path\030\001 \001(\t\022\r\n\005label\030\002 \003(\t\022\025\n\r"
+  "keep_label_id\030\003 \001(\010\022&\n\tlabel_map\030\004 \001(\0132\023"
+  ".mediapipe.LabelMap2`\n\003ext\022\034.mediapipe.C"
+  "alculatorOptions\030\260\213\216x \001(\01322.mediapipe.De"
+  "tectionLabelIdToTextCalculatorOptions"
   ;
-static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_5ftext_5fcalculator_2eproto_deps[1] = {
+static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_5ftext_5fcalculator_2eproto_deps[2] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
+  &::descriptor_table_mediapipe_2futil_2flabel_5fmap_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_5ftext_5fcalculator_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_5ftext_5fcalculator_2eproto = {
-  false, false, 325, descriptor_table_protodef_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_5ftext_5fcalculator_2eproto, "mediapipe/calculators/util/detection_label_id_to_text_calculator.proto", 
-  &descriptor_table_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_5ftext_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_5ftext_5fcalculator_2eproto_deps, 1, 1,
+  false, false, 397, descriptor_table_protodef_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_5ftext_5fcalculator_2eproto, "mediapipe/calculators/util/detection_label_id_to_text_calculator.proto", 
+  &descriptor_table_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_5ftext_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_5ftext_5fcalculator_2eproto_deps, 2, 1,
   schemas, file_default_instances, TableStruct_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_5ftext_5fcalculator_2eproto::offsets,
   file_level_metadata_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_5ftext_5fcalculator_2eproto, file_level_enum_descriptors_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_5ftext_5fcalculator_2eproto, file_level_service_descriptors_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_5ftext_5fcalculator_2eproto,
 };
@@ -95,10 +100,22 @@ class DetectionLabelIdToTextCalculatorOptions::_Internal {
     (*has_bits)[0] |= 1u;
   }
   static void set_has_keep_label_id(HasBits* has_bits) {
+    (*has_bits)[0] |= 4u;
+  }
+  static const ::mediapipe::LabelMap& label_map(const DetectionLabelIdToTextCalculatorOptions* msg);
+  static void set_has_label_map(HasBits* has_bits) {
     (*has_bits)[0] |= 2u;
   }
 };
 
+const ::mediapipe::LabelMap&
+DetectionLabelIdToTextCalculatorOptions::_Internal::label_map(const DetectionLabelIdToTextCalculatorOptions* msg) {
+  return *msg->label_map_;
+}
+void DetectionLabelIdToTextCalculatorOptions::clear_label_map() {
+  if (label_map_ != nullptr) label_map_->Clear();
+  _has_bits_[0] &= ~0x00000002u;
+}
 DetectionLabelIdToTextCalculatorOptions::DetectionLabelIdToTextCalculatorOptions(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
   label_(arena) {
@@ -116,13 +133,21 @@ DetectionLabelIdToTextCalculatorOptions::DetectionLabelIdToTextCalculatorOptions
     label_map_path_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_label_map_path(), 
       GetArena());
   }
+  if (from._internal_has_label_map()) {
+    label_map_ = new ::mediapipe::LabelMap(*from.label_map_);
+  } else {
+    label_map_ = nullptr;
+  }
   keep_label_id_ = from.keep_label_id_;
   // @@protoc_insertion_point(copy_constructor:mediapipe.DetectionLabelIdToTextCalculatorOptions)
 }
 
 void DetectionLabelIdToTextCalculatorOptions::SharedCtor() {
 label_map_path_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-keep_label_id_ = false;
+::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+    reinterpret_cast<char*>(&label_map_) - reinterpret_cast<char*>(this)),
+    0, static_cast<size_t>(reinterpret_cast<char*>(&keep_label_id_) -
+    reinterpret_cast<char*>(&label_map_)) + sizeof(keep_label_id_));
 }
 
 DetectionLabelIdToTextCalculatorOptions::~DetectionLabelIdToTextCalculatorOptions() {
@@ -134,6 +159,7 @@ DetectionLabelIdToTextCalculatorOptions::~DetectionLabelIdToTextCalculatorOption
 void DetectionLabelIdToTextCalculatorOptions::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
   label_map_path_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (this != internal_default_instance()) delete label_map_;
 }
 
 void DetectionLabelIdToTextCalculatorOptions::ArenaDtor(void* object) {
@@ -154,8 +180,14 @@ void DetectionLabelIdToTextCalculatorOptions::Clear() {
 
   label_.Clear();
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000001u) {
-    label_map_path_.ClearNonDefaultToEmpty();
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      label_map_path_.ClearNonDefaultToEmpty();
+    }
+    if (cached_has_bits & 0x00000002u) {
+      GOOGLE_DCHECK(label_map_ != nullptr);
+      label_map_->Clear();
+    }
   }
   keep_label_id_ = false;
   _has_bits_.Clear();
@@ -201,6 +233,13 @@ const char* DetectionLabelIdToTextCalculatorOptions::_InternalParse(const char* 
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
           _Internal::set_has_keep_label_id(&has_bits);
           keep_label_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // optional .mediapipe.LabelMap label_map = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+          ptr = ctx->ParseMessage(_internal_mutable_label_map(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -256,9 +295,17 @@ failure:
   }
 
   // optional bool keep_label_id = 3;
-  if (cached_has_bits & 0x00000002u) {
+  if (cached_has_bits & 0x00000004u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(3, this->_internal_keep_label_id(), target);
+  }
+
+  // optional .mediapipe.LabelMap label_map = 4;
+  if (cached_has_bits & 0x00000002u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        4, _Internal::label_map(this), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -286,7 +333,7 @@ size_t DetectionLabelIdToTextCalculatorOptions::ByteSizeLong() const {
   }
 
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000003u) {
+  if (cached_has_bits & 0x00000007u) {
     // optional string label_map_path = 1;
     if (cached_has_bits & 0x00000001u) {
       total_size += 1 +
@@ -294,8 +341,15 @@ size_t DetectionLabelIdToTextCalculatorOptions::ByteSizeLong() const {
           this->_internal_label_map_path());
     }
 
-    // optional bool keep_label_id = 3;
+    // optional .mediapipe.LabelMap label_map = 4;
     if (cached_has_bits & 0x00000002u) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *label_map_);
+    }
+
+    // optional bool keep_label_id = 3;
+    if (cached_has_bits & 0x00000004u) {
       total_size += 1 + 1;
     }
 
@@ -333,11 +387,14 @@ void DetectionLabelIdToTextCalculatorOptions::MergeFrom(const DetectionLabelIdTo
 
   label_.MergeFrom(from.label_);
   cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 0x00000003u) {
+  if (cached_has_bits & 0x00000007u) {
     if (cached_has_bits & 0x00000001u) {
       _internal_set_label_map_path(from._internal_label_map_path());
     }
     if (cached_has_bits & 0x00000002u) {
+      _internal_mutable_label_map()->::mediapipe::LabelMap::MergeFrom(from._internal_label_map());
+    }
+    if (cached_has_bits & 0x00000004u) {
       keep_label_id_ = from.keep_label_id_;
     }
     _has_bits_[0] |= cached_has_bits;
@@ -368,7 +425,12 @@ void DetectionLabelIdToTextCalculatorOptions::InternalSwap(DetectionLabelIdToTex
   swap(_has_bits_[0], other->_has_bits_[0]);
   label_.InternalSwap(&other->label_);
   label_map_path_.Swap(&other->label_map_path_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-  swap(keep_label_id_, other->keep_label_id_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(DetectionLabelIdToTextCalculatorOptions, keep_label_id_)
+      + sizeof(DetectionLabelIdToTextCalculatorOptions::keep_label_id_)
+      - PROTOBUF_FIELD_OFFSET(DetectionLabelIdToTextCalculatorOptions, label_map_)>(
+          reinterpret_cast<char*>(&label_map_),
+          reinterpret_cast<char*>(&other->label_map_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata DetectionLabelIdToTextCalculatorOptions::GetMetadata() const {

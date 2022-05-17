@@ -43,6 +43,19 @@ struct ImageToTensorCalculatorOptions_IntRangeDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT ImageToTensorCalculatorOptions_IntRangeDefaultTypeInternal _ImageToTensorCalculatorOptions_IntRange_default_instance_;
+constexpr ImageToTensorCalculatorOptions_UIntRange::ImageToTensorCalculatorOptions_UIntRange(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : min_(PROTOBUF_ULONGLONG(0))
+  , max_(PROTOBUF_ULONGLONG(0)){}
+struct ImageToTensorCalculatorOptions_UIntRangeDefaultTypeInternal {
+  constexpr ImageToTensorCalculatorOptions_UIntRangeDefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  ~ImageToTensorCalculatorOptions_UIntRangeDefaultTypeInternal() {}
+  union {
+    ImageToTensorCalculatorOptions_UIntRange _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT ImageToTensorCalculatorOptions_UIntRangeDefaultTypeInternal _ImageToTensorCalculatorOptions_UIntRange_default_instance_;
 constexpr ImageToTensorCalculatorOptions::ImageToTensorCalculatorOptions(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : output_tensor_width_(0)
@@ -63,7 +76,7 @@ struct ImageToTensorCalculatorOptionsDefaultTypeInternal {
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT ImageToTensorCalculatorOptionsDefaultTypeInternal _ImageToTensorCalculatorOptions_default_instance_;
 }  // namespace mediapipe
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto[3];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto[4];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto = nullptr;
 
@@ -86,6 +99,15 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fcalculators_2ftens
   PROTOBUF_FIELD_OFFSET(::mediapipe::ImageToTensorCalculatorOptions_IntRange, max_),
   0,
   1,
+  PROTOBUF_FIELD_OFFSET(::mediapipe::ImageToTensorCalculatorOptions_UIntRange, _has_bits_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::ImageToTensorCalculatorOptions_UIntRange, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::mediapipe::ImageToTensorCalculatorOptions_UIntRange, min_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::ImageToTensorCalculatorOptions_UIntRange, max_),
+  0,
+  1,
   PROTOBUF_FIELD_OFFSET(::mediapipe::ImageToTensorCalculatorOptions, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::ImageToTensorCalculatorOptions, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -96,6 +118,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fcalculators_2ftens
   PROTOBUF_FIELD_OFFSET(::mediapipe::ImageToTensorCalculatorOptions, keep_aspect_ratio_),
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   PROTOBUF_FIELD_OFFSET(::mediapipe::ImageToTensorCalculatorOptions, gpu_origin_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::ImageToTensorCalculatorOptions, border_mode_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::ImageToTensorCalculatorOptions, range_),
@@ -104,18 +127,21 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fcalculators_2ftens
   2,
   ~0u,
   ~0u,
+  ~0u,
   3,
   4,
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, 7, sizeof(::mediapipe::ImageToTensorCalculatorOptions_FloatRange)},
   { 9, 16, sizeof(::mediapipe::ImageToTensorCalculatorOptions_IntRange)},
-  { 18, 31, sizeof(::mediapipe::ImageToTensorCalculatorOptions)},
+  { 18, 25, sizeof(::mediapipe::ImageToTensorCalculatorOptions_UIntRange)},
+  { 27, 41, sizeof(::mediapipe::ImageToTensorCalculatorOptions)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::mediapipe::_ImageToTensorCalculatorOptions_FloatRange_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::mediapipe::_ImageToTensorCalculatorOptions_IntRange_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::mediapipe::_ImageToTensorCalculatorOptions_UIntRange_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::mediapipe::_ImageToTensorCalculatorOptions_default_instance_),
 };
 
@@ -123,7 +149,7 @@ const char descriptor_table_protodef_mediapipe_2fcalculators_2ftensor_2fimage_5f
   "\n=mediapipe/calculators/tensor/image_to_"
   "tensor_calculator.proto\022\tmediapipe\032$medi"
   "apipe/framework/calculator.proto\032\036mediap"
-  "ipe/gpu/gpu_origin.proto\"\240\005\n\036ImageToTens"
+  "ipe/gpu/gpu_origin.proto\"\240\006\n\036ImageToTens"
   "orCalculatorOptions\022\033\n\023output_tensor_wid"
   "th\030\001 \001(\005\022\034\n\024output_tensor_height\030\002 \001(\005\022\031"
   "\n\021keep_aspect_ratio\030\003 \001(\010\022Y\n\031output_tens"
@@ -131,16 +157,19 @@ const char descriptor_table_protodef_mediapipe_2fcalculators_2ftensor_2fimage_5f
   "TensorCalculatorOptions.FloatRangeH\000\022U\n\027"
   "output_tensor_int_range\030\007 \001(\01322.mediapip"
   "e.ImageToTensorCalculatorOptions.IntRang"
-  "eH\000\022-\n\ngpu_origin\030\005 \001(\0162\031.mediapipe.GpuO"
-  "rigin.Mode\022I\n\013border_mode\030\006 \001(\01624.mediap"
-  "ipe.ImageToTensorCalculatorOptions.Borde"
-  "rMode\032&\n\nFloatRange\022\013\n\003min\030\001 \001(\002\022\013\n\003max\030"
-  "\002 \001(\002\032$\n\010IntRange\022\013\n\003min\030\001 \001(\003\022\013\n\003max\030\002 "
-  "\001(\003\"K\n\nBorderMode\022\026\n\022BORDER_UNSPECIFIED\020"
-  "\000\022\017\n\013BORDER_ZERO\020\001\022\024\n\020BORDER_REPLICATE\020\002"
-  "2X\n\003ext\022\034.mediapipe.CalculatorOptions\030\323\352"
-  "\267\237\001 \001(\0132).mediapipe.ImageToTensorCalcula"
-  "torOptionsB\007\n\005range"
+  "eH\000\022W\n\030output_tensor_uint_range\030\010 \001(\01323."
+  "mediapipe.ImageToTensorCalculatorOptions"
+  ".UIntRangeH\000\022-\n\ngpu_origin\030\005 \001(\0162\031.media"
+  "pipe.GpuOrigin.Mode\022I\n\013border_mode\030\006 \001(\016"
+  "24.mediapipe.ImageToTensorCalculatorOpti"
+  "ons.BorderMode\032&\n\nFloatRange\022\013\n\003min\030\001 \001("
+  "\002\022\013\n\003max\030\002 \001(\002\032$\n\010IntRange\022\013\n\003min\030\001 \001(\003\022"
+  "\013\n\003max\030\002 \001(\003\032%\n\tUIntRange\022\013\n\003min\030\001 \001(\004\022\013"
+  "\n\003max\030\002 \001(\004\"K\n\nBorderMode\022\026\n\022BORDER_UNSP"
+  "ECIFIED\020\000\022\017\n\013BORDER_ZERO\020\001\022\024\n\020BORDER_REP"
+  "LICATE\020\0022X\n\003ext\022\034.mediapipe.CalculatorOp"
+  "tions\030\323\352\267\237\001 \001(\0132).mediapipe.ImageToTenso"
+  "rCalculatorOptionsB\007\n\005range"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto_deps[2] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
@@ -148,8 +177,8 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto = {
-  false, false, 819, descriptor_table_protodef_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto, "mediapipe/calculators/tensor/image_to_tensor_calculator.proto", 
-  &descriptor_table_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto_deps, 2, 3,
+  false, false, 947, descriptor_table_protodef_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto, "mediapipe/calculators/tensor/image_to_tensor_calculator.proto", 
+  &descriptor_table_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto_deps, 2, 4,
   schemas, file_default_instances, TableStruct_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto::offsets,
   file_level_metadata_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto, file_level_enum_descriptors_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto, file_level_service_descriptors_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto,
 };
@@ -682,6 +711,256 @@ void ImageToTensorCalculatorOptions_IntRange::InternalSwap(ImageToTensorCalculat
 
 // ===================================================================
 
+class ImageToTensorCalculatorOptions_UIntRange::_Internal {
+ public:
+  using HasBits = decltype(std::declval<ImageToTensorCalculatorOptions_UIntRange>()._has_bits_);
+  static void set_has_min(HasBits* has_bits) {
+    (*has_bits)[0] |= 1u;
+  }
+  static void set_has_max(HasBits* has_bits) {
+    (*has_bits)[0] |= 2u;
+  }
+};
+
+ImageToTensorCalculatorOptions_UIntRange::ImageToTensorCalculatorOptions_UIntRange(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:mediapipe.ImageToTensorCalculatorOptions.UIntRange)
+}
+ImageToTensorCalculatorOptions_UIntRange::ImageToTensorCalculatorOptions_UIntRange(const ImageToTensorCalculatorOptions_UIntRange& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      _has_bits_(from._has_bits_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::memcpy(&min_, &from.min_,
+    static_cast<size_t>(reinterpret_cast<char*>(&max_) -
+    reinterpret_cast<char*>(&min_)) + sizeof(max_));
+  // @@protoc_insertion_point(copy_constructor:mediapipe.ImageToTensorCalculatorOptions.UIntRange)
+}
+
+void ImageToTensorCalculatorOptions_UIntRange::SharedCtor() {
+::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+    reinterpret_cast<char*>(&min_) - reinterpret_cast<char*>(this)),
+    0, static_cast<size_t>(reinterpret_cast<char*>(&max_) -
+    reinterpret_cast<char*>(&min_)) + sizeof(max_));
+}
+
+ImageToTensorCalculatorOptions_UIntRange::~ImageToTensorCalculatorOptions_UIntRange() {
+  // @@protoc_insertion_point(destructor:mediapipe.ImageToTensorCalculatorOptions.UIntRange)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void ImageToTensorCalculatorOptions_UIntRange::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void ImageToTensorCalculatorOptions_UIntRange::ArenaDtor(void* object) {
+  ImageToTensorCalculatorOptions_UIntRange* _this = reinterpret_cast< ImageToTensorCalculatorOptions_UIntRange* >(object);
+  (void)_this;
+}
+void ImageToTensorCalculatorOptions_UIntRange::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void ImageToTensorCalculatorOptions_UIntRange::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+
+void ImageToTensorCalculatorOptions_UIntRange::Clear() {
+// @@protoc_insertion_point(message_clear_start:mediapipe.ImageToTensorCalculatorOptions.UIntRange)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    ::memset(&min_, 0, static_cast<size_t>(
+        reinterpret_cast<char*>(&max_) -
+        reinterpret_cast<char*>(&min_)) + sizeof(max_));
+  }
+  _has_bits_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* ImageToTensorCalculatorOptions_UIntRange::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  _Internal::HasBits has_bits{};
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // optional uint64 min = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          _Internal::set_has_min(&has_bits);
+          min_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // optional uint64 max = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+          _Internal::set_has_max(&has_bits);
+          max_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag == 0) || ((tag & 7) == 4)) {
+          CHK_(ptr);
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  _has_bits_.Or(has_bits);
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* ImageToTensorCalculatorOptions_UIntRange::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:mediapipe.ImageToTensorCalculatorOptions.UIntRange)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  // optional uint64 min = 1;
+  if (cached_has_bits & 0x00000001u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt64ToArray(1, this->_internal_min(), target);
+  }
+
+  // optional uint64 max = 2;
+  if (cached_has_bits & 0x00000002u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt64ToArray(2, this->_internal_max(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:mediapipe.ImageToTensorCalculatorOptions.UIntRange)
+  return target;
+}
+
+size_t ImageToTensorCalculatorOptions_UIntRange::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:mediapipe.ImageToTensorCalculatorOptions.UIntRange)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    // optional uint64 min = 1;
+    if (cached_has_bits & 0x00000001u) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64Size(
+          this->_internal_min());
+    }
+
+    // optional uint64 max = 2;
+    if (cached_has_bits & 0x00000002u) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt64Size(
+          this->_internal_max());
+    }
+
+  }
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void ImageToTensorCalculatorOptions_UIntRange::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:mediapipe.ImageToTensorCalculatorOptions.UIntRange)
+  GOOGLE_DCHECK_NE(&from, this);
+  const ImageToTensorCalculatorOptions_UIntRange* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<ImageToTensorCalculatorOptions_UIntRange>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:mediapipe.ImageToTensorCalculatorOptions.UIntRange)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:mediapipe.ImageToTensorCalculatorOptions.UIntRange)
+    MergeFrom(*source);
+  }
+}
+
+void ImageToTensorCalculatorOptions_UIntRange::MergeFrom(const ImageToTensorCalculatorOptions_UIntRange& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:mediapipe.ImageToTensorCalculatorOptions.UIntRange)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  cached_has_bits = from._has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      min_ = from.min_;
+    }
+    if (cached_has_bits & 0x00000002u) {
+      max_ = from.max_;
+    }
+    _has_bits_[0] |= cached_has_bits;
+  }
+}
+
+void ImageToTensorCalculatorOptions_UIntRange::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:mediapipe.ImageToTensorCalculatorOptions.UIntRange)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void ImageToTensorCalculatorOptions_UIntRange::CopyFrom(const ImageToTensorCalculatorOptions_UIntRange& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:mediapipe.ImageToTensorCalculatorOptions.UIntRange)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ImageToTensorCalculatorOptions_UIntRange::IsInitialized() const {
+  return true;
+}
+
+void ImageToTensorCalculatorOptions_UIntRange::InternalSwap(ImageToTensorCalculatorOptions_UIntRange* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_has_bits_[0], other->_has_bits_[0]);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(ImageToTensorCalculatorOptions_UIntRange, max_)
+      + sizeof(ImageToTensorCalculatorOptions_UIntRange::max_)
+      - PROTOBUF_FIELD_OFFSET(ImageToTensorCalculatorOptions_UIntRange, min_)>(
+          reinterpret_cast<char*>(&min_),
+          reinterpret_cast<char*>(&other->min_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata ImageToTensorCalculatorOptions_UIntRange::GetMetadata() const {
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto_getter, &descriptor_table_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto_once,
+      file_level_metadata_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto[2]);
+}
+
+// ===================================================================
+
 class ImageToTensorCalculatorOptions::_Internal {
  public:
   using HasBits = decltype(std::declval<ImageToTensorCalculatorOptions>()._has_bits_);
@@ -696,6 +975,7 @@ class ImageToTensorCalculatorOptions::_Internal {
   }
   static const ::mediapipe::ImageToTensorCalculatorOptions_FloatRange& output_tensor_float_range(const ImageToTensorCalculatorOptions* msg);
   static const ::mediapipe::ImageToTensorCalculatorOptions_IntRange& output_tensor_int_range(const ImageToTensorCalculatorOptions* msg);
+  static const ::mediapipe::ImageToTensorCalculatorOptions_UIntRange& output_tensor_uint_range(const ImageToTensorCalculatorOptions* msg);
   static void set_has_gpu_origin(HasBits* has_bits) {
     (*has_bits)[0] |= 8u;
   }
@@ -711,6 +991,10 @@ ImageToTensorCalculatorOptions::_Internal::output_tensor_float_range(const Image
 const ::mediapipe::ImageToTensorCalculatorOptions_IntRange&
 ImageToTensorCalculatorOptions::_Internal::output_tensor_int_range(const ImageToTensorCalculatorOptions* msg) {
   return *msg->range_.output_tensor_int_range_;
+}
+const ::mediapipe::ImageToTensorCalculatorOptions_UIntRange&
+ImageToTensorCalculatorOptions::_Internal::output_tensor_uint_range(const ImageToTensorCalculatorOptions* msg) {
+  return *msg->range_.output_tensor_uint_range_;
 }
 void ImageToTensorCalculatorOptions::set_allocated_output_tensor_float_range(::mediapipe::ImageToTensorCalculatorOptions_FloatRange* output_tensor_float_range) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
@@ -742,6 +1026,21 @@ void ImageToTensorCalculatorOptions::set_allocated_output_tensor_int_range(::med
   }
   // @@protoc_insertion_point(field_set_allocated:mediapipe.ImageToTensorCalculatorOptions.output_tensor_int_range)
 }
+void ImageToTensorCalculatorOptions::set_allocated_output_tensor_uint_range(::mediapipe::ImageToTensorCalculatorOptions_UIntRange* output_tensor_uint_range) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  clear_range();
+  if (output_tensor_uint_range) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(output_tensor_uint_range);
+    if (message_arena != submessage_arena) {
+      output_tensor_uint_range = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, output_tensor_uint_range, submessage_arena);
+    }
+    set_has_output_tensor_uint_range();
+    range_.output_tensor_uint_range_ = output_tensor_uint_range;
+  }
+  // @@protoc_insertion_point(field_set_allocated:mediapipe.ImageToTensorCalculatorOptions.output_tensor_uint_range)
+}
 ImageToTensorCalculatorOptions::ImageToTensorCalculatorOptions(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
@@ -763,6 +1062,10 @@ ImageToTensorCalculatorOptions::ImageToTensorCalculatorOptions(const ImageToTens
     }
     case kOutputTensorIntRange: {
       _internal_mutable_output_tensor_int_range()->::mediapipe::ImageToTensorCalculatorOptions_IntRange::MergeFrom(from._internal_output_tensor_int_range());
+      break;
+    }
+    case kOutputTensorUintRange: {
+      _internal_mutable_output_tensor_uint_range()->::mediapipe::ImageToTensorCalculatorOptions_UIntRange::MergeFrom(from._internal_output_tensor_uint_range());
       break;
     }
     case RANGE_NOT_SET: {
@@ -815,6 +1118,12 @@ void ImageToTensorCalculatorOptions::clear_range() {
     case kOutputTensorIntRange: {
       if (GetArena() == nullptr) {
         delete range_.output_tensor_int_range_;
+      }
+      break;
+    }
+    case kOutputTensorUintRange: {
+      if (GetArena() == nullptr) {
+        delete range_.output_tensor_uint_range_;
       }
       break;
     }
@@ -912,6 +1221,13 @@ const char* ImageToTensorCalculatorOptions::_InternalParse(const char* ptr, ::PR
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
+      // .mediapipe.ImageToTensorCalculatorOptions.UIntRange output_tensor_uint_range = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
+          ptr = ctx->ParseMessage(_internal_mutable_output_tensor_uint_range(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag == 0) || ((tag & 7) == 4)) {
@@ -983,14 +1299,23 @@ failure:
       6, this->_internal_border_mode(), target);
   }
 
-  // .mediapipe.ImageToTensorCalculatorOptions.IntRange output_tensor_int_range = 7;
-  if (_internal_has_output_tensor_int_range()) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(
-        7, _Internal::output_tensor_int_range(this), target, stream);
+  switch (range_case()) {
+    case kOutputTensorIntRange: {
+      target = stream->EnsureSpace(target);
+      target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        InternalWriteMessage(
+          7, _Internal::output_tensor_int_range(this), target, stream);
+      break;
+    }
+    case kOutputTensorUintRange: {
+      target = stream->EnsureSpace(target);
+      target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        InternalWriteMessage(
+          8, _Internal::output_tensor_uint_range(this), target, stream);
+      break;
+    }
+    default: ;
   }
-
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -1056,6 +1381,13 @@ size_t ImageToTensorCalculatorOptions::ByteSizeLong() const {
           *range_.output_tensor_int_range_);
       break;
     }
+    // .mediapipe.ImageToTensorCalculatorOptions.UIntRange output_tensor_uint_range = 8;
+    case kOutputTensorUintRange: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *range_.output_tensor_uint_range_);
+      break;
+    }
     case RANGE_NOT_SET: {
       break;
     }
@@ -1119,6 +1451,10 @@ void ImageToTensorCalculatorOptions::MergeFrom(const ImageToTensorCalculatorOpti
       _internal_mutable_output_tensor_int_range()->::mediapipe::ImageToTensorCalculatorOptions_IntRange::MergeFrom(from._internal_output_tensor_int_range());
       break;
     }
+    case kOutputTensorUintRange: {
+      _internal_mutable_output_tensor_uint_range()->::mediapipe::ImageToTensorCalculatorOptions_UIntRange::MergeFrom(from._internal_output_tensor_uint_range());
+      break;
+    }
     case RANGE_NOT_SET: {
       break;
     }
@@ -1160,7 +1496,7 @@ void ImageToTensorCalculatorOptions::InternalSwap(ImageToTensorCalculatorOptions
 ::PROTOBUF_NAMESPACE_ID::Metadata ImageToTensorCalculatorOptions::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto_getter, &descriptor_table_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto_once,
-      file_level_metadata_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto[2]);
+      file_level_metadata_mediapipe_2fcalculators_2ftensor_2fimage_5fto_5ftensor_5fcalculator_2eproto[3]);
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int ImageToTensorCalculatorOptions::kExtFieldNumber;
@@ -1177,6 +1513,9 @@ template<> PROTOBUF_NOINLINE ::mediapipe::ImageToTensorCalculatorOptions_FloatRa
 }
 template<> PROTOBUF_NOINLINE ::mediapipe::ImageToTensorCalculatorOptions_IntRange* Arena::CreateMaybeMessage< ::mediapipe::ImageToTensorCalculatorOptions_IntRange >(Arena* arena) {
   return Arena::CreateMessageInternal< ::mediapipe::ImageToTensorCalculatorOptions_IntRange >(arena);
+}
+template<> PROTOBUF_NOINLINE ::mediapipe::ImageToTensorCalculatorOptions_UIntRange* Arena::CreateMaybeMessage< ::mediapipe::ImageToTensorCalculatorOptions_UIntRange >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::mediapipe::ImageToTensorCalculatorOptions_UIntRange >(arena);
 }
 template<> PROTOBUF_NOINLINE ::mediapipe::ImageToTensorCalculatorOptions* Arena::CreateMaybeMessage< ::mediapipe::ImageToTensorCalculatorOptions >(Arena* arena) {
   return Arena::CreateMessageInternal< ::mediapipe::ImageToTensorCalculatorOptions >(arena);

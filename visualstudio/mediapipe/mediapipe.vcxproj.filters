@@ -1161,6 +1161,21 @@
     <ClCompile Include="..\..\mediapipe\calculators\tflite\tflite_tensors_to_landmarks_calculator.cc">
       <Filter>calculators\tflite</Filter>
     </ClCompile>
+    <ClCompile Include="framework\stream_handler\timestamp_align_input_stream_handler.pb.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\stream_handler\timestamp_align_input_stream_handler.cc">
+      <Filter>framework\stream_handler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\opencv_image_encoder_calculator.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="calculators\image\opencv_image_encoder_calculator.pb.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
+    <ClCompile Include="util\label_map.pb.cc">
+      <Filter>util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\mediapipe\framework\tool\options_util.h">
@@ -1780,6 +1795,15 @@
     </ClInclude>
     <ClInclude Include="..\..\mediapipe\util\tracking\tone_models.h">
       <Filter>util\tracking</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\stream_handler\timestamp_align_input_stream_handler.pb.h">
+      <Filter>framework\stream_handler</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\image\opencv_image_encoder_calculator.pb.h">
+      <Filter>calculators\image</Filter>
+    </ClInclude>
+    <ClInclude Include="util\label_map.pb.h">
+      <Filter>util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

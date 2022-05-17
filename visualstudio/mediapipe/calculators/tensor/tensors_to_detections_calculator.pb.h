@@ -47,7 +47,7 @@ struct TableStruct_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fdetections_
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[1]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -58,13 +58,412 @@ namespace mediapipe {
 class TensorsToDetectionsCalculatorOptions;
 struct TensorsToDetectionsCalculatorOptionsDefaultTypeInternal;
 extern TensorsToDetectionsCalculatorOptionsDefaultTypeInternal _TensorsToDetectionsCalculatorOptions_default_instance_;
+class TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices;
+struct TensorsToDetectionsCalculatorOptions_BoxBoundariesIndicesDefaultTypeInternal;
+extern TensorsToDetectionsCalculatorOptions_BoxBoundariesIndicesDefaultTypeInternal _TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices_default_instance_;
+class TensorsToDetectionsCalculatorOptions_TensorMapping;
+struct TensorsToDetectionsCalculatorOptions_TensorMappingDefaultTypeInternal;
+extern TensorsToDetectionsCalculatorOptions_TensorMappingDefaultTypeInternal _TensorsToDetectionsCalculatorOptions_TensorMapping_default_instance_;
 }  // namespace mediapipe
 PROTOBUF_NAMESPACE_OPEN
 template<> ::mediapipe::TensorsToDetectionsCalculatorOptions* Arena::CreateMaybeMessage<::mediapipe::TensorsToDetectionsCalculatorOptions>(Arena*);
+template<> ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* Arena::CreateMaybeMessage<::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices>(Arena*);
+template<> ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* Arena::CreateMaybeMessage<::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace mediapipe {
 
 // ===================================================================
+
+class TensorsToDetectionsCalculatorOptions_TensorMapping PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:mediapipe.TensorsToDetectionsCalculatorOptions.TensorMapping) */ {
+ public:
+  inline TensorsToDetectionsCalculatorOptions_TensorMapping() : TensorsToDetectionsCalculatorOptions_TensorMapping(nullptr) {}
+  ~TensorsToDetectionsCalculatorOptions_TensorMapping() override;
+  explicit constexpr TensorsToDetectionsCalculatorOptions_TensorMapping(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  TensorsToDetectionsCalculatorOptions_TensorMapping(const TensorsToDetectionsCalculatorOptions_TensorMapping& from);
+  TensorsToDetectionsCalculatorOptions_TensorMapping(TensorsToDetectionsCalculatorOptions_TensorMapping&& from) noexcept
+    : TensorsToDetectionsCalculatorOptions_TensorMapping() {
+    *this = ::std::move(from);
+  }
+
+  inline TensorsToDetectionsCalculatorOptions_TensorMapping& operator=(const TensorsToDetectionsCalculatorOptions_TensorMapping& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline TensorsToDetectionsCalculatorOptions_TensorMapping& operator=(TensorsToDetectionsCalculatorOptions_TensorMapping&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const TensorsToDetectionsCalculatorOptions_TensorMapping& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const TensorsToDetectionsCalculatorOptions_TensorMapping* internal_default_instance() {
+    return reinterpret_cast<const TensorsToDetectionsCalculatorOptions_TensorMapping*>(
+               &_TensorsToDetectionsCalculatorOptions_TensorMapping_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    0;
+
+  friend void swap(TensorsToDetectionsCalculatorOptions_TensorMapping& a, TensorsToDetectionsCalculatorOptions_TensorMapping& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(TensorsToDetectionsCalculatorOptions_TensorMapping* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(TensorsToDetectionsCalculatorOptions_TensorMapping* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline TensorsToDetectionsCalculatorOptions_TensorMapping* New() const final {
+    return CreateMaybeMessage<TensorsToDetectionsCalculatorOptions_TensorMapping>(nullptr);
+  }
+
+  TensorsToDetectionsCalculatorOptions_TensorMapping* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<TensorsToDetectionsCalculatorOptions_TensorMapping>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const TensorsToDetectionsCalculatorOptions_TensorMapping& from);
+  void MergeFrom(const TensorsToDetectionsCalculatorOptions_TensorMapping& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(TensorsToDetectionsCalculatorOptions_TensorMapping* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "mediapipe.TensorsToDetectionsCalculatorOptions.TensorMapping";
+  }
+  protected:
+  explicit TensorsToDetectionsCalculatorOptions_TensorMapping(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kDetectionsTensorIndexFieldNumber = 1,
+    kClassesTensorIndexFieldNumber = 2,
+    kScoresTensorIndexFieldNumber = 3,
+    kNumDetectionsTensorIndexFieldNumber = 4,
+    kAnchorsTensorIndexFieldNumber = 5,
+  };
+  // optional int32 detections_tensor_index = 1;
+  bool has_detections_tensor_index() const;
+  private:
+  bool _internal_has_detections_tensor_index() const;
+  public:
+  void clear_detections_tensor_index();
+  ::PROTOBUF_NAMESPACE_ID::int32 detections_tensor_index() const;
+  void set_detections_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_detections_tensor_index() const;
+  void _internal_set_detections_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional int32 classes_tensor_index = 2;
+  bool has_classes_tensor_index() const;
+  private:
+  bool _internal_has_classes_tensor_index() const;
+  public:
+  void clear_classes_tensor_index();
+  ::PROTOBUF_NAMESPACE_ID::int32 classes_tensor_index() const;
+  void set_classes_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_classes_tensor_index() const;
+  void _internal_set_classes_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional int32 scores_tensor_index = 3;
+  bool has_scores_tensor_index() const;
+  private:
+  bool _internal_has_scores_tensor_index() const;
+  public:
+  void clear_scores_tensor_index();
+  ::PROTOBUF_NAMESPACE_ID::int32 scores_tensor_index() const;
+  void set_scores_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_scores_tensor_index() const;
+  void _internal_set_scores_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional int32 num_detections_tensor_index = 4;
+  bool has_num_detections_tensor_index() const;
+  private:
+  bool _internal_has_num_detections_tensor_index() const;
+  public:
+  void clear_num_detections_tensor_index();
+  ::PROTOBUF_NAMESPACE_ID::int32 num_detections_tensor_index() const;
+  void set_num_detections_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_num_detections_tensor_index() const;
+  void _internal_set_num_detections_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional int32 anchors_tensor_index = 5;
+  bool has_anchors_tensor_index() const;
+  private:
+  bool _internal_has_anchors_tensor_index() const;
+  public:
+  void clear_anchors_tensor_index();
+  ::PROTOBUF_NAMESPACE_ID::int32 anchors_tensor_index() const;
+  void set_anchors_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_anchors_tensor_index() const;
+  void _internal_set_anchors_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:mediapipe.TensorsToDetectionsCalculatorOptions.TensorMapping)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::int32 detections_tensor_index_;
+  ::PROTOBUF_NAMESPACE_ID::int32 classes_tensor_index_;
+  ::PROTOBUF_NAMESPACE_ID::int32 scores_tensor_index_;
+  ::PROTOBUF_NAMESPACE_ID::int32 num_detections_tensor_index_;
+  ::PROTOBUF_NAMESPACE_ID::int32 anchors_tensor_index_;
+  friend struct ::TableStruct_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fdetections_5fcalculator_2eproto;
+};
+// -------------------------------------------------------------------
+
+class TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:mediapipe.TensorsToDetectionsCalculatorOptions.BoxBoundariesIndices) */ {
+ public:
+  inline TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices() : TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices(nullptr) {}
+  ~TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices() override;
+  explicit constexpr TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices(const TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices& from);
+  TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices(TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices&& from) noexcept
+    : TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices() {
+    *this = ::std::move(from);
+  }
+
+  inline TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices& operator=(const TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices& operator=(TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
+    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
+  }
+  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
+    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* internal_default_instance() {
+    return reinterpret_cast<const TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices*>(
+               &_TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  friend void swap(TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices& a, TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* New() const final {
+    return CreateMaybeMessage<TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices>(nullptr);
+  }
+
+  TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices& from);
+  void MergeFrom(const TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "mediapipe.TensorsToDetectionsCalculatorOptions.BoxBoundariesIndices";
+  }
+  protected:
+  explicit TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kYminFieldNumber = 1,
+    kXmaxFieldNumber = 4,
+    kXminFieldNumber = 2,
+    kYmaxFieldNumber = 3,
+  };
+  // optional int32 ymin = 1 [default = 0];
+  bool has_ymin() const;
+  private:
+  bool _internal_has_ymin() const;
+  public:
+  void clear_ymin();
+  ::PROTOBUF_NAMESPACE_ID::int32 ymin() const;
+  void set_ymin(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_ymin() const;
+  void _internal_set_ymin(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional int32 xmax = 4 [default = 3];
+  bool has_xmax() const;
+  private:
+  bool _internal_has_xmax() const;
+  public:
+  void clear_xmax();
+  ::PROTOBUF_NAMESPACE_ID::int32 xmax() const;
+  void set_xmax(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_xmax() const;
+  void _internal_set_xmax(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional int32 xmin = 2 [default = 1];
+  bool has_xmin() const;
+  private:
+  bool _internal_has_xmin() const;
+  public:
+  void clear_xmin();
+  ::PROTOBUF_NAMESPACE_ID::int32 xmin() const;
+  void set_xmin(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_xmin() const;
+  void _internal_set_xmin(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional int32 ymax = 3 [default = 2];
+  bool has_ymax() const;
+  private:
+  bool _internal_has_ymax() const;
+  public:
+  void clear_ymax();
+  ::PROTOBUF_NAMESPACE_ID::int32 ymax() const;
+  void set_ymax(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_ymax() const;
+  void _internal_set_ymax(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:mediapipe.TensorsToDetectionsCalculatorOptions.BoxBoundariesIndices)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::int32 ymin_;
+  ::PROTOBUF_NAMESPACE_ID::int32 xmax_;
+  ::PROTOBUF_NAMESPACE_ID::int32 xmin_;
+  ::PROTOBUF_NAMESPACE_ID::int32 ymax_;
+  friend struct ::TableStruct_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fdetections_5fcalculator_2eproto;
+};
+// -------------------------------------------------------------------
 
 class TensorsToDetectionsCalculatorOptions PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:mediapipe.TensorsToDetectionsCalculatorOptions) */ {
@@ -111,12 +510,17 @@ class TensorsToDetectionsCalculatorOptions PROTOBUF_FINAL :
   static const TensorsToDetectionsCalculatorOptions& default_instance() {
     return *internal_default_instance();
   }
+  enum BoxIndicesCase {
+    kBoxBoundariesIndices = 23,
+    BOX_INDICES_NOT_SET = 0,
+  };
+
   static inline const TensorsToDetectionsCalculatorOptions* internal_default_instance() {
     return reinterpret_cast<const TensorsToDetectionsCalculatorOptions*>(
                &_TensorsToDetectionsCalculatorOptions_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    2;
 
   friend void swap(TensorsToDetectionsCalculatorOptions& a, TensorsToDetectionsCalculatorOptions& b) {
     a.Swap(&b);
@@ -177,10 +581,15 @@ class TensorsToDetectionsCalculatorOptions PROTOBUF_FINAL :
 
   // nested types ----------------------------------------------------
 
+  typedef TensorsToDetectionsCalculatorOptions_TensorMapping TensorMapping;
+  typedef TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices BoxBoundariesIndices;
+
   // accessors -------------------------------------------------------
 
   enum : int {
     kIgnoreClassesFieldNumber = 8,
+    kAllowClassesFieldNumber = 21,
+    kTensorMappingFieldNumber = 22,
     kNumClassesFieldNumber = 1,
     kNumBoxesFieldNumber = 2,
     kNumCoordsFieldNumber = 3,
@@ -198,6 +607,8 @@ class TensorsToDetectionsCalculatorOptions PROTOBUF_FINAL :
     kScoreClippingThreshFieldNumber = 16,
     kMinScoreThreshFieldNumber = 19,
     kNumValuesPerKeypointFieldNumber = 11,
+    kMaxResultsFieldNumber = 20,
+    kBoxBoundariesIndicesFieldNumber = 23,
   };
   // repeated int32 ignore_classes = 8;
   int ignore_classes_size() const;
@@ -220,6 +631,46 @@ class TensorsToDetectionsCalculatorOptions PROTOBUF_FINAL :
       ignore_classes() const;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
       mutable_ignore_classes();
+
+  // repeated int32 allow_classes = 21 [packed = true];
+  int allow_classes_size() const;
+  private:
+  int _internal_allow_classes_size() const;
+  public:
+  void clear_allow_classes();
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_allow_classes(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      _internal_allow_classes() const;
+  void _internal_add_allow_classes(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      _internal_mutable_allow_classes();
+  public:
+  ::PROTOBUF_NAMESPACE_ID::int32 allow_classes(int index) const;
+  void set_allow_classes(int index, ::PROTOBUF_NAMESPACE_ID::int32 value);
+  void add_allow_classes(::PROTOBUF_NAMESPACE_ID::int32 value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      allow_classes() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      mutable_allow_classes();
+
+  // optional .mediapipe.TensorsToDetectionsCalculatorOptions.TensorMapping tensor_mapping = 22;
+  bool has_tensor_mapping() const;
+  private:
+  bool _internal_has_tensor_mapping() const;
+  public:
+  void clear_tensor_mapping();
+  const ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping& tensor_mapping() const;
+  PROTOBUF_FUTURE_MUST_USE_RESULT ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* release_tensor_mapping();
+  ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* mutable_tensor_mapping();
+  void set_allocated_tensor_mapping(::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* tensor_mapping);
+  private:
+  const ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping& _internal_tensor_mapping() const;
+  ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* _internal_mutable_tensor_mapping();
+  public:
+  void unsafe_arena_set_allocated_tensor_mapping(
+      ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* tensor_mapping);
+  ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* unsafe_arena_release_tensor_mapping();
 
   // optional int32 num_classes = 1;
   bool has_num_classes() const;
@@ -442,6 +893,39 @@ class TensorsToDetectionsCalculatorOptions PROTOBUF_FINAL :
   void _internal_set_num_values_per_keypoint(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
+  // optional int32 max_results = 20 [default = -1];
+  bool has_max_results() const;
+  private:
+  bool _internal_has_max_results() const;
+  public:
+  void clear_max_results();
+  ::PROTOBUF_NAMESPACE_ID::int32 max_results() const;
+  void set_max_results(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_max_results() const;
+  void _internal_set_max_results(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // .mediapipe.TensorsToDetectionsCalculatorOptions.BoxBoundariesIndices box_boundaries_indices = 23;
+  bool has_box_boundaries_indices() const;
+  private:
+  bool _internal_has_box_boundaries_indices() const;
+  public:
+  void clear_box_boundaries_indices();
+  const ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices& box_boundaries_indices() const;
+  PROTOBUF_FUTURE_MUST_USE_RESULT ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* release_box_boundaries_indices();
+  ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* mutable_box_boundaries_indices();
+  void set_allocated_box_boundaries_indices(::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* box_boundaries_indices);
+  private:
+  const ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices& _internal_box_boundaries_indices() const;
+  ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* _internal_mutable_box_boundaries_indices();
+  public:
+  void unsafe_arena_set_allocated_box_boundaries_indices(
+      ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* box_boundaries_indices);
+  ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* unsafe_arena_release_box_boundaries_indices();
+
+  void clear_box_indices();
+  BoxIndicesCase box_indices_case() const;
   static const int kExtFieldNumber = 335742639;
   static ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier< ::mediapipe::CalculatorOptions,
       ::PROTOBUF_NAMESPACE_ID::internal::MessageTypeTraits< ::mediapipe::TensorsToDetectionsCalculatorOptions >, 11, false >
@@ -449,6 +933,10 @@ class TensorsToDetectionsCalculatorOptions PROTOBUF_FINAL :
   // @@protoc_insertion_point(class_scope:mediapipe.TensorsToDetectionsCalculatorOptions)
  private:
   class _Internal;
+  void set_has_box_boundaries_indices();
+
+  inline bool has_box_indices() const;
+  inline void clear_has_box_indices();
 
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
@@ -456,6 +944,9 @@ class TensorsToDetectionsCalculatorOptions PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 > ignore_classes_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 > allow_classes_;
+  mutable std::atomic<int> _allow_classes_cached_byte_size_;
+  ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* tensor_mapping_;
   ::PROTOBUF_NAMESPACE_ID::int32 num_classes_;
   ::PROTOBUF_NAMESPACE_ID::int32 num_boxes_;
   ::PROTOBUF_NAMESPACE_ID::int32 num_coords_;
@@ -473,6 +964,14 @@ class TensorsToDetectionsCalculatorOptions PROTOBUF_FINAL :
   float score_clipping_thresh_;
   float min_score_thresh_;
   ::PROTOBUF_NAMESPACE_ID::int32 num_values_per_keypoint_;
+  ::PROTOBUF_NAMESPACE_ID::int32 max_results_;
+  union BoxIndicesUnion {
+    constexpr BoxIndicesUnion() : _constinit_{} {}
+      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
+    ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* box_boundaries_indices_;
+  } box_indices_;
+  ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
+
   friend struct ::TableStruct_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fdetections_5fcalculator_2eproto;
 };
 // ===================================================================
@@ -484,11 +983,271 @@ class TensorsToDetectionsCalculatorOptions PROTOBUF_FINAL :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// TensorsToDetectionsCalculatorOptions_TensorMapping
+
+// optional int32 detections_tensor_index = 1;
+inline bool TensorsToDetectionsCalculatorOptions_TensorMapping::_internal_has_detections_tensor_index() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool TensorsToDetectionsCalculatorOptions_TensorMapping::has_detections_tensor_index() const {
+  return _internal_has_detections_tensor_index();
+}
+inline void TensorsToDetectionsCalculatorOptions_TensorMapping::clear_detections_tensor_index() {
+  detections_tensor_index_ = 0;
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_TensorMapping::_internal_detections_tensor_index() const {
+  return detections_tensor_index_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_TensorMapping::detections_tensor_index() const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToDetectionsCalculatorOptions.TensorMapping.detections_tensor_index)
+  return _internal_detections_tensor_index();
+}
+inline void TensorsToDetectionsCalculatorOptions_TensorMapping::_internal_set_detections_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00000001u;
+  detections_tensor_index_ = value;
+}
+inline void TensorsToDetectionsCalculatorOptions_TensorMapping::set_detections_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_detections_tensor_index(value);
+  // @@protoc_insertion_point(field_set:mediapipe.TensorsToDetectionsCalculatorOptions.TensorMapping.detections_tensor_index)
+}
+
+// optional int32 classes_tensor_index = 2;
+inline bool TensorsToDetectionsCalculatorOptions_TensorMapping::_internal_has_classes_tensor_index() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool TensorsToDetectionsCalculatorOptions_TensorMapping::has_classes_tensor_index() const {
+  return _internal_has_classes_tensor_index();
+}
+inline void TensorsToDetectionsCalculatorOptions_TensorMapping::clear_classes_tensor_index() {
+  classes_tensor_index_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_TensorMapping::_internal_classes_tensor_index() const {
+  return classes_tensor_index_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_TensorMapping::classes_tensor_index() const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToDetectionsCalculatorOptions.TensorMapping.classes_tensor_index)
+  return _internal_classes_tensor_index();
+}
+inline void TensorsToDetectionsCalculatorOptions_TensorMapping::_internal_set_classes_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00000002u;
+  classes_tensor_index_ = value;
+}
+inline void TensorsToDetectionsCalculatorOptions_TensorMapping::set_classes_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_classes_tensor_index(value);
+  // @@protoc_insertion_point(field_set:mediapipe.TensorsToDetectionsCalculatorOptions.TensorMapping.classes_tensor_index)
+}
+
+// optional int32 scores_tensor_index = 3;
+inline bool TensorsToDetectionsCalculatorOptions_TensorMapping::_internal_has_scores_tensor_index() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool TensorsToDetectionsCalculatorOptions_TensorMapping::has_scores_tensor_index() const {
+  return _internal_has_scores_tensor_index();
+}
+inline void TensorsToDetectionsCalculatorOptions_TensorMapping::clear_scores_tensor_index() {
+  scores_tensor_index_ = 0;
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_TensorMapping::_internal_scores_tensor_index() const {
+  return scores_tensor_index_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_TensorMapping::scores_tensor_index() const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToDetectionsCalculatorOptions.TensorMapping.scores_tensor_index)
+  return _internal_scores_tensor_index();
+}
+inline void TensorsToDetectionsCalculatorOptions_TensorMapping::_internal_set_scores_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00000004u;
+  scores_tensor_index_ = value;
+}
+inline void TensorsToDetectionsCalculatorOptions_TensorMapping::set_scores_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_scores_tensor_index(value);
+  // @@protoc_insertion_point(field_set:mediapipe.TensorsToDetectionsCalculatorOptions.TensorMapping.scores_tensor_index)
+}
+
+// optional int32 num_detections_tensor_index = 4;
+inline bool TensorsToDetectionsCalculatorOptions_TensorMapping::_internal_has_num_detections_tensor_index() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool TensorsToDetectionsCalculatorOptions_TensorMapping::has_num_detections_tensor_index() const {
+  return _internal_has_num_detections_tensor_index();
+}
+inline void TensorsToDetectionsCalculatorOptions_TensorMapping::clear_num_detections_tensor_index() {
+  num_detections_tensor_index_ = 0;
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_TensorMapping::_internal_num_detections_tensor_index() const {
+  return num_detections_tensor_index_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_TensorMapping::num_detections_tensor_index() const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToDetectionsCalculatorOptions.TensorMapping.num_detections_tensor_index)
+  return _internal_num_detections_tensor_index();
+}
+inline void TensorsToDetectionsCalculatorOptions_TensorMapping::_internal_set_num_detections_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00000008u;
+  num_detections_tensor_index_ = value;
+}
+inline void TensorsToDetectionsCalculatorOptions_TensorMapping::set_num_detections_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_num_detections_tensor_index(value);
+  // @@protoc_insertion_point(field_set:mediapipe.TensorsToDetectionsCalculatorOptions.TensorMapping.num_detections_tensor_index)
+}
+
+// optional int32 anchors_tensor_index = 5;
+inline bool TensorsToDetectionsCalculatorOptions_TensorMapping::_internal_has_anchors_tensor_index() const {
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  return value;
+}
+inline bool TensorsToDetectionsCalculatorOptions_TensorMapping::has_anchors_tensor_index() const {
+  return _internal_has_anchors_tensor_index();
+}
+inline void TensorsToDetectionsCalculatorOptions_TensorMapping::clear_anchors_tensor_index() {
+  anchors_tensor_index_ = 0;
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_TensorMapping::_internal_anchors_tensor_index() const {
+  return anchors_tensor_index_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_TensorMapping::anchors_tensor_index() const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToDetectionsCalculatorOptions.TensorMapping.anchors_tensor_index)
+  return _internal_anchors_tensor_index();
+}
+inline void TensorsToDetectionsCalculatorOptions_TensorMapping::_internal_set_anchors_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00000010u;
+  anchors_tensor_index_ = value;
+}
+inline void TensorsToDetectionsCalculatorOptions_TensorMapping::set_anchors_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_anchors_tensor_index(value);
+  // @@protoc_insertion_point(field_set:mediapipe.TensorsToDetectionsCalculatorOptions.TensorMapping.anchors_tensor_index)
+}
+
+// -------------------------------------------------------------------
+
+// TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices
+
+// optional int32 ymin = 1 [default = 0];
+inline bool TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::_internal_has_ymin() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::has_ymin() const {
+  return _internal_has_ymin();
+}
+inline void TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::clear_ymin() {
+  ymin_ = 0;
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::_internal_ymin() const {
+  return ymin_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::ymin() const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToDetectionsCalculatorOptions.BoxBoundariesIndices.ymin)
+  return _internal_ymin();
+}
+inline void TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::_internal_set_ymin(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00000001u;
+  ymin_ = value;
+}
+inline void TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::set_ymin(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_ymin(value);
+  // @@protoc_insertion_point(field_set:mediapipe.TensorsToDetectionsCalculatorOptions.BoxBoundariesIndices.ymin)
+}
+
+// optional int32 xmin = 2 [default = 1];
+inline bool TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::_internal_has_xmin() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::has_xmin() const {
+  return _internal_has_xmin();
+}
+inline void TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::clear_xmin() {
+  xmin_ = 1;
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::_internal_xmin() const {
+  return xmin_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::xmin() const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToDetectionsCalculatorOptions.BoxBoundariesIndices.xmin)
+  return _internal_xmin();
+}
+inline void TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::_internal_set_xmin(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00000004u;
+  xmin_ = value;
+}
+inline void TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::set_xmin(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_xmin(value);
+  // @@protoc_insertion_point(field_set:mediapipe.TensorsToDetectionsCalculatorOptions.BoxBoundariesIndices.xmin)
+}
+
+// optional int32 ymax = 3 [default = 2];
+inline bool TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::_internal_has_ymax() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::has_ymax() const {
+  return _internal_has_ymax();
+}
+inline void TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::clear_ymax() {
+  ymax_ = 2;
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::_internal_ymax() const {
+  return ymax_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::ymax() const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToDetectionsCalculatorOptions.BoxBoundariesIndices.ymax)
+  return _internal_ymax();
+}
+inline void TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::_internal_set_ymax(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00000008u;
+  ymax_ = value;
+}
+inline void TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::set_ymax(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_ymax(value);
+  // @@protoc_insertion_point(field_set:mediapipe.TensorsToDetectionsCalculatorOptions.BoxBoundariesIndices.ymax)
+}
+
+// optional int32 xmax = 4 [default = 3];
+inline bool TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::_internal_has_xmax() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::has_xmax() const {
+  return _internal_has_xmax();
+}
+inline void TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::clear_xmax() {
+  xmax_ = 3;
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::_internal_xmax() const {
+  return xmax_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::xmax() const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToDetectionsCalculatorOptions.BoxBoundariesIndices.xmax)
+  return _internal_xmax();
+}
+inline void TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::_internal_set_xmax(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00000002u;
+  xmax_ = value;
+}
+inline void TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices::set_xmax(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_xmax(value);
+  // @@protoc_insertion_point(field_set:mediapipe.TensorsToDetectionsCalculatorOptions.BoxBoundariesIndices.xmax)
+}
+
+// -------------------------------------------------------------------
+
 // TensorsToDetectionsCalculatorOptions
 
 // optional int32 num_classes = 1;
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_num_classes() const {
-  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_num_classes() const {
@@ -496,7 +1255,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_num_classes() const {
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_num_classes() {
   num_classes_ = 0;
-  _has_bits_[0] &= ~0x00000001u;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::_internal_num_classes() const {
   return num_classes_;
@@ -506,7 +1265,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::num_
   return _internal_num_classes();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_num_classes(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _has_bits_[0] |= 0x00000001u;
+  _has_bits_[0] |= 0x00000002u;
   num_classes_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_num_classes(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -516,7 +1275,7 @@ inline void TensorsToDetectionsCalculatorOptions::set_num_classes(::PROTOBUF_NAM
 
 // optional int32 num_boxes = 2;
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_num_boxes() const {
-  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_num_boxes() const {
@@ -524,7 +1283,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_num_boxes() const {
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_num_boxes() {
   num_boxes_ = 0;
-  _has_bits_[0] &= ~0x00000002u;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::_internal_num_boxes() const {
   return num_boxes_;
@@ -534,7 +1293,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::num_
   return _internal_num_boxes();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_num_boxes(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _has_bits_[0] |= 0x00000002u;
+  _has_bits_[0] |= 0x00000004u;
   num_boxes_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_num_boxes(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -544,7 +1303,7 @@ inline void TensorsToDetectionsCalculatorOptions::set_num_boxes(::PROTOBUF_NAMES
 
 // optional int32 num_coords = 3;
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_num_coords() const {
-  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_num_coords() const {
@@ -552,7 +1311,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_num_coords() const {
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_num_coords() {
   num_coords_ = 0;
-  _has_bits_[0] &= ~0x00000004u;
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::_internal_num_coords() const {
   return num_coords_;
@@ -562,7 +1321,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::num_
   return _internal_num_coords();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_num_coords(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _has_bits_[0] |= 0x00000004u;
+  _has_bits_[0] |= 0x00000008u;
   num_coords_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_num_coords(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -572,7 +1331,7 @@ inline void TensorsToDetectionsCalculatorOptions::set_num_coords(::PROTOBUF_NAME
 
 // optional int32 keypoint_coord_offset = 9;
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_keypoint_coord_offset() const {
-  bool value = (_has_bits_[0] & 0x00000080u) != 0;
+  bool value = (_has_bits_[0] & 0x00000100u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_keypoint_coord_offset() const {
@@ -580,7 +1339,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_keypoint_coord_offset() co
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_keypoint_coord_offset() {
   keypoint_coord_offset_ = 0;
-  _has_bits_[0] &= ~0x00000080u;
+  _has_bits_[0] &= ~0x00000100u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::_internal_keypoint_coord_offset() const {
   return keypoint_coord_offset_;
@@ -590,7 +1349,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::keyp
   return _internal_keypoint_coord_offset();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_keypoint_coord_offset(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _has_bits_[0] |= 0x00000080u;
+  _has_bits_[0] |= 0x00000100u;
   keypoint_coord_offset_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_keypoint_coord_offset(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -600,7 +1359,7 @@ inline void TensorsToDetectionsCalculatorOptions::set_keypoint_coord_offset(::PR
 
 // optional int32 num_keypoints = 10 [default = 0];
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_num_keypoints() const {
-  bool value = (_has_bits_[0] & 0x00000100u) != 0;
+  bool value = (_has_bits_[0] & 0x00000200u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_num_keypoints() const {
@@ -608,7 +1367,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_num_keypoints() const {
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_num_keypoints() {
   num_keypoints_ = 0;
-  _has_bits_[0] &= ~0x00000100u;
+  _has_bits_[0] &= ~0x00000200u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::_internal_num_keypoints() const {
   return num_keypoints_;
@@ -618,7 +1377,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::num_
   return _internal_num_keypoints();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_num_keypoints(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _has_bits_[0] |= 0x00000100u;
+  _has_bits_[0] |= 0x00000200u;
   num_keypoints_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_num_keypoints(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -628,7 +1387,7 @@ inline void TensorsToDetectionsCalculatorOptions::set_num_keypoints(::PROTOBUF_N
 
 // optional int32 num_values_per_keypoint = 11 [default = 2];
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_num_values_per_keypoint() const {
-  bool value = (_has_bits_[0] & 0x00010000u) != 0;
+  bool value = (_has_bits_[0] & 0x00020000u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_num_values_per_keypoint() const {
@@ -636,7 +1395,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_num_values_per_keypoint() 
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_num_values_per_keypoint() {
   num_values_per_keypoint_ = 2;
-  _has_bits_[0] &= ~0x00010000u;
+  _has_bits_[0] &= ~0x00020000u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::_internal_num_values_per_keypoint() const {
   return num_values_per_keypoint_;
@@ -646,7 +1405,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::num_
   return _internal_num_values_per_keypoint();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_num_values_per_keypoint(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _has_bits_[0] |= 0x00010000u;
+  _has_bits_[0] |= 0x00020000u;
   num_values_per_keypoint_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_num_values_per_keypoint(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -656,7 +1415,7 @@ inline void TensorsToDetectionsCalculatorOptions::set_num_values_per_keypoint(::
 
 // optional int32 box_coord_offset = 12 [default = 0];
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_box_coord_offset() const {
-  bool value = (_has_bits_[0] & 0x00000200u) != 0;
+  bool value = (_has_bits_[0] & 0x00000400u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_box_coord_offset() const {
@@ -664,7 +1423,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_box_coord_offset() const {
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_box_coord_offset() {
   box_coord_offset_ = 0;
-  _has_bits_[0] &= ~0x00000200u;
+  _has_bits_[0] &= ~0x00000400u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::_internal_box_coord_offset() const {
   return box_coord_offset_;
@@ -674,7 +1433,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::box_
   return _internal_box_coord_offset();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_box_coord_offset(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _has_bits_[0] |= 0x00000200u;
+  _has_bits_[0] |= 0x00000400u;
   box_coord_offset_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_box_coord_offset(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -684,7 +1443,7 @@ inline void TensorsToDetectionsCalculatorOptions::set_box_coord_offset(::PROTOBU
 
 // optional float x_scale = 4 [default = 0];
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_x_scale() const {
-  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_x_scale() const {
@@ -692,7 +1451,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_x_scale() const {
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_x_scale() {
   x_scale_ = 0;
-  _has_bits_[0] &= ~0x00000008u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline float TensorsToDetectionsCalculatorOptions::_internal_x_scale() const {
   return x_scale_;
@@ -702,7 +1461,7 @@ inline float TensorsToDetectionsCalculatorOptions::x_scale() const {
   return _internal_x_scale();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_x_scale(float value) {
-  _has_bits_[0] |= 0x00000008u;
+  _has_bits_[0] |= 0x00000010u;
   x_scale_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_x_scale(float value) {
@@ -712,7 +1471,7 @@ inline void TensorsToDetectionsCalculatorOptions::set_x_scale(float value) {
 
 // optional float y_scale = 5 [default = 0];
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_y_scale() const {
-  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  bool value = (_has_bits_[0] & 0x00000020u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_y_scale() const {
@@ -720,7 +1479,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_y_scale() const {
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_y_scale() {
   y_scale_ = 0;
-  _has_bits_[0] &= ~0x00000010u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline float TensorsToDetectionsCalculatorOptions::_internal_y_scale() const {
   return y_scale_;
@@ -730,7 +1489,7 @@ inline float TensorsToDetectionsCalculatorOptions::y_scale() const {
   return _internal_y_scale();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_y_scale(float value) {
-  _has_bits_[0] |= 0x00000010u;
+  _has_bits_[0] |= 0x00000020u;
   y_scale_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_y_scale(float value) {
@@ -740,7 +1499,7 @@ inline void TensorsToDetectionsCalculatorOptions::set_y_scale(float value) {
 
 // optional float w_scale = 6 [default = 0];
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_w_scale() const {
-  bool value = (_has_bits_[0] & 0x00000020u) != 0;
+  bool value = (_has_bits_[0] & 0x00000040u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_w_scale() const {
@@ -748,7 +1507,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_w_scale() const {
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_w_scale() {
   w_scale_ = 0;
-  _has_bits_[0] &= ~0x00000020u;
+  _has_bits_[0] &= ~0x00000040u;
 }
 inline float TensorsToDetectionsCalculatorOptions::_internal_w_scale() const {
   return w_scale_;
@@ -758,7 +1517,7 @@ inline float TensorsToDetectionsCalculatorOptions::w_scale() const {
   return _internal_w_scale();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_w_scale(float value) {
-  _has_bits_[0] |= 0x00000020u;
+  _has_bits_[0] |= 0x00000040u;
   w_scale_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_w_scale(float value) {
@@ -768,7 +1527,7 @@ inline void TensorsToDetectionsCalculatorOptions::set_w_scale(float value) {
 
 // optional float h_scale = 7 [default = 0];
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_h_scale() const {
-  bool value = (_has_bits_[0] & 0x00000040u) != 0;
+  bool value = (_has_bits_[0] & 0x00000080u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_h_scale() const {
@@ -776,7 +1535,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_h_scale() const {
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_h_scale() {
   h_scale_ = 0;
-  _has_bits_[0] &= ~0x00000040u;
+  _has_bits_[0] &= ~0x00000080u;
 }
 inline float TensorsToDetectionsCalculatorOptions::_internal_h_scale() const {
   return h_scale_;
@@ -786,7 +1545,7 @@ inline float TensorsToDetectionsCalculatorOptions::h_scale() const {
   return _internal_h_scale();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_h_scale(float value) {
-  _has_bits_[0] |= 0x00000040u;
+  _has_bits_[0] |= 0x00000080u;
   h_scale_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_h_scale(float value) {
@@ -796,7 +1555,7 @@ inline void TensorsToDetectionsCalculatorOptions::set_h_scale(float value) {
 
 // optional bool apply_exponential_on_box_size = 13 [default = false];
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_apply_exponential_on_box_size() const {
-  bool value = (_has_bits_[0] & 0x00000400u) != 0;
+  bool value = (_has_bits_[0] & 0x00000800u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_apply_exponential_on_box_size() const {
@@ -804,7 +1563,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_apply_exponential_on_box_s
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_apply_exponential_on_box_size() {
   apply_exponential_on_box_size_ = false;
-  _has_bits_[0] &= ~0x00000400u;
+  _has_bits_[0] &= ~0x00000800u;
 }
 inline bool TensorsToDetectionsCalculatorOptions::_internal_apply_exponential_on_box_size() const {
   return apply_exponential_on_box_size_;
@@ -814,7 +1573,7 @@ inline bool TensorsToDetectionsCalculatorOptions::apply_exponential_on_box_size(
   return _internal_apply_exponential_on_box_size();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_apply_exponential_on_box_size(bool value) {
-  _has_bits_[0] |= 0x00000400u;
+  _has_bits_[0] |= 0x00000800u;
   apply_exponential_on_box_size_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_apply_exponential_on_box_size(bool value) {
@@ -824,7 +1583,7 @@ inline void TensorsToDetectionsCalculatorOptions::set_apply_exponential_on_box_s
 
 // optional bool reverse_output_order = 14 [default = false];
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_reverse_output_order() const {
-  bool value = (_has_bits_[0] & 0x00000800u) != 0;
+  bool value = (_has_bits_[0] & 0x00001000u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_reverse_output_order() const {
@@ -832,7 +1591,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_reverse_output_order() con
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_reverse_output_order() {
   reverse_output_order_ = false;
-  _has_bits_[0] &= ~0x00000800u;
+  _has_bits_[0] &= ~0x00001000u;
 }
 inline bool TensorsToDetectionsCalculatorOptions::_internal_reverse_output_order() const {
   return reverse_output_order_;
@@ -842,7 +1601,7 @@ inline bool TensorsToDetectionsCalculatorOptions::reverse_output_order() const {
   return _internal_reverse_output_order();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_reverse_output_order(bool value) {
-  _has_bits_[0] |= 0x00000800u;
+  _has_bits_[0] |= 0x00001000u;
   reverse_output_order_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_reverse_output_order(bool value) {
@@ -897,9 +1656,56 @@ TensorsToDetectionsCalculatorOptions::mutable_ignore_classes() {
   return _internal_mutable_ignore_classes();
 }
 
+// repeated int32 allow_classes = 21 [packed = true];
+inline int TensorsToDetectionsCalculatorOptions::_internal_allow_classes_size() const {
+  return allow_classes_.size();
+}
+inline int TensorsToDetectionsCalculatorOptions::allow_classes_size() const {
+  return _internal_allow_classes_size();
+}
+inline void TensorsToDetectionsCalculatorOptions::clear_allow_classes() {
+  allow_classes_.Clear();
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::_internal_allow_classes(int index) const {
+  return allow_classes_.Get(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::allow_classes(int index) const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToDetectionsCalculatorOptions.allow_classes)
+  return _internal_allow_classes(index);
+}
+inline void TensorsToDetectionsCalculatorOptions::set_allow_classes(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
+  allow_classes_.Set(index, value);
+  // @@protoc_insertion_point(field_set:mediapipe.TensorsToDetectionsCalculatorOptions.allow_classes)
+}
+inline void TensorsToDetectionsCalculatorOptions::_internal_add_allow_classes(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  allow_classes_.Add(value);
+}
+inline void TensorsToDetectionsCalculatorOptions::add_allow_classes(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_add_allow_classes(value);
+  // @@protoc_insertion_point(field_add:mediapipe.TensorsToDetectionsCalculatorOptions.allow_classes)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+TensorsToDetectionsCalculatorOptions::_internal_allow_classes() const {
+  return allow_classes_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+TensorsToDetectionsCalculatorOptions::allow_classes() const {
+  // @@protoc_insertion_point(field_list:mediapipe.TensorsToDetectionsCalculatorOptions.allow_classes)
+  return _internal_allow_classes();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+TensorsToDetectionsCalculatorOptions::_internal_mutable_allow_classes() {
+  return &allow_classes_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+TensorsToDetectionsCalculatorOptions::mutable_allow_classes() {
+  // @@protoc_insertion_point(field_mutable_list:mediapipe.TensorsToDetectionsCalculatorOptions.allow_classes)
+  return _internal_mutable_allow_classes();
+}
+
 // optional bool sigmoid_score = 15 [default = false];
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_sigmoid_score() const {
-  bool value = (_has_bits_[0] & 0x00001000u) != 0;
+  bool value = (_has_bits_[0] & 0x00002000u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_sigmoid_score() const {
@@ -907,7 +1713,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_sigmoid_score() const {
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_sigmoid_score() {
   sigmoid_score_ = false;
-  _has_bits_[0] &= ~0x00001000u;
+  _has_bits_[0] &= ~0x00002000u;
 }
 inline bool TensorsToDetectionsCalculatorOptions::_internal_sigmoid_score() const {
   return sigmoid_score_;
@@ -917,7 +1723,7 @@ inline bool TensorsToDetectionsCalculatorOptions::sigmoid_score() const {
   return _internal_sigmoid_score();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_sigmoid_score(bool value) {
-  _has_bits_[0] |= 0x00001000u;
+  _has_bits_[0] |= 0x00002000u;
   sigmoid_score_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_sigmoid_score(bool value) {
@@ -927,7 +1733,7 @@ inline void TensorsToDetectionsCalculatorOptions::set_sigmoid_score(bool value) 
 
 // optional float score_clipping_thresh = 16;
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_score_clipping_thresh() const {
-  bool value = (_has_bits_[0] & 0x00004000u) != 0;
+  bool value = (_has_bits_[0] & 0x00008000u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_score_clipping_thresh() const {
@@ -935,7 +1741,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_score_clipping_thresh() co
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_score_clipping_thresh() {
   score_clipping_thresh_ = 0;
-  _has_bits_[0] &= ~0x00004000u;
+  _has_bits_[0] &= ~0x00008000u;
 }
 inline float TensorsToDetectionsCalculatorOptions::_internal_score_clipping_thresh() const {
   return score_clipping_thresh_;
@@ -945,7 +1751,7 @@ inline float TensorsToDetectionsCalculatorOptions::score_clipping_thresh() const
   return _internal_score_clipping_thresh();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_score_clipping_thresh(float value) {
-  _has_bits_[0] |= 0x00004000u;
+  _has_bits_[0] |= 0x00008000u;
   score_clipping_thresh_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_score_clipping_thresh(float value) {
@@ -955,7 +1761,7 @@ inline void TensorsToDetectionsCalculatorOptions::set_score_clipping_thresh(floa
 
 // optional bool flip_vertically = 18 [default = false];
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_flip_vertically() const {
-  bool value = (_has_bits_[0] & 0x00002000u) != 0;
+  bool value = (_has_bits_[0] & 0x00004000u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_flip_vertically() const {
@@ -963,7 +1769,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_flip_vertically() const {
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_flip_vertically() {
   flip_vertically_ = false;
-  _has_bits_[0] &= ~0x00002000u;
+  _has_bits_[0] &= ~0x00004000u;
 }
 inline bool TensorsToDetectionsCalculatorOptions::_internal_flip_vertically() const {
   return flip_vertically_;
@@ -973,7 +1779,7 @@ inline bool TensorsToDetectionsCalculatorOptions::flip_vertically() const {
   return _internal_flip_vertically();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_flip_vertically(bool value) {
-  _has_bits_[0] |= 0x00002000u;
+  _has_bits_[0] |= 0x00004000u;
   flip_vertically_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_flip_vertically(bool value) {
@@ -983,7 +1789,7 @@ inline void TensorsToDetectionsCalculatorOptions::set_flip_vertically(bool value
 
 // optional float min_score_thresh = 19;
 inline bool TensorsToDetectionsCalculatorOptions::_internal_has_min_score_thresh() const {
-  bool value = (_has_bits_[0] & 0x00008000u) != 0;
+  bool value = (_has_bits_[0] & 0x00010000u) != 0;
   return value;
 }
 inline bool TensorsToDetectionsCalculatorOptions::has_min_score_thresh() const {
@@ -991,7 +1797,7 @@ inline bool TensorsToDetectionsCalculatorOptions::has_min_score_thresh() const {
 }
 inline void TensorsToDetectionsCalculatorOptions::clear_min_score_thresh() {
   min_score_thresh_ = 0;
-  _has_bits_[0] &= ~0x00008000u;
+  _has_bits_[0] &= ~0x00010000u;
 }
 inline float TensorsToDetectionsCalculatorOptions::_internal_min_score_thresh() const {
   return min_score_thresh_;
@@ -1001,7 +1807,7 @@ inline float TensorsToDetectionsCalculatorOptions::min_score_thresh() const {
   return _internal_min_score_thresh();
 }
 inline void TensorsToDetectionsCalculatorOptions::_internal_set_min_score_thresh(float value) {
-  _has_bits_[0] |= 0x00008000u;
+  _has_bits_[0] |= 0x00010000u;
   min_score_thresh_ = value;
 }
 inline void TensorsToDetectionsCalculatorOptions::set_min_score_thresh(float value) {
@@ -1009,9 +1815,206 @@ inline void TensorsToDetectionsCalculatorOptions::set_min_score_thresh(float val
   // @@protoc_insertion_point(field_set:mediapipe.TensorsToDetectionsCalculatorOptions.min_score_thresh)
 }
 
+// optional int32 max_results = 20 [default = -1];
+inline bool TensorsToDetectionsCalculatorOptions::_internal_has_max_results() const {
+  bool value = (_has_bits_[0] & 0x00040000u) != 0;
+  return value;
+}
+inline bool TensorsToDetectionsCalculatorOptions::has_max_results() const {
+  return _internal_has_max_results();
+}
+inline void TensorsToDetectionsCalculatorOptions::clear_max_results() {
+  max_results_ = -1;
+  _has_bits_[0] &= ~0x00040000u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::_internal_max_results() const {
+  return max_results_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToDetectionsCalculatorOptions::max_results() const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToDetectionsCalculatorOptions.max_results)
+  return _internal_max_results();
+}
+inline void TensorsToDetectionsCalculatorOptions::_internal_set_max_results(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00040000u;
+  max_results_ = value;
+}
+inline void TensorsToDetectionsCalculatorOptions::set_max_results(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_max_results(value);
+  // @@protoc_insertion_point(field_set:mediapipe.TensorsToDetectionsCalculatorOptions.max_results)
+}
+
+// optional .mediapipe.TensorsToDetectionsCalculatorOptions.TensorMapping tensor_mapping = 22;
+inline bool TensorsToDetectionsCalculatorOptions::_internal_has_tensor_mapping() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  PROTOBUF_ASSUME(!value || tensor_mapping_ != nullptr);
+  return value;
+}
+inline bool TensorsToDetectionsCalculatorOptions::has_tensor_mapping() const {
+  return _internal_has_tensor_mapping();
+}
+inline void TensorsToDetectionsCalculatorOptions::clear_tensor_mapping() {
+  if (tensor_mapping_ != nullptr) tensor_mapping_->Clear();
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline const ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping& TensorsToDetectionsCalculatorOptions::_internal_tensor_mapping() const {
+  const ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* p = tensor_mapping_;
+  return p != nullptr ? *p : reinterpret_cast<const ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping&>(
+      ::mediapipe::_TensorsToDetectionsCalculatorOptions_TensorMapping_default_instance_);
+}
+inline const ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping& TensorsToDetectionsCalculatorOptions::tensor_mapping() const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToDetectionsCalculatorOptions.tensor_mapping)
+  return _internal_tensor_mapping();
+}
+inline void TensorsToDetectionsCalculatorOptions::unsafe_arena_set_allocated_tensor_mapping(
+    ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* tensor_mapping) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(tensor_mapping_);
+  }
+  tensor_mapping_ = tensor_mapping;
+  if (tensor_mapping) {
+    _has_bits_[0] |= 0x00000001u;
+  } else {
+    _has_bits_[0] &= ~0x00000001u;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:mediapipe.TensorsToDetectionsCalculatorOptions.tensor_mapping)
+}
+inline ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* TensorsToDetectionsCalculatorOptions::release_tensor_mapping() {
+  _has_bits_[0] &= ~0x00000001u;
+  ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* temp = tensor_mapping_;
+  tensor_mapping_ = nullptr;
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* TensorsToDetectionsCalculatorOptions::unsafe_arena_release_tensor_mapping() {
+  // @@protoc_insertion_point(field_release:mediapipe.TensorsToDetectionsCalculatorOptions.tensor_mapping)
+  _has_bits_[0] &= ~0x00000001u;
+  ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* temp = tensor_mapping_;
+  tensor_mapping_ = nullptr;
+  return temp;
+}
+inline ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* TensorsToDetectionsCalculatorOptions::_internal_mutable_tensor_mapping() {
+  _has_bits_[0] |= 0x00000001u;
+  if (tensor_mapping_ == nullptr) {
+    auto* p = CreateMaybeMessage<::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping>(GetArena());
+    tensor_mapping_ = p;
+  }
+  return tensor_mapping_;
+}
+inline ::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* TensorsToDetectionsCalculatorOptions::mutable_tensor_mapping() {
+  // @@protoc_insertion_point(field_mutable:mediapipe.TensorsToDetectionsCalculatorOptions.tensor_mapping)
+  return _internal_mutable_tensor_mapping();
+}
+inline void TensorsToDetectionsCalculatorOptions::set_allocated_tensor_mapping(::mediapipe::TensorsToDetectionsCalculatorOptions_TensorMapping* tensor_mapping) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete tensor_mapping_;
+  }
+  if (tensor_mapping) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(tensor_mapping);
+    if (message_arena != submessage_arena) {
+      tensor_mapping = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, tensor_mapping, submessage_arena);
+    }
+    _has_bits_[0] |= 0x00000001u;
+  } else {
+    _has_bits_[0] &= ~0x00000001u;
+  }
+  tensor_mapping_ = tensor_mapping;
+  // @@protoc_insertion_point(field_set_allocated:mediapipe.TensorsToDetectionsCalculatorOptions.tensor_mapping)
+}
+
+// .mediapipe.TensorsToDetectionsCalculatorOptions.BoxBoundariesIndices box_boundaries_indices = 23;
+inline bool TensorsToDetectionsCalculatorOptions::_internal_has_box_boundaries_indices() const {
+  return box_indices_case() == kBoxBoundariesIndices;
+}
+inline bool TensorsToDetectionsCalculatorOptions::has_box_boundaries_indices() const {
+  return _internal_has_box_boundaries_indices();
+}
+inline void TensorsToDetectionsCalculatorOptions::set_has_box_boundaries_indices() {
+  _oneof_case_[0] = kBoxBoundariesIndices;
+}
+inline void TensorsToDetectionsCalculatorOptions::clear_box_boundaries_indices() {
+  if (_internal_has_box_boundaries_indices()) {
+    if (GetArena() == nullptr) {
+      delete box_indices_.box_boundaries_indices_;
+    }
+    clear_has_box_indices();
+  }
+}
+inline ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* TensorsToDetectionsCalculatorOptions::release_box_boundaries_indices() {
+  // @@protoc_insertion_point(field_release:mediapipe.TensorsToDetectionsCalculatorOptions.box_boundaries_indices)
+  if (_internal_has_box_boundaries_indices()) {
+    clear_has_box_indices();
+      ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* temp = box_indices_.box_boundaries_indices_;
+    if (GetArena() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    box_indices_.box_boundaries_indices_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices& TensorsToDetectionsCalculatorOptions::_internal_box_boundaries_indices() const {
+  return _internal_has_box_boundaries_indices()
+      ? *box_indices_.box_boundaries_indices_
+      : reinterpret_cast< ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices&>(::mediapipe::_TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices_default_instance_);
+}
+inline const ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices& TensorsToDetectionsCalculatorOptions::box_boundaries_indices() const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToDetectionsCalculatorOptions.box_boundaries_indices)
+  return _internal_box_boundaries_indices();
+}
+inline ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* TensorsToDetectionsCalculatorOptions::unsafe_arena_release_box_boundaries_indices() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:mediapipe.TensorsToDetectionsCalculatorOptions.box_boundaries_indices)
+  if (_internal_has_box_boundaries_indices()) {
+    clear_has_box_indices();
+    ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* temp = box_indices_.box_boundaries_indices_;
+    box_indices_.box_boundaries_indices_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void TensorsToDetectionsCalculatorOptions::unsafe_arena_set_allocated_box_boundaries_indices(::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* box_boundaries_indices) {
+  clear_box_indices();
+  if (box_boundaries_indices) {
+    set_has_box_boundaries_indices();
+    box_indices_.box_boundaries_indices_ = box_boundaries_indices;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:mediapipe.TensorsToDetectionsCalculatorOptions.box_boundaries_indices)
+}
+inline ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* TensorsToDetectionsCalculatorOptions::_internal_mutable_box_boundaries_indices() {
+  if (!_internal_has_box_boundaries_indices()) {
+    clear_box_indices();
+    set_has_box_boundaries_indices();
+    box_indices_.box_boundaries_indices_ = CreateMaybeMessage< ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices >(GetArena());
+  }
+  return box_indices_.box_boundaries_indices_;
+}
+inline ::mediapipe::TensorsToDetectionsCalculatorOptions_BoxBoundariesIndices* TensorsToDetectionsCalculatorOptions::mutable_box_boundaries_indices() {
+  // @@protoc_insertion_point(field_mutable:mediapipe.TensorsToDetectionsCalculatorOptions.box_boundaries_indices)
+  return _internal_mutable_box_boundaries_indices();
+}
+
+inline bool TensorsToDetectionsCalculatorOptions::has_box_indices() const {
+  return box_indices_case() != BOX_INDICES_NOT_SET;
+}
+inline void TensorsToDetectionsCalculatorOptions::clear_has_box_indices() {
+  _oneof_case_[0] = BOX_INDICES_NOT_SET;
+}
+inline TensorsToDetectionsCalculatorOptions::BoxIndicesCase TensorsToDetectionsCalculatorOptions::box_indices_case() const {
+  return TensorsToDetectionsCalculatorOptions::BoxIndicesCase(_oneof_case_[0]);
+}
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 

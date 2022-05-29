@@ -205,20 +205,8 @@
     <ClCompile Include="..\..\mediapipe\graphs\face_mesh\calculators\face_landmarks_to_render_data_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\graphs\iris_tracking\calculators\iris_to_render_data_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\graphs\iris_tracking\calculators\update_face_landmarks_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\modules\face_geometry\effect_renderer_calculator.cc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\mediapipe\modules\face_geometry\env_generator_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\modules\face_geometry\geometry_pipeline_calculator.cc" />
-    <ClCompile Include="..\..\mediapipe\modules\face_geometry\libs\effect_renderer.cc">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\mediapipe\modules\face_geometry\libs\geometry_pipeline.cc" />
     <ClCompile Include="..\..\mediapipe\modules\face_geometry\libs\mesh_3d_utils.cc" />
     <ClCompile Include="..\..\mediapipe\modules\face_geometry\libs\procrustes_solver.cc" />
@@ -374,7 +362,6 @@
     <ClCompile Include="gpu\scale_mode.pb.cc" />
     <ClCompile Include="graphs\iris_tracking\calculators\iris_to_depth_calculator.pb.cc" />
     <ClCompile Include="graphs\iris_tracking\calculators\iris_to_render_data_calculator.pb.cc" />
-    <ClCompile Include="modules\face_geometry\effect_renderer_calculator.pb.cc" />
     <ClCompile Include="modules\face_geometry\env_generator_calculator.pb.cc" />
     <ClCompile Include="modules\face_geometry\geometry_pipeline_calculator.pb.cc" />
     <ClCompile Include="modules\face_geometry\protos\environment.pb.cc" />
@@ -445,7 +432,6 @@
     <ClInclude Include="..\..\mediapipe\gpu\gpu_buffer.h" />
     <ClInclude Include="..\..\mediapipe\gpu\gpu_buffer_format.h" />
     <ClInclude Include="..\..\mediapipe\gpu\gpu_buffer_storage.h" />
-    <ClInclude Include="..\..\mediapipe\modules\face_geometry\libs\effect_renderer.h" />
     <ClInclude Include="..\..\mediapipe\modules\face_geometry\libs\geometry_pipeline.h" />
     <ClInclude Include="..\..\mediapipe\modules\face_geometry\libs\mesh_3d_utils.h" />
     <ClInclude Include="..\..\mediapipe\modules\face_geometry\libs\procrustes_solver.h" />
@@ -583,7 +569,6 @@
     <ClInclude Include="gpu\scale_mode.pb.h" />
     <ClInclude Include="graphs\iris_tracking\calculators\iris_to_depth_calculator.pb.h" />
     <ClInclude Include="graphs\iris_tracking\calculators\iris_to_render_data_calculator.pb.h" />
-    <ClInclude Include="modules\face_geometry\effect_renderer_calculator.pb.h" />
     <ClInclude Include="modules\face_geometry\env_generator_calculator.pb.h" />
     <ClInclude Include="modules\face_geometry\geometry_pipeline_calculator.pb.h" />
     <ClInclude Include="modules\face_geometry\protos\environment.pb.h" />
@@ -707,6 +692,7 @@
     </Link>
     <PostBuildEvent>
       <Command>powershell Expand-Archive -Force "$(SolutionDir)..\third_party\opencv\x86\opencv_world410d.zip" -DestinationPath "$(SolutionDir)bin\Win32\Debug"</Command>
+      <Message>unzip DLLs...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -734,6 +720,7 @@
     </Link>
     <PostBuildEvent>
       <Command>powershell Expand-Archive -Force "$(SolutionDir)..\third_party\opencv\x86\opencv_world410.zip" -DestinationPath "$(SolutionDir)bin\Win32\Release"</Command>
+      <Message>unzip DLLs...</Message>
     </PostBuildEvent>
     <Lib>
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>

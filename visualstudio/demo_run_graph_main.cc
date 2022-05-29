@@ -35,9 +35,11 @@
 // forward declaration
 absl::Status load_calculator_graph(mediapipe::CalculatorGraph& graph, char const* config_file);
 
-constexpr char kInputStream[] = "input_video";
-constexpr char kOutputStream[] = "output_video";
-constexpr char kWindowName[] = "MediaPipe";
+constexpr char const* kWindowName = "MediaPipe";
+
+constexpr char const* kInputStream = "input_video";
+constexpr char const* kUserInput = "user_input";
+constexpr char const* kOutputStream = "output_video";
 
 ABSL_FLAG(std::string, calculator_graph_config_file, "",
           "Name of file containing text format CalculatorGraphConfig proto.");
@@ -47,6 +49,16 @@ ABSL_FLAG(std::string, input_video_path, "",
 ABSL_FLAG(std::string, output_video_path, "",
           "Full path of where to save result (.mp4 only). "
           "If not provided, show result in a window.");
+
+void mouse_event(int event, int x, int y, int flags, void* user_data) {
+  if (user_data) {
+    auto& mouse = ((UserInput*) user_data)->mouse;
+    mouse.event = event;
+    mouse.flags = flags;
+    mouse.x = x;
+    mouse.y = y;
+  }
+}
 
 absl::Status RunMPPGraph() {
   std::string calculator_graph_config_contents;
@@ -85,12 +97,26 @@ absl::Status RunMPPGraph() {
   MP_RETURN_IF_ERROR(graph.StartRun({}));
 
   LOG(INFO) << "Start grabbing and processing frames.";
-  bool grab_frames = true;
-  while (grab_frames) {
+
+  bool const process_key_input = graph.HasInputStream(kUserInput);
+  UserInput user_input;
+  if (process_key_input) {
+    cv::setMouseCallback(kWindowName, mouse_event, &user_input);
+  }
+
+  for (auto const start_time=std::chrono::system_clock::now();
+       user_input.wait_key!=27; user_input.wait_key=cv::waitKeyEx(1)) {
+    // close window after wait key
+    if (cv::getWindowProperty(kWindowName, cv::WND_PROP_VISIBLE)<1.0) {
+      break;
+    }
+
     // Capture opencv camera or video frame.
     cv::Mat camera_frame_raw;
     capture >> camera_frame_raw;
-    if (camera_frame_raw.empty()) {
+    if (!camera_frame_raw.empty()) {
+      ++user_input.frame_id;
+    } else {
       if (!load_video) {
         LOG(INFO) << "Ignore empty frames from camera.";
         continue;
@@ -104,6 +130,18 @@ absl::Status RunMPPGraph() {
       cv::flip(camera_frame, camera_frame, /*flipcode=HORIZONTAL*/ 1);
     }
 
+    // timestamp
+    mediapipe::Timestamp const timestamp(get_elapsed_time_microseconds(start_time));
+
+    // process key input
+    if (process_key_input) {
+      graph.AddPacketToInputStream(kUserInput, mediapipe::MakePacket<UserInput>(user_input).At(timestamp));
+
+      // reset
+      user_input.mouse.event = 0;
+      user_input.mouse.flags = 0;
+    }
+
     // Wrap Mat into an ImageFrame.
     auto input_frame = absl::make_unique<mediapipe::ImageFrame>(
         mediapipe::ImageFormat::SRGB, camera_frame.cols, camera_frame.rows,
@@ -112,10 +150,8 @@ absl::Status RunMPPGraph() {
     camera_frame.copyTo(input_frame_mat);
 
     // Send image packet into the graph.
-    int64_t const frame_timestamp_us = (int64_t) ((double)cv::getTickCount() / (double)cv::getTickFrequency() * 1e6);
     MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(
-        kInputStream, mediapipe::Adopt(input_frame.release())
-                          .At(mediapipe::Timestamp(frame_timestamp_us))));
+        kInputStream, mediapipe::Adopt(input_frame.release()).At(timestamp)));
 
     // Get the graph result packet, or stop if that fails.
     mediapipe::Packet packet;
@@ -138,10 +174,11 @@ absl::Status RunMPPGraph() {
       }
       writer.write(output_frame_mat);
     } else {
+      if (0x03==user_input.wait_key) { // capture: Ctrl+C
+        cv::imwrite("screen_shot.jpg", output_frame_mat);
+      }
+
       cv::imshow(kWindowName, output_frame_mat);
-      // Press any key to exit.
-      const int pressed_key = cv::waitKey(5);
-      if (pressed_key >= 0 && pressed_key != 255) grab_frames = false;
     }
   }
 
@@ -157,10 +194,9 @@ int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
   absl::Status run_status = RunMPPGraph();
   if (!run_status.ok()) {
-    LOG(ERROR) << "Failed to run the graph: " << run_status.message();
+    std::cout << "Failed to run the graph: " << run_status.message() << "\n";
+    system("pause");
     return EXIT_FAILURE;
-  } else {
-    LOG(INFO) << "Success!";
   }
   return EXIT_SUCCESS;
 }

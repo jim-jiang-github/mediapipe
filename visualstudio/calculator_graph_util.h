@@ -1,5 +1,18 @@
 #include "mediapipe/framework/calculator_graph.h"
 
+// OpenCV key input
+struct UserInput {
+  struct {
+    int event{0}, flags{0}, x{0}, y{0};
+  } mouse;
+  int wait_key{-1}; // cv::waitKeyEx
+  int frame_id{-1};
+};
+
+inline uint64_t get_elapsed_time_microseconds(std::chrono::system_clock::time_point const& start_time) {
+  return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now()-start_time).count();
+}
+
 inline bool read_config_from_pbtxt(mediapipe::CalculatorGraphConfig& config, char const* filename) {
   bool result = false;
   FILE* file = fopen(filename, "rb");

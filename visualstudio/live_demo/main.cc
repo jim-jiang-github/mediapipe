@@ -185,8 +185,14 @@ int select_graph(mediapipe::CalculatorGraph& graph) {
   return -2;
 }
 
-inline int64_t get_elapsed_time_microseconds(std::chrono::time_point<std::chrono::system_clock> const& start_time) {
-  return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now()-start_time).count();
+void mouse_event(int event, int x, int y, int flags, void* user_data) {
+  if (user_data) {
+    auto& mouse = ((UserInput*) user_data)->mouse;
+    mouse.event = event;
+    mouse.flags = flags;
+    mouse.x = x;
+    mouse.y = y;
+  }
 }
 
 int main(int argc, char** argv) {
@@ -276,16 +282,28 @@ int main(int argc, char** argv) {
   float frame_per_second = 0.0f;
 
   printf("\nAlright! Start grabbing and processing frames...\n");
-  for (int key(-1),frame_id(-1); key!=27; key=cv::waitKeyEx(1)) {
+
+  bool const process_key_input = graph.HasInputStream("user_input");
+  UserInput user_input;
+  if (process_key_input) {
+    cv::setMouseCallback(window_title, mouse_event, &user_input);
+  }
+
+  for (auto const start_time=std::chrono::system_clock::now();
+       user_input.wait_key!=27; user_input.wait_key=cv::waitKeyEx(1)) {
+    // close window after wait key
+    if (cv::getWindowProperty(window_title, cv::WND_PROP_VISIBLE)<1.0) {
+      break;
+    }
 
     // TO-DO: you can actually change demo here...
-    if ('1'<=key && key<=9) {
+    if ('1'<=user_input.wait_key && user_input.wait_key<=9) {
     }
 
     cv::Mat camera_frame_raw;
     capture >> camera_frame_raw;
     if (!camera_frame_raw.empty()) {
-      ++frame_id;
+      ++user_input.frame_id;
     } else if (!input_video) {
       printf("Ignore empty frames from camera.\n");
       continue;
@@ -300,6 +318,18 @@ int main(int argc, char** argv) {
       cv::flip(camera_frame, camera_frame, /*flipcode=HORIZONTAL*/ 1);
     }
 
+    // timestamp
+    mediapipe::Timestamp const timestamp(get_elapsed_time_microseconds(start_time));
+
+    // process key input
+    if (process_key_input) {
+      graph.AddPacketToInputStream("user_input", mediapipe::MakePacket<UserInput>(user_input).At(timestamp));
+
+      // reset
+      user_input.mouse.event = 0;
+      user_input.mouse.flags = 0;
+    }
+
     // Wrap Mat into an ImageFrame.
     auto input_frame = absl::make_unique<mediapipe::ImageFrame>(
         mediapipe::ImageFormat::SRGB, camera_frame.cols, camera_frame.rows,
@@ -308,8 +338,7 @@ int main(int argc, char** argv) {
     camera_frame.copyTo(input_frame_mat);
 
     // Send image packet into the graph.
-    if (!graph.AddPacketToInputStream(input_stream, mediapipe::Adopt(input_frame.release())
-                          .At(mediapipe::Timestamp(get_elapsed_time_microseconds(time_start)))).ok()) {
+    if (!graph.AddPacketToInputStream(input_stream, mediapipe::Adopt(input_frame.release()).At(timestamp)).ok()) {
       if (--error<=-5) {
         printf("Failed to send image packet into the graph.\n");
         break;
@@ -336,8 +365,7 @@ int main(int argc, char** argv) {
       if (writer.isOpened()) {
         writer.write(output_frame_mat);
       } else {
-        writer.open(save_video,
-                    cv::VideoWriter::fourcc('a', 'v', 'c', '1'),  // .mp4
+        writer.open(save_video, cv::VideoWriter::fourcc('a', 'v', 'c', '1'),
                     capture.get(cv::CAP_PROP_FPS), output_frame_mat.size());
         if (writer.isOpened()) {
           writer.write(output_frame_mat);
@@ -373,6 +401,10 @@ int main(int argc, char** argv) {
 
     // present
     cv::imshow(window_title, output_frame_mat);
+
+    if (0x03==user_input.wait_key) { // capture: Ctrl+C
+      cv::imwrite("screen_shot.jpg", output_frame_mat);
+    }
   }
 
   printf("Shutting down...\n");

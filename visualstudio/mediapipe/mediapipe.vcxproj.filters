@@ -555,9 +555,6 @@
     <ClCompile Include="gpu\gpu_origin.pb.cc">
       <Filter>gpu</Filter>
     </ClCompile>
-    <ClCompile Include="modules\face_geometry\effect_renderer_calculator.pb.cc">
-      <Filter>modules\face_geometry</Filter>
-    </ClCompile>
     <ClCompile Include="modules\face_geometry\env_generator_calculator.pb.cc">
       <Filter>modules\face_geometry</Filter>
     </ClCompile>
@@ -605,9 +602,6 @@
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\gpu\gpu_buffer.cc">
       <Filter>gpu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\modules\face_geometry\libs\effect_renderer.cc">
-      <Filter>modules\face_geometry\libs</Filter>
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\modules\face_geometry\libs\geometry_pipeline.cc">
       <Filter>modules\face_geometry\libs</Filter>
@@ -998,9 +992,6 @@
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\graphs\face_mesh\calculators\face_landmarks_to_render_data_calculator.cc">
       <Filter>graphs\face_mesh\calculators</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\mediapipe\modules\face_geometry\effect_renderer_calculator.cc">
-      <Filter>modules\face_geometry</Filter>
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\modules\face_geometry\env_generator_calculator.cc">
       <Filter>modules\face_geometry</Filter>
@@ -1505,9 +1496,6 @@
     <ClInclude Include="gpu\gpu_origin.pb.h">
       <Filter>gpu</Filter>
     </ClInclude>
-    <ClInclude Include="modules\face_geometry\effect_renderer_calculator.pb.h">
-      <Filter>modules\face_geometry</Filter>
-    </ClInclude>
     <ClInclude Include="modules\face_geometry\env_generator_calculator.pb.h">
       <Filter>modules\face_geometry</Filter>
     </ClInclude>
@@ -1555,9 +1543,6 @@
     </ClInclude>
     <ClInclude Include="..\..\mediapipe\gpu\gpu_buffer.h">
       <Filter>gpu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\mediapipe\modules\face_geometry\libs\effect_renderer.h">
-      <Filter>modules\face_geometry\libs</Filter>
     </ClInclude>
     <ClInclude Include="..\..\mediapipe\modules\face_geometry\libs\geometry_pipeline.h">
       <Filter>modules\face_geometry\libs</Filter>

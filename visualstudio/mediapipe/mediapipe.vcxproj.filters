@@ -112,6 +112,18 @@
     <Filter Include="modules\hand_landmark">
       <UniqueIdentifier>{29fe2b9e-ff1a-460e-8a72-d9fcb188f650}</UniqueIdentifier>
     </Filter>
+    <Filter Include="graphs\object_detection_3d">
+      <UniqueIdentifier>{fe5c19a8-3613-4bac-aec0-ea55d3974062}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="graphs\object_detection_3d\calculators">
+      <UniqueIdentifier>{9141ccf1-131b-4d7d-81ae-3fde2b525840}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modules\objectron">
+      <UniqueIdentifier>{51f27a89-992b-4faa-ab05-405f74901d67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="modules\objectron\calculators">
+      <UniqueIdentifier>{b0ec7dbe-3db3-406c-a4b6-3a58d93bbf78}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\mediapipe\framework\deps\status_builder.cc">
@@ -1167,6 +1179,105 @@
     <ClCompile Include="util\label_map.pb.cc">
       <Filter>util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\mediapipe\graphs\object_detection_3d\calculators\annotations_to_model_matrices_calculator.cc">
+      <Filter>graphs\object_detection_3d\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\graphs\object_detection_3d\calculators\annotations_to_render_data_calculator.cc">
+      <Filter>graphs\object_detection_3d\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="graphs\object_detection_3d\calculators\annotations_to_model_matrices_calculator.pb.cc">
+      <Filter>graphs\object_detection_3d\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="graphs\object_detection_3d\calculators\annotations_to_render_data_calculator.pb.cc">
+      <Filter>graphs\object_detection_3d\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="graphs\object_detection_3d\calculators\model_matrix.pb.cc">
+      <Filter>graphs\object_detection_3d\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="graphs\object_detection_3d\calculators\gl_animation_overlay_calculator.pb.cc">
+      <Filter>graphs\object_detection_3d\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\graphs\object_detection_3d\calculators\gl_animation_overlay_calculator.cc">
+      <Filter>graphs\object_detection_3d\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\tflite_tensors_to_objects_calculator.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\tensors_to_objects_calculator.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\tensor_util.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\model.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\lift_2d_frame_annotation_to_3d_calculator.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\landmarks_to_frame_annotation_calculator.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\frame_annotation_tracker_calculator.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\frame_annotation_tracker.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\frame_annotation_to_timed_box_list_calculator.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\frame_annotation_to_rect_calculator.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\filter_detection_calculator.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\epnp.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\decoder.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\box_util.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\box.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\objectron\calculators\a_r_capture_metadata.pb.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\objectron\calculators\annotation_data.pb.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\objectron\calculators\belief_decoder_config.pb.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\objectron\calculators\camera_parameters.pb.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\objectron\calculators\filter_detection_calculator.pb.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\objectron\calculators\frame_annotation_to_rect_calculator.pb.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\objectron\calculators\frame_annotation_tracker_calculator.pb.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\objectron\calculators\lift_2d_frame_annotation_to_3d_calculator.pb.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\objectron\calculators\object.pb.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\objectron\calculators\tensors_to_objects_calculator.pb.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\objectron\calculators\tflite_tensors_to_objects_calculator.pb.cc">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\mediapipe\framework\tool\options_util.h">
@@ -1789,6 +1900,75 @@
     </ClInclude>
     <ClInclude Include="util\label_map.pb.h">
       <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="graphs\object_detection_3d\calculators\annotations_to_model_matrices_calculator.pb.h">
+      <Filter>graphs\object_detection_3d\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="graphs\object_detection_3d\calculators\annotations_to_render_data_calculator.pb.h">
+      <Filter>graphs\object_detection_3d\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="graphs\object_detection_3d\calculators\model_matrix.pb.h">
+      <Filter>graphs\object_detection_3d\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="graphs\object_detection_3d\calculators\gl_animation_overlay_calculator.pb.h">
+      <Filter>graphs\object_detection_3d\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\types.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\tensor_util.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\model.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\frame_annotation_tracker.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\epnp.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\decoder.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\box_util.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\box.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\objectron\calculators\a_r_capture_metadata.pb.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\objectron\calculators\annotation_data.pb.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\objectron\calculators\belief_decoder_config.pb.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\objectron\calculators\camera_parameters.pb.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\objectron\calculators\filter_detection_calculator.pb.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\objectron\calculators\frame_annotation_to_rect_calculator.pb.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\objectron\calculators\frame_annotation_tracker_calculator.pb.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\objectron\calculators\lift_2d_frame_annotation_to_3d_calculator.pb.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\objectron\calculators\object.pb.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\objectron\calculators\tensors_to_objects_calculator.pb.h">
+      <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\objectron\calculators\tflite_tensors_to_objects_calculator.pb.h">
+      <Filter>modules\objectron\calculators</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

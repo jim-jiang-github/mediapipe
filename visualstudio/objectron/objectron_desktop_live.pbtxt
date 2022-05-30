@@ -1,0 +1,75 @@
+# MediaPipe graph that performs face mesh with TensorFlow Lite on CPU.
+
+# Input image. (ImageFrame)
+input_stream: "input_video"
+
+# user input. keyboard and mouse
+#input_stream: "user_input"
+
+# Output image with rendered results. (ImageFrame)
+output_stream: "output_video"
+
+# Throttles the images flowing downstream for flow control. It passes through
+# the very first incoming image unaltered, and waits for downstream nodes
+# (calculators and subgraphs) in the graph to finish their tasks before it
+# passes through another image. All images that come in while waiting are
+# dropped, limiting the number of in-flight images in most part of the graph to
+# 1. This prevents the downstream nodes from queuing up incoming images and data
+# excessively, which leads to increased latency and memory usage, unwanted in
+# real-time mobile applications. It also eliminates unnecessarily computation,
+# e.g., the output produced by a node may get dropped downstream if the
+# subsequent nodes are still busy processing previous inputs.
+node {
+  calculator: "FlowLimiterCalculator"
+  input_stream: "input_video"
+  input_stream: "FINISHED:output_video"
+  input_stream_info: {
+    tag_index: "FINISHED"
+    back_edge: true
+  }
+  output_stream: "throttled_input_video"
+}
+
+# Generates side packets
+node {
+  calculator: "ConstantSidePacketCalculator"
+  output_side_packet: "PACKET:0:max_num_objects"
+  output_side_packet: "PACKET:1:box_landmark_model_path"
+  output_side_packet: "PACKET:2:allowed_labels"
+  node_options: {
+    [type.googleapis.com/mediapipe.ConstantSidePacketCalculatorOptions]: {
+      # max number of objects to detect/track
+      packet { int_value: 5 }
+
+      #packet { string_value: "../../mediapipe/modules/objectron/object_detection_3d_sneakers.tflite" }
+      #packet { string_value: "Footwear" }
+      #packet { string_value: "../../mediapipe/modules/objectron/object_detection_3d_chair.tflite" }
+      #packet { string_value: "Chair" }
+      #packet { string_value: "../../mediapipe/modules/objectron/object_detection_3d_camera.tflite" }
+      #packet { string_value: "Camera" }
+      packet { string_value: "../../mediapipe/modules/objectron/object_detection_3d_cup.tflite" }
+      packet { string_value: "Mug" }
+    }
+  }
+}
+
+# Run Objectron subgraph.
+node {
+  calculator: "ObjectronCpuSubgraph"
+  input_stream: "IMAGE:throttled_input_video"
+  input_side_packet: "MAX_NUM_OBJECTS:max_num_objects"
+  input_side_packet: "MODEL_PATH:box_landmark_model_path"
+  input_side_packet: "LABELS_CSV:allowed_labels"
+  output_stream: "MULTI_LANDMARKS:box_landmarks"
+  output_stream: "NORM_RECTS:box_rect"
+}
+
+# Subgraph that renders annotations and overlays them on top of the input
+# images (see renderer_cpu.pbtxt).
+node {
+  calculator: "RendererSubgraph"
+  input_stream: "IMAGE:throttled_input_video"
+  input_stream: "MULTI_LANDMARKS:box_landmarks"
+  input_stream: "NORM_RECTS:box_rect"
+  output_stream: "IMAGE:output_video"
+}

@@ -205,6 +205,14 @@
     <ClCompile Include="..\..\mediapipe\graphs\face_mesh\calculators\face_landmarks_to_render_data_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\graphs\iris_tracking\calculators\iris_to_render_data_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\graphs\iris_tracking\calculators\update_face_landmarks_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\graphs\object_detection_3d\calculators\annotations_to_model_matrices_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\graphs\object_detection_3d\calculators\annotations_to_render_data_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\graphs\object_detection_3d\calculators\gl_animation_overlay_calculator.cc">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\mediapipe\modules\face_geometry\env_generator_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\modules\face_geometry\geometry_pipeline_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\modules\face_geometry\libs\geometry_pipeline.cc" />
@@ -214,6 +222,21 @@
     <ClCompile Include="..\..\mediapipe\modules\hand_landmark\calculators\hand_landmarks_to_rect_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\modules\holistic_landmark\calculators\hand_detections_from_pose_to_rects_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\modules\holistic_landmark\calculators\roi_tracking_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\box.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\box_util.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\decoder.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\epnp.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\filter_detection_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\frame_annotation_to_rect_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\frame_annotation_to_timed_box_list_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\frame_annotation_tracker.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\frame_annotation_tracker_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\landmarks_to_frame_annotation_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\lift_2d_frame_annotation_to_3d_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\model.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\tensors_to_objects_calculator.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\tensor_util.cc" />
+    <ClCompile Include="..\..\mediapipe\modules\objectron\calculators\tflite_tensors_to_objects_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\util\annotation_renderer.cc" />
     <ClCompile Include="..\..\mediapipe\util\cpu_util.cc" />
     <ClCompile Include="..\..\mediapipe\util\filtering\low_pass_filter.cc" />
@@ -362,6 +385,10 @@
     <ClCompile Include="gpu\scale_mode.pb.cc" />
     <ClCompile Include="graphs\iris_tracking\calculators\iris_to_depth_calculator.pb.cc" />
     <ClCompile Include="graphs\iris_tracking\calculators\iris_to_render_data_calculator.pb.cc" />
+    <ClCompile Include="graphs\object_detection_3d\calculators\annotations_to_model_matrices_calculator.pb.cc" />
+    <ClCompile Include="graphs\object_detection_3d\calculators\annotations_to_render_data_calculator.pb.cc" />
+    <ClCompile Include="graphs\object_detection_3d\calculators\gl_animation_overlay_calculator.pb.cc" />
+    <ClCompile Include="graphs\object_detection_3d\calculators\model_matrix.pb.cc" />
     <ClCompile Include="modules\face_geometry\env_generator_calculator.pb.cc" />
     <ClCompile Include="modules\face_geometry\geometry_pipeline_calculator.pb.cc" />
     <ClCompile Include="modules\face_geometry\protos\environment.pb.cc" />
@@ -369,6 +396,17 @@
     <ClCompile Include="modules\face_geometry\protos\geometry_pipeline_metadata.pb.cc" />
     <ClCompile Include="modules\face_geometry\protos\mesh_3d.pb.cc" />
     <ClCompile Include="modules\holistic_landmark\calculators\roi_tracking_calculator.pb.cc" />
+    <ClCompile Include="modules\objectron\calculators\annotation_data.pb.cc" />
+    <ClCompile Include="modules\objectron\calculators\a_r_capture_metadata.pb.cc" />
+    <ClCompile Include="modules\objectron\calculators\belief_decoder_config.pb.cc" />
+    <ClCompile Include="modules\objectron\calculators\camera_parameters.pb.cc" />
+    <ClCompile Include="modules\objectron\calculators\filter_detection_calculator.pb.cc" />
+    <ClCompile Include="modules\objectron\calculators\frame_annotation_to_rect_calculator.pb.cc" />
+    <ClCompile Include="modules\objectron\calculators\frame_annotation_tracker_calculator.pb.cc" />
+    <ClCompile Include="modules\objectron\calculators\lift_2d_frame_annotation_to_3d_calculator.pb.cc" />
+    <ClCompile Include="modules\objectron\calculators\object.pb.cc" />
+    <ClCompile Include="modules\objectron\calculators\tensors_to_objects_calculator.pb.cc" />
+    <ClCompile Include="modules\objectron\calculators\tflite_tensors_to_objects_calculator.pb.cc" />
     <ClCompile Include="util\color.pb.cc" />
     <ClCompile Include="util\label_map.pb.cc" />
     <ClCompile Include="util\render_data.pb.cc" />
@@ -436,6 +474,14 @@
     <ClInclude Include="..\..\mediapipe\modules\face_geometry\libs\mesh_3d_utils.h" />
     <ClInclude Include="..\..\mediapipe\modules\face_geometry\libs\procrustes_solver.h" />
     <ClInclude Include="..\..\mediapipe\modules\face_geometry\libs\validation_utils.h" />
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\box.h" />
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\box_util.h" />
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\decoder.h" />
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\epnp.h" />
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\frame_annotation_tracker.h" />
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\model.h" />
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\tensor_util.h" />
+    <ClInclude Include="..\..\mediapipe\modules\objectron\calculators\types.h" />
     <ClInclude Include="..\..\mediapipe\util\annotation_renderer.h" />
     <ClInclude Include="..\..\mediapipe\util\filtering\low_pass_filter.h" />
     <ClInclude Include="..\..\mediapipe\util\filtering\one_euro_filter.h" />
@@ -569,6 +615,10 @@
     <ClInclude Include="gpu\scale_mode.pb.h" />
     <ClInclude Include="graphs\iris_tracking\calculators\iris_to_depth_calculator.pb.h" />
     <ClInclude Include="graphs\iris_tracking\calculators\iris_to_render_data_calculator.pb.h" />
+    <ClInclude Include="graphs\object_detection_3d\calculators\annotations_to_model_matrices_calculator.pb.h" />
+    <ClInclude Include="graphs\object_detection_3d\calculators\annotations_to_render_data_calculator.pb.h" />
+    <ClInclude Include="graphs\object_detection_3d\calculators\gl_animation_overlay_calculator.pb.h" />
+    <ClInclude Include="graphs\object_detection_3d\calculators\model_matrix.pb.h" />
     <ClInclude Include="modules\face_geometry\env_generator_calculator.pb.h" />
     <ClInclude Include="modules\face_geometry\geometry_pipeline_calculator.pb.h" />
     <ClInclude Include="modules\face_geometry\protos\environment.pb.h" />
@@ -576,6 +626,17 @@
     <ClInclude Include="modules\face_geometry\protos\geometry_pipeline_metadata.pb.h" />
     <ClInclude Include="modules\face_geometry\protos\mesh_3d.pb.h" />
     <ClInclude Include="modules\holistic_landmark\calculators\roi_tracking_calculator.pb.h" />
+    <ClInclude Include="modules\objectron\calculators\annotation_data.pb.h" />
+    <ClInclude Include="modules\objectron\calculators\a_r_capture_metadata.pb.h" />
+    <ClInclude Include="modules\objectron\calculators\belief_decoder_config.pb.h" />
+    <ClInclude Include="modules\objectron\calculators\camera_parameters.pb.h" />
+    <ClInclude Include="modules\objectron\calculators\filter_detection_calculator.pb.h" />
+    <ClInclude Include="modules\objectron\calculators\frame_annotation_to_rect_calculator.pb.h" />
+    <ClInclude Include="modules\objectron\calculators\frame_annotation_tracker_calculator.pb.h" />
+    <ClInclude Include="modules\objectron\calculators\lift_2d_frame_annotation_to_3d_calculator.pb.h" />
+    <ClInclude Include="modules\objectron\calculators\object.pb.h" />
+    <ClInclude Include="modules\objectron\calculators\tensors_to_objects_calculator.pb.h" />
+    <ClInclude Include="modules\objectron\calculators\tflite_tensors_to_objects_calculator.pb.h" />
     <ClInclude Include="util\color.pb.h" />
     <ClInclude Include="util\label_map.pb.h" />
     <ClInclude Include="util\render_data.pb.h" />

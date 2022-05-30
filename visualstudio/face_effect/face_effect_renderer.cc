@@ -53,6 +53,9 @@ void print_help() {
 namespace mediapipe {
 
 class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
+  // canonical face model vertices
+  std::vector<Vector3> canonical_face_model_;
+  
   // to solve landmarks from image space to metric space
   WeightedOrthogonalProblemSolver wop_solver_;
   std::vector<int> procrustes_landmark_indices_;
@@ -432,6 +435,12 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
       char filename[256];
       sprintf(filename, "%s/facepaint.pngblob", model_path);
       if (effect_meshes_[2].Create(mesh, filename)) {
+        canonical_face_model_.clear();
+        canonical_face_model_.reserve(mesh.vertices.size());
+        for (auto const& v:mesh.vertices) {
+          canonical_face_model_.push_back({v.x, v.y, v.z});
+        }
+
         sprintf(filename, "%s/glasses.pbtxt", model_path);
         if (LoadMeshFrom_pbtxt(mesh, filename)) {
           sprintf(filename, "%s/glasses.pngblob", model_path);

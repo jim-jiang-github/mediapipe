@@ -89,6 +89,9 @@ absl::Status DetectionLabelIdToTextCalculator::Open(CalculatorContext* cc) {
     std::string line;
     int i = 0;
     while (std::getline(stream, line)) {
+#ifdef _WIN32
+      std::stringstream(line) >> line; // remove unwanted tail '\r' (windows: CRLF)
+#endif
       LabelMapItem item;
       item.set_name(line);
       (*local_label_map_.mutable_index_to_item())[i++] = item;

@@ -35,11 +35,13 @@ class DrawMesh final {
   // render states
   uint8_t mode_:2; // 1: point, 2:line, 0/3:triangle
   uint8_t transparent_:1;
-  uint8_t color_disable_:1;
-  uint8_t depth_disable_:1;
-  uint8_t zpass_:1;
-  uint8_t cull_:2;
-  int8_t  depth_offset_{0};
+  uint8_t color_write_disabled_:1;
+  uint8_t depth_write_disabled_:1;
+  uint8_t texture_disabled_:1;
+  uint8_t cull_disabled_:1;  // to be implemented
+  uint8_t ztest_disabled_:1; // to be implemented
+
+  int8_t  depth_fill_offset_{0}; // depth_write_disabled_ = false
 
 public:
   DrawMesh() = default;
@@ -47,13 +49,19 @@ public:
   DrawMesh& operator=(DrawMesh const&) = delete;
   ~DrawMesh() { Release(); }
 
-  void SetColorWrite(bool enable) { color_disable_ = !enable; }
-  void SetDepthWrite(bool enable) { depth_disable_ = !enable; }
-  void SetDepthOffset(int8_t offset) { depth_offset_ = offset; }
-  void SetMode(uint8_t mode) { if (mode<5) mode_ = mode; }
+  void SetColorWrite(bool enable) { color_write_disabled_ = !enable; }
+  void SetDepthWrite(bool enable) { depth_write_disabled_ = !enable; }
+  void SetTextureEnable(bool enable) { texture_disabled_ = !enable; }
+  void SetDepthWriteOffset(int8_t offset) { depth_fill_offset_ = offset; }
+
+  void SetMode(uint8_t mode) { if (mode<4) mode_ = mode; }
 
   bool Create(Mesh const& mesh, char const* texture_name);
-  bool Update(Vector3 const* xyz, int size);
+  bool Update(Vector3 const* xyz, int num_vertices);
+
+  // could be slow...
+  bool Update(Vector3 const* xyz, Vector2 const* texcoord, int num_vertices,
+              uint8_t const* rgb_texture, int texture_width, int texture_height);
 
   // release OpenGL release
   void Release();
@@ -187,10 +195,14 @@ public:
   bool Draw(Matrix3 const&, DrawMesh const&);
 
   // draw points
-  bool Draw(Matrix3 const&, Vector3 const* points, int num_points);
+  bool Draw(Matrix3 const&, Vector3 const* points, int num_points, float point_size=4.0f);
 
   // return result in RGB8 format
   uint8_t const* EndScene();
+
+  // render states...
+  void SetDepthWriteEnable(bool enable);
+  void SetDepthTestEnable(bool enable);
 };
 
 #endif

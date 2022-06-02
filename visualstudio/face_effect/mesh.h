@@ -41,6 +41,10 @@ struct Vector3 {
   float x, y, z;
 };
 
+struct Vector2 {
+  float x, y;
+};
+
 // mesh from file
 struct Mesh {
   struct Vertex {

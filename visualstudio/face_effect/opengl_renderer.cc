@@ -264,9 +264,14 @@ bool DrawMesh::Create(Mesh const& mesh, char const* texture_file) {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-  color_disable_ = false;
-  depth_disable_ = false;
-  depth_offset_ = 0;
+  mode_ = 0; // 1: point, 2:line, 0/3:triangle
+  transparent_ = false;
+  color_write_disabled_ = false;
+  depth_write_disabled_ = false;
+  texture_disabled_ = false;
+  cull_disabled_ = false;
+  ztest_disabled_ = false;
+  depth_fill_offset_ = 0;
 
   return true;
 }
@@ -276,6 +281,43 @@ bool DrawMesh::Update(Vector3 const* vertices, int size) {
     glBindBuffer(GL_ARRAY_BUFFER, bos_[0]);
     glBufferSubData(GL_ARRAY_BUFFER, 0, size*12, vertices);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    return true;
+  }
+  return false;
+}
+
+// could be slow...
+bool DrawMesh::Update(Vector3 const* xyz, Vector2 const* texcoord, int num_vertices,
+                      uint8_t const* rgb_texture, int texture_width, int texture_height) {
+  if (xyz && num_vertices<=num_vertices_ && bos_[0]) {
+    glBindBuffer(GL_ARRAY_BUFFER, bos_[0]);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, num_vertices*12, xyz);
+    if (texcoord) {
+      glBufferSubData(GL_ARRAY_BUFFER, num_vertices*12, num_vertices*8, texcoord);
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    transparent_ = false;
+    if (rgb_texture && texture_width>0 && texture_height>0 && 0==(texture_width&3)) {
+      if (0==texture_) {
+        glGenTextures(1, &texture_);
+        if (0==texture_) {
+          return false;
+        }
+      }
+
+      glBindTexture(GL_TEXTURE_2D, texture_);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, texture_width, texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, rgb_texture);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+      glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+      glBindTexture(GL_TEXTURE_2D, 0);
+    } else if (texture_) {
+      glDeleteTextures(1, &texture_);
+      texture_ = 0;
+    }
+
     return true;
   }
   return false;
@@ -294,9 +336,14 @@ void DrawMesh::Release() {
 
   num_vertices_ = num_triangles_ = num_lines_ = 0;
 
-  color_disable_ = false;
-  depth_disable_ = false;
-  depth_offset_ = 0;
+  mode_ = 0; // 1: point, 2:line, 0/3:triangle
+  transparent_ = false;
+  color_write_disabled_ = false;
+  depth_write_disabled_ = false;
+  texture_disabled_ = false;
+  cull_disabled_ = false;
+  ztest_disabled_ = false;
+  depth_fill_offset_ = 0;
 }
 
 OpenGLRenderer::OpenGLRenderer():
@@ -321,7 +368,7 @@ bool OpenGLRenderer::InitGLObjects_() {
 #endif
 
   glShadeModel(GL_SMOOTH);
-  glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
+  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glClearDepth(1.0f);
   glDepthRange(0.0f, 1.0f);
   glDepthMask(GL_FALSE);
@@ -495,7 +542,7 @@ bool OpenGLRenderer::Run_() {
 }
 
 bool OpenGLRenderer::BeginScene(uint8_t const* background, int width, int height) {
-  assert(background && width>0 && height>0);
+  assert(width>0 && height>0);
   if ((width_*height_)<(width*height) || nullptr==read_pixels_) {
     read_pixels_ = (uint8_t*) malloc(width*height*4);
     if (!read_pixels_) {
@@ -540,33 +587,38 @@ bool OpenGLRenderer::BeginScene(uint8_t const* background, int width, int height
   }
 
   // draw background - fullscreen quad with writing Z=1.0
+  if (background) {
+    // no testing needed, every pixel pass!
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
 
-  // no testing needed, every pixel pass!
-  glDisable(GL_DEPTH_TEST);
-  glDisable(GL_CULL_FACE);
-
-  // will write Z= 1.0
-  glDepthMask(GL_TRUE);
+    // will write Z= 1.0
+    glDepthMask(GL_TRUE);
 
 #if 1
-  // since we draw fullscreen with writing Z=1.0, then why should it need this clear?
-  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
-  glDepthMask(GL_FALSE); // if clear, need no z write
+    // since we draw fullscreen with writing Z=1.0, then why should it need this clear?
+    glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glDepthMask(GL_FALSE); // if clear, need no z write
 #endif
 
-  glUseProgram(fullscren_shader_);
+    glUseProgram(fullscren_shader_);
 
-  // upload texture
-  glActiveTexture(GL_TEXTURE0); // only use one texture unit 
-  glBindTexture(GL_TEXTURE_2D, fullscreen_texture_);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE, background);
+    // upload texture
+    glActiveTexture(GL_TEXTURE0); // only use one texture unit 
+    glBindTexture(GL_TEXTURE_2D, fullscreen_texture_);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, width_, height_, 0, GL_RGB, GL_UNSIGNED_BYTE, background);
 
-  constexpr uint8_t fullscreen_vb[] = { 0,255,  0,0,  255,255,  255,0 }; // fullscreen quad
-  glEnableVertexAttribArray(GL_VERTEX_ATTRIBUTE_POSITION);
-  glVertexAttribPointer(GL_VERTEX_ATTRIBUTE_POSITION, 2, GL_UNSIGNED_BYTE, GL_TRUE, 0, fullscreen_vb);
-  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    constexpr uint8_t fullscreen_vb[] = { 0,255,  0,0,  255,255,  255,0 }; // fullscreen quad
+    glEnableVertexAttribArray(GL_VERTEX_ATTRIBUTE_POSITION);
+    glVertexAttribPointer(GL_VERTEX_ATTRIBUTE_POSITION, 2, GL_UNSIGNED_BYTE, GL_TRUE, 0, fullscreen_vb);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-  glUseProgram(0);
+    glUseProgram(0);
+  } else {
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+  }
 
   //
   // build projection matrix wrt to vfov
@@ -601,35 +653,8 @@ bool OpenGLRenderer::Draw(Matrix3 const& xform, DrawMesh const& e) {
 
   size_t buffer_offset;
 
-  if (e.color_disable_) {
-    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-
-    if (e.depth_offset_) {
-      glEnable(GL_POLYGON_OFFSET_FILL);
-      glPolygonOffset(1.0f, (float) e.depth_offset_);
-    }
-
-    glUseProgram(color_model_shader_);
-    glUniformMatrix4fv(color_model_shader_mvp_loc_, 1, GL_FALSE, mvp);
-
-    glBindBuffer(GL_ARRAY_BUFFER, e.bos_[0]);
-    glEnableVertexAttribArray(GL_VERTEX_ATTRIBUTE_POSITION);
-    glVertexAttribPointer(GL_VERTEX_ATTRIBUTE_POSITION, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, e.bos_[1]);
-    glDrawElements(GL_TRIANGLES, e.num_triangles_*3, (e.num_vertices_>255) ? GL_UNSIGNED_SHORT:GL_UNSIGNED_BYTE, nullptr);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    if (e.depth_offset_) {
-      glDisable(GL_POLYGON_OFFSET_FILL);
-      glPolygonOffset(0.0f, 0.0f);
-    }
-
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    return true;
-  }
-
-  if (e.texture_) {
+  bool const texture_enabled = e.texture_ && !e.texture_disabled_ && !e.color_write_disabled_;
+  if (texture_enabled) {
     glUseProgram(textured_model_shader_);
     glUniformMatrix4fv(textured_model_shader_mvp_loc_, 1, GL_FALSE, mvp);
     glBindTexture(GL_TEXTURE_2D, e.texture_);
@@ -650,12 +675,24 @@ bool OpenGLRenderer::Draw(Matrix3 const& xform, DrawMesh const& e) {
   glBindBuffer(GL_ARRAY_BUFFER, e.bos_[0]);
   glEnableVertexAttribArray(GL_VERTEX_ATTRIBUTE_POSITION);
   glVertexAttribPointer(GL_VERTEX_ATTRIBUTE_POSITION, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-  if (e.texture_) {
+  if (texture_enabled) {
     buffer_offset = e.num_vertices_*12;
     glEnableVertexAttribArray(GL_VERTEX_ATTRIBUTE_TEXCOORD);
     glVertexAttribPointer(GL_VERTEX_ATTRIBUTE_TEXCOORD, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid const*) buffer_offset);
   } else {
     glDisableVertexAttribArray(GL_VERTEX_ATTRIBUTE_TEXCOORD);
+  }
+    
+  if (e.depth_write_disabled_) {
+    glDepthMask(GL_FALSE);
+  } else if (e.depth_fill_offset_) {
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(1.0f, (float) e.depth_fill_offset_);
+  }
+
+  if (e.color_write_disabled_) {
+    assert(!e.depth_write_disabled_);
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
   }
 
   // draw call
@@ -676,10 +713,20 @@ bool OpenGLRenderer::Draw(Matrix3 const& xform, DrawMesh const& e) {
   glBindTexture(GL_TEXTURE_2D, 0);
   glUseProgram(0);
 
+  if (e.depth_write_disabled_) {
+    glDepthMask(GL_TRUE);
+  } else if (e.depth_fill_offset_) {
+    glDisable(GL_POLYGON_OFFSET_FILL);
+  }
+
+  if (e.color_write_disabled_) {
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+  }
+
   return true;
 }
 
-bool OpenGLRenderer::Draw(Matrix3 const& xform, Vector3 const* points, int num_points) {
+bool OpenGLRenderer::Draw(Matrix3 const& xform, Vector3 const* points, int num_points, float point_size) {
   float mvp[16];
   perspective_projection_.MVP(mvp, xform);
 
@@ -692,6 +739,8 @@ bool OpenGLRenderer::Draw(Matrix3 const& xform, Vector3 const* points, int num_p
 
   glEnableVertexAttribArray(GL_VERTEX_ATTRIBUTE_POSITION);
   glVertexAttribPointer(GL_VERTEX_ATTRIBUTE_POSITION, 3, GL_FLOAT, GL_FALSE, 0, points);
+
+  glPointSize(point_size<1.0f ? 1.0f:point_size);
 
   //glDisable(GL_DEPTH_TEST);
   glDrawArrays(GL_POINTS, 0, num_points);
@@ -728,4 +777,17 @@ uint8_t const* OpenGLRenderer::EndScene() {
 #endif
 
   return read_pixels_;
+}
+
+// the ugly... should keep current settings
+void OpenGLRenderer::SetDepthWriteEnable(bool enable) {
+  glDepthMask(enable);
+}
+
+void OpenGLRenderer::SetDepthTestEnable(bool enable) {
+  if (enable) {
+    glEnable(GL_DEPTH_TEST);
+  } else {
+    glDisable(GL_DEPTH_TEST);
+  }
 }

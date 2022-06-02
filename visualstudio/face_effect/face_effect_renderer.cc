@@ -32,20 +32,28 @@
 #include "mediapipe/framework/port/opencv_highgui_inc.h"
 #include "mediapipe/framework/formats/landmark.pb.h"
 
+// compare with face_geometry module
+#include "mediapipe/modules/face_geometry/protos/face_geometry.pb.h"
+#include "mediapipe/modules/face_geometry/geometry_pipeline_calculator.pb.h"
+
 namespace {
+
 constexpr char const* kImageTag = "IMAGE";
 constexpr char const* kNormLandmarksTag = "NORM_LANDMARKS";
 constexpr char const* kUserInputTag = "USER_INPUT";
+constexpr char const* kMultiFaceGeometryTag = "MULTI_FACE_GEOMETRY"; // optional, check face_effect.cc
 
 constexpr int num_effect_meshes = 3;
 
 void print_help() {
   printf("\n[INFO]\nface_effect key controls:\n");
-  printf("      Effect: '1', '2', '3' or SPACEBAR\n");
-  printf("   Primitive: 'm' for triangles, lines or points\n");
-  printf("  Camera FOV: 'a' or 's'\n");
-  printf(" Model Scale: 'z' or 'x'\n");
-  printf("        HELP: 'h'\n\n");
+  printf("    Mouse L+Move: 3D view angle\n");
+  printf("          Effect: '1', '2', '3' or SPACEBAR\n");
+  printf("       Primitive: 'm' for triangles, lines or points\n");
+  printf(" Canonical Model: 'k'\n");
+  printf("      Camera FOV: 'a' or 's'\n");
+  printf("     Model Scale: 'z' or 'x'\n");
+  printf("            HELP: 'h'\n\n");
 }
 
 } // namespace
@@ -55,13 +63,14 @@ namespace mediapipe {
 class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
   // canonical face model vertices
   std::vector<Vector3> canonical_face_model_;
-  
+
   // to solve landmarks from image space to metric space
   WeightedOrthogonalProblemSolver wop_solver_;
   std::vector<int> procrustes_landmark_indices_;
 
   // effect to show
   DrawMesh effect_meshes_[num_effect_meshes];
+  DrawMesh face_mesh_;
 
   // bring calculator contex to render thread
   CalculatorContext* calc_ctx_{nullptr};
@@ -84,12 +93,17 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
     }
   } render_task_;
 
+  
+  float print_pose_transform_error_threshold_{0.01f};
+
   // tweakable...
   float camera_vertical_fov_{43.0f};
-  uint8_t draw_mode_{0};
-  uint8_t current_effect_{0};
+  int mouse_x_{0}, mouse_y_{0};
   uint8_t canonical_face_model_scale_pct_{100};
-  uint8_t canonical_face_model_anchor_{100}; // ???
+  uint8_t current_effect_{0};
+  uint8_t draw_mode_:2;
+  uint8_t view_angle_3d_:1;
+  uint8_t show_canonical_landmarks_:2,:3;
 
   //
   // solve face landmark from weak perspective projection model to 3D metric space
@@ -255,6 +269,8 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
           outputs.Tag(kImageTag).Set<ImageFrame>();
           input_checks |= 16;
         }
+      } else if (kMultiFaceGeometryTag==tag_and_index.first) {
+        type.Set<std::vector<face_geometry::FaceGeometry>>();
       }
     }
 
@@ -273,6 +289,11 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
     OpenGLRenderer::Run_();
 
     cc->SetOffset(TimestampDiff(0));
+
+    draw_mode_ = 0;
+    view_angle_3d_ = false;
+    show_canonical_landmarks_ = 0;
+    print_pose_transform_error_threshold_ = 0.01f;
 
     print_help();
 
@@ -296,6 +317,8 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
       } else if ('m'==input.wait_key) {
         //draw_mode_ = (2==draw_mode_) ? 0:2; // 0:triangles, 2:lines
         draw_mode_ = (draw_mode_+1)%3;
+        char const* types[] = { "triangle", "point", "line" };
+        printf("[INFO] Primitive type= %s\n", types[draw_mode_]);
       } else if ('z'==input.wait_key) {
         if (canonical_face_model_scale_pct_>50) {
           --canonical_face_model_scale_pct_;
@@ -318,6 +341,10 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
           printf("[INFO] Camera FOV= %.1f\n", camera_vertical_fov_);
           OpenGLRenderer::SetCameraPerspective(camera_vertical_fov_);
         }
+      } else if ('k'==input.wait_key) {
+        show_canonical_landmarks_ = (show_canonical_landmarks_+1)%3;
+      } else if ('e'==input.wait_key) {
+        print_pose_transform_error_threshold_ = 0.01f; // reset threshold
       } else if ('h'==input.wait_key) {
         print_help();
       } else if (input.wait_key>0) {
@@ -325,9 +352,23 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
       }
 
       // mouse
+      mouse_x_ = input.mouse.x;
+      mouse_y_ = input.mouse.y;
       if (cv::EVENT_LBUTTONDOWN==input.mouse.event) {
+        //printf("[INFO] MOUSE LBUTTONDOWN @ %d, %d\n", input.mouse.x, input.mouse.y);
+        view_angle_3d_ = true;
+      } else if (cv::EVENT_LBUTTONUP==input.mouse.event) {
+        //printf("[INFO] MOUSE LBUTTONUP @ %d, %d\n", input.mouse.x, input.mouse.y);
+        view_angle_3d_ = false;
+      } else {
         if (cv::EVENT_FLAG_LBUTTON&input.mouse.flags) {
-          printf("[INFO] LBUTTON down at: %d, %d\n", input.mouse.x, input.mouse.y);
+          view_angle_3d_ = true;
+          //assert(1==mouse_LButton_down_);
+          //printf("[INFO] MOUSE L+MOVE @ %d, %d\n", input.mouse.x, input.mouse.y);
+        } else {
+          //view_angle_3d_ = false;
+          //assert(0==mouse_LButton_down_);
+          //printf("[INFO] MOUSE event:%d flags:0x%X @ %d, %d\n", input.mouse.event, input.mouse.flags, input.mouse.x, input.mouse.y);
         }
       }
     }
@@ -350,10 +391,8 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
         render_task_.landmark_set = nullptr;
       }
 
-      // kickout rendering
-      if (render_task_.background) {
-        OpenGLRenderer::FrameMove_();
-      }
+      // kick off rendering
+      OpenGLRenderer::FrameMove_();
 
       if (render_task_.result) {
         outputs.Tag(kImageTag).Add(new ImageFrame(target_format,
@@ -440,6 +479,7 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
         for (auto const& v:mesh.vertices) {
           canonical_face_model_.push_back({v.x, v.y, v.z});
         }
+        face_mesh_.Create(mesh, nullptr);
 
         sprintf(filename, "%s/glasses.pbtxt", model_path);
         if (LoadMeshFrom_pbtxt(mesh, filename)) {
@@ -460,29 +500,135 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
   }
   bool DrawFrame_() override {
     if (render_task_ &&
-        OpenGLRenderer::BeginScene(render_task_.background, render_task_.width, render_task_.height)) {
+        OpenGLRenderer::BeginScene(view_angle_3d_ ? nullptr:render_task_.background, render_task_.width, render_task_.height)) {
       // draw each landmarks
       if (render_task_.landmark_set) {
-        Matrix3 const identity;
-        Matrix3 xform;      // transform canonical face model to landmarks in metric 3D space
         Vector3 landmarks[478]; // landmarks in metric 3D space
+        Vector2 texcoords[478]; // landmarks in metric 3D space
+        Matrix3 xform; // transform canonical face model to landmarks in metric 3D space
+        Matrix3 view;  // view transform as identity
 
-        auto& face_mesh = effect_meshes_[2];
+        if (view_angle_3d_) {
+          float yaw = 0.5f - (float)mouse_x_/(float)render_task_.width;
+          float pitch = (float)mouse_y_/(float)render_task_.height - 0.5f;
+          float ca = cos(pitch);
+          float sa = sin(pitch);
+
+          float cb = cos(yaw);
+          float sb = sin(yaw);
+
+          view.m11 = cb;   view.m12 = sb*sa; view.m13 = sb*ca;
+          view.m21 = 0.0f; view.m22 = ca;    view.m23 = -sa;
+          view.m31 = -sb;  view.m32 = cb*sa; view.m33 = cb*ca;
+
+          constexpr float dist = 35.0f;
+          view.m14 = view.m13*dist;
+          view.m24 = view.m23*dist;
+          view.m34 = view.m33*dist - dist;
+        }
+
+        face_geometry::FaceGeometry const* geometry_list = nullptr;
+        if (calc_ctx_->Inputs().HasTag(kMultiFaceGeometryTag)) {
+          auto const& packet = calc_ctx_->Inputs().Tag(kMultiFaceGeometryTag);
+          if (!packet.IsEmpty()) {
+            geometry_list = (packet.Get<std::vector<face_geometry::FaceGeometry>>()).data();
+          }
+        }
+
+        auto& face_paint = effect_meshes_[2];
         auto& current_fx = effect_meshes_[current_effect_%num_effect_meshes];
         for (auto const& normalized_landmarks: *render_task_.landmark_set) {
           int const num_landmarks = normalized_landmarks.landmark_size();
           if (SolveFaceLandmark3D_(xform, landmarks, normalized_landmarks)) {
-            face_mesh.Update(landmarks, 468);
-            // draw occlusion
-            face_mesh.SetColorWrite(false);
-            face_mesh.SetDepthOffset(1);
-            OpenGLRenderer::Draw(identity, face_mesh);
-            face_mesh.SetColorWrite(true);
-            face_mesh.SetDepthOffset(0);
+
+            // compare face_geometry::pose_transformation_matrix with our transform
+            if (geometry_list) {
+              auto const& ltm = geometry_list->pose_transform_matrix();
+              assert(ltm.packed_data_size()==ltm.rows()*ltm.cols());
+              auto err = xform;
+              if (mediapipe::MatrixData_Layout_COLUMN_MAJOR==ltm.layout()) { // as default
+                auto const* mtx = ltm.packed_data().data();
+                err.m11 -= mtx[0]; err.m12 -= mtx[4]; err.m13 -= mtx[8];  err.m14 -= mtx[12];
+                err.m21 -= mtx[1]; err.m22 -= mtx[5]; err.m23 -= mtx[9];  err.m24 -= mtx[13];
+                err.m31 -= mtx[2]; err.m32 -= mtx[6]; err.m33 -= mtx[10]; err.m34 -= mtx[14];
+              } else {
+                auto const* mtx = ltm.packed_data().data();
+                err.m11 -= mtx[0]; err.m12 -= mtx[1]; err.m13 -= mtx[2];  err.m14 -= mtx[3];
+                err.m21 -= mtx[4]; err.m22 -= mtx[5]; err.m23 -= mtx[6];  err.m24 -= mtx[7];
+                err.m31 -= mtx[8]; err.m32 -= mtx[9]; err.m33 -= mtx[10]; err.m34 -= mtx[11];
+              }
+              float translate_error = sqrt(err.m14*err.m14 + err.m24*err.m24 + err.m34*err.m34);
+              float rot_error = fabs(err.m11) + fabs(err.m12) + fabs(err.m13) +  
+                                fabs(err.m21) + fabs(err.m22) + fabs(err.m23) +  
+                                fabs(err.m31) + fabs(err.m32) + fabs(err.m33);
+
+              if ((translate_error+rot_error)>=print_pose_transform_error_threshold_) {
+                printf("pose_transform_matrix error = {\n");
+                printf("  % .6f % .6f % .6f  % .6f\n", err.m11, err.m12, err.m13, err.m14);
+                printf("  % .6f % .6f % .6f  % .6f\n", err.m21, err.m22, err.m23, err.m24);
+                printf("  % .6f % .6f % .6f  % .6f\n", err.m31, err.m32, err.m33, err.m34);
+                printf("}\n");
+                print_pose_transform_error_threshold_ = translate_error+rot_error;
+              }
+
+              ++geometry_list;
+            }
+
+            if (view_angle_3d_) {
+              // xform = view * xform
+              Matrix3 m = xform;
+              xform.m11 = view.m11*m.m11 + view.m12*m.m21 + view.m13*m.m31;
+              xform.m12 = view.m11*m.m12 + view.m12*m.m22 + view.m13*m.m32;
+              xform.m13 = view.m11*m.m13 + view.m12*m.m23 + view.m13*m.m33;
+              xform.m14 = view.m11*m.m14 + view.m12*m.m24 + view.m13*m.m34 + view.m14;
+
+              xform.m21 = view.m21*m.m11 + view.m22*m.m21 + view.m23*m.m31;
+              xform.m22 = view.m21*m.m12 + view.m22*m.m22 + view.m23*m.m32;
+              xform.m23 = view.m21*m.m13 + view.m22*m.m23 + view.m23*m.m33;
+              xform.m24 = view.m21*m.m14 + view.m22*m.m24 + view.m23*m.m34 + view.m24;
+
+              xform.m31 = view.m31*m.m11 + view.m32*m.m21 + view.m33*m.m31;
+              xform.m32 = view.m31*m.m12 + view.m32*m.m22 + view.m33*m.m32;
+              xform.m33 = view.m31*m.m13 + view.m32*m.m23 + view.m33*m.m33;
+              xform.m34 = view.m31*m.m14 + view.m32*m.m24 + view.m33*m.m34 + view.m34;
+            }
+
+            face_paint.Update(landmarks, 468);
+
+            if (view_angle_3d_) {
+              for (int i=0; i<468; ++i) {
+                auto const& s = normalized_landmarks.landmark(i);
+                auto& t = texcoords[i];
+                t.x = s.x();
+                t.y = s.y();
+              }
+              face_mesh_.Update(landmarks, texcoords, 468,
+                                render_task_.background, render_task_.width, render_task_.height);
+
+              face_mesh_.SetDepthWriteOffset(1); // put this somewhere for one time only
+              face_mesh_.SetDepthWrite(true);
+              OpenGLRenderer::Draw(view, face_mesh_);
+
+              // line
+              OpenGLRenderer::SetColor(0, 0, 255); // blue
+              face_mesh_.SetMode(2);
+              face_mesh_.SetTextureEnable(false);
+              face_mesh_.SetDepthWrite(false);
+              OpenGLRenderer::Draw(view, face_mesh_);
+              face_mesh_.SetMode(0);
+              face_mesh_.SetTextureEnable(true);
+            } else {
+              // draw occlusion
+              face_paint.SetColorWrite(false);
+              face_paint.SetDepthWriteOffset(1);
+              OpenGLRenderer::Draw(view, face_paint);
+              face_paint.SetColorWrite(true);
+              face_paint.SetDepthWriteOffset(0);
+            }
 
             // draw effect
             current_fx.SetMode(draw_mode_);
-            if (&face_mesh!=&current_fx) {
+            if (&face_paint!=&current_fx) {
               // compansate scale difference between canonical face model and face mesh
               if (100!=canonical_face_model_scale_pct_) {
                 float const ss = 0.01f*canonical_face_model_scale_pct_;
@@ -505,7 +651,7 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
 
               OpenGLRenderer::Draw(xform, current_fx);
             } else {
-              OpenGLRenderer::Draw(identity, face_mesh);
+              OpenGLRenderer::Draw(view, face_paint);
             }
             current_fx.SetMode(0);
 
@@ -523,7 +669,27 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
                 v.z = zz;
               }
               OpenGLRenderer::SetColor(0, 255, 0); // color green
-              OpenGLRenderer::Draw(identity, iris, 10);
+              OpenGLRenderer::Draw(view, iris, 10);
+            }
+
+            if (show_canonical_landmarks_) {
+              OpenGLRenderer::SetDepthTestEnable(false);
+              OpenGLRenderer::SetColor(255, 255, 0);
+              if (1==show_canonical_landmarks_) {
+                int totals = 0;
+                for (int id:procrustes_landmark_indices_) {
+                  landmarks[totals++] = canonical_face_model_[id];
+                }
+                OpenGLRenderer::Draw(xform, landmarks, totals, 8.0f);
+              } else {
+                face_paint.Update(canonical_face_model_.data(), (int)canonical_face_model_.size());
+                face_paint.SetMode(2);
+                face_paint.SetTextureEnable(false);
+                OpenGLRenderer::Draw(xform, face_paint);
+                face_paint.SetTextureEnable(true);
+                face_paint.SetMode(0);
+              }
+              OpenGLRenderer::SetDepthTestEnable(true);
             }
           }
         }
@@ -536,6 +702,7 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
     return true;
   }
   void OnDestroyGL_() override {
+    face_mesh_.Release();
     for (int i=0; i<num_effect_meshes; ++i) {
       effect_meshes_[i].Release();
     }

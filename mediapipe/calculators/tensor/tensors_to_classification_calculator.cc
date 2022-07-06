@@ -96,6 +96,9 @@ absl::Status TensorsToClassificationCalculator::Open(CalculatorContext* cc) {
     std::string line;
     int i = 0;
     while (std::getline(stream, line)) {
+#ifdef _WIN32
+      std::stringstream(line) >> line; // remove unwanted tail '\r' (windows: CRLF)
+#endif
       label_map_[i++] = line;
     }
     label_map_loaded_ = true;

@@ -211,14 +211,14 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
     // 1) camera projection model such as:
     //     a) estimated vertical field of view (use key 'a'/'s' to try out)
     //     b) distortion correction (not implemnted)
-    //    
+    //
     // 2) the size different between your face and canonical face model. (use key 'z'/'x' to adjust)
     //    the distance between 2 eyes (landmarks #133 to #362) of the canonical model = 3.7cm.
     //    refer:
     //     a) canonical face mesh: (text files)
-    //        mediapipe/modules/face_geometry/data/geometry_pipeline_metadata_landmarks.pbtxt 
+    //        mediapipe/modules/face_geometry/data/geometry_pipeline_metadata_landmarks.pbtxt
     //        mediapipe/modules/face_geometry/data/canonical_face_model.obj
-    //        
+    //
     //     b) landmark indices:
     //        mediapipe/modules/face_geometry/data/canonical_face_model_uv_visualization.png
     //

@@ -20,8 +20,8 @@
 #include "../demo_run_graph_main.cc"
 
 // define graph loading function
-DEFINE_LOAD_GRAPH("./face_effect_desktop_live.pbtxt")
-//DEFINE_LOAD_GRAPH("./face_effect_desktop_live_vs_face_geometry.pbtxt") // test with face_geometry module
+//DEFINE_LOAD_GRAPH("./face_effect_desktop_live.pbtxt")
+DEFINE_LOAD_GRAPH("./face_effect_desktop_live_vs_face_geometry.pbtxt") // test with face_geometry module
 
 namespace mediapipe {
 

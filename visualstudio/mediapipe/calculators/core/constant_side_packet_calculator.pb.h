@@ -125,6 +125,7 @@ class ConstantSidePacketCalculatorOptions_ConstantSidePacket PROTOBUF_FINAL :
     kUint64Value = 5,
     kClassificationListValue = 6,
     kLandmarkListValue = 7,
+    kDoubleValue = 9,
     VALUE_NOT_SET = 0,
   };
 
@@ -204,6 +205,7 @@ class ConstantSidePacketCalculatorOptions_ConstantSidePacket PROTOBUF_FINAL :
     kUint64ValueFieldNumber = 5,
     kClassificationListValueFieldNumber = 6,
     kLandmarkListValueFieldNumber = 7,
+    kDoubleValueFieldNumber = 9,
   };
   // int32 int_value = 1;
   bool has_int_value() const;
@@ -311,6 +313,19 @@ class ConstantSidePacketCalculatorOptions_ConstantSidePacket PROTOBUF_FINAL :
       ::mediapipe::LandmarkList* landmark_list_value);
   ::mediapipe::LandmarkList* unsafe_arena_release_landmark_list_value();
 
+  // double double_value = 9;
+  bool has_double_value() const;
+  private:
+  bool _internal_has_double_value() const;
+  public:
+  void clear_double_value();
+  double double_value() const;
+  void set_double_value(double value);
+  private:
+  double _internal_double_value() const;
+  void _internal_set_double_value(double value);
+  public:
+
   void clear_value();
   ValueCase value_case() const;
   // @@protoc_insertion_point(class_scope:mediapipe.ConstantSidePacketCalculatorOptions.ConstantSidePacket)
@@ -323,6 +338,7 @@ class ConstantSidePacketCalculatorOptions_ConstantSidePacket PROTOBUF_FINAL :
   void set_has_uint64_value();
   void set_has_classification_list_value();
   void set_has_landmark_list_value();
+  void set_has_double_value();
 
   inline bool has_value() const;
   inline void clear_has_value();
@@ -340,6 +356,7 @@ class ConstantSidePacketCalculatorOptions_ConstantSidePacket PROTOBUF_FINAL :
     ::PROTOBUF_NAMESPACE_ID::uint64 uint64_value_;
     ::mediapipe::ClassificationList* classification_list_value_;
     ::mediapipe::LandmarkList* landmark_list_value_;
+    double double_value_;
   } value_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -871,6 +888,44 @@ inline ::mediapipe::LandmarkList* ConstantSidePacketCalculatorOptions_ConstantSi
 inline ::mediapipe::LandmarkList* ConstantSidePacketCalculatorOptions_ConstantSidePacket::mutable_landmark_list_value() {
   // @@protoc_insertion_point(field_mutable:mediapipe.ConstantSidePacketCalculatorOptions.ConstantSidePacket.landmark_list_value)
   return _internal_mutable_landmark_list_value();
+}
+
+// double double_value = 9;
+inline bool ConstantSidePacketCalculatorOptions_ConstantSidePacket::_internal_has_double_value() const {
+  return value_case() == kDoubleValue;
+}
+inline bool ConstantSidePacketCalculatorOptions_ConstantSidePacket::has_double_value() const {
+  return _internal_has_double_value();
+}
+inline void ConstantSidePacketCalculatorOptions_ConstantSidePacket::set_has_double_value() {
+  _oneof_case_[0] = kDoubleValue;
+}
+inline void ConstantSidePacketCalculatorOptions_ConstantSidePacket::clear_double_value() {
+  if (_internal_has_double_value()) {
+    value_.double_value_ = 0;
+    clear_has_value();
+  }
+}
+inline double ConstantSidePacketCalculatorOptions_ConstantSidePacket::_internal_double_value() const {
+  if (_internal_has_double_value()) {
+    return value_.double_value_;
+  }
+  return 0;
+}
+inline void ConstantSidePacketCalculatorOptions_ConstantSidePacket::_internal_set_double_value(double value) {
+  if (!_internal_has_double_value()) {
+    clear_value();
+    set_has_double_value();
+  }
+  value_.double_value_ = value;
+}
+inline double ConstantSidePacketCalculatorOptions_ConstantSidePacket::double_value() const {
+  // @@protoc_insertion_point(field_get:mediapipe.ConstantSidePacketCalculatorOptions.ConstantSidePacket.double_value)
+  return _internal_double_value();
+}
+inline void ConstantSidePacketCalculatorOptions_ConstantSidePacket::set_double_value(double value) {
+  _internal_set_double_value(value);
+  // @@protoc_insertion_point(field_set:mediapipe.ConstantSidePacketCalculatorOptions.ConstantSidePacket.double_value)
 }
 
 inline bool ConstantSidePacketCalculatorOptions_ConstantSidePacket::has_value() const {

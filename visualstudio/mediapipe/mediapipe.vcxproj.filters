@@ -124,6 +124,9 @@
     <Filter Include="modules\objectron\calculators">
       <UniqueIdentifier>{b0ec7dbe-3db3-406c-a4b6-3a58d93bbf78}</UniqueIdentifier>
     </Filter>
+    <Filter Include="modules\face_detection">
+      <UniqueIdentifier>{5f6dc7f6-7364-40c5-9c47-0a82e6696575}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\mediapipe\framework\deps\status_builder.cc">
@@ -1278,6 +1281,12 @@
     <ClCompile Include="modules\objectron\calculators\tflite_tensors_to_objects_calculator.pb.cc">
       <Filter>modules\objectron\calculators</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\mediapipe\framework\formats\tensor_ahwb.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="modules\face_detection\face_detection.pb.cc">
+      <Filter>modules\face_detection</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\mediapipe\framework\tool\options_util.h">
@@ -1969,6 +1978,9 @@
     </ClInclude>
     <ClInclude Include="modules\objectron\calculators\tflite_tensors_to_objects_calculator.pb.h">
       <Filter>modules\objectron\calculators</Filter>
+    </ClInclude>
+    <ClInclude Include="modules\face_detection\face_detection.pb.h">
+      <Filter>modules\face_detection</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

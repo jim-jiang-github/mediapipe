@@ -1,7 +1,7 @@
 #include "../calculator_graph_util.h"
 
-// define graph loading function
-DEFINE_LOAD_GRAPH("../../mediapipe/graphs/hand_tracking/hand_tracking_desktop_live.pbtxt");
+// name of file containing text format CalculatorGraphConfig proto
+constexpr char const* calculator_graph_config_file = "../../mediapipe/graphs/hand_tracking/hand_tracking_desktop_live.pbtxt";
 
 // subgraphs
 namespace mediapipe {
@@ -14,7 +14,16 @@ DEFINE_SUBGRAPH(HandLandmarkTrackingCpu, "../../mediapipe/modules/hand_landmark/
   DEFINE_SUBGRAPH(HandLandmarkLandmarksToRoi, "../../mediapipe/modules/hand_landmark/hand_landmark_landmarks_to_roi.pbtxt");
 
 DEFINE_SUBGRAPH(HandRendererSubgraph, "../../mediapipe/graphs/hand_tracking/subgraphs/hand_renderer_cpu.pbtxt");
-} // namespace mediapipe
+}
+
+// load graph
+absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
+  mediapipe::CalculatorGraphConfig config;
+  if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
+    return graph.Initialize(config);
+  }
+  return absl::NotFoundError(calculator_graph_config_file);
+}
 
 // the program entrance point, the main().
 // If you have main() already, don't include this.

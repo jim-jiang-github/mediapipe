@@ -155,6 +155,7 @@ mediapipe/graphs/object_detection_3d/calculators/annotations_to_model_matrices_c
 mediapipe/graphs/object_detection_3d/calculators/annotations_to_render_data_calculator.proto ^
 mediapipe/graphs/object_detection_3d/calculators/gl_animation_overlay_calculator.proto ^
 mediapipe/graphs/object_detection_3d/calculators/model_matrix.proto ^
+mediapipe/modules/face_detection/face_detection.proto ^
 mediapipe/modules/face_geometry/effect_renderer_calculator.proto ^
 mediapipe/modules/face_geometry/env_generator_calculator.proto ^
 mediapipe/modules/face_geometry/geometry_pipeline_calculator.proto ^

@@ -1,7 +1,8 @@
 #include "../calculator_graph_util.h"
+#include "../register_options.h"
 
-// define graph loading function
-DEFINE_LOAD_GRAPH("../../mediapipe/graphs/holistic_tracking/holistic_tracking_cpu.pbtxt")
+// name of file containing text format CalculatorGraphConfig proto
+constexpr char const* calculator_graph_config_file = "../../mediapipe/graphs/holistic_tracking/holistic_tracking_cpu.pbtxt";
 
 // subgraphs
 namespace mediapipe {
@@ -29,8 +30,9 @@ DEFINE_SUBGRAPH(HolisticLandmarkCpu, "../../mediapipe/modules/holistic_landmark/
 
   DEFINE_SUBGRAPH(FaceLandmarksFromPoseCpu, "../../mediapipe/modules/holistic_landmark/face_landmarks_from_pose_cpu.pbtxt");
     DEFINE_SUBGRAPH(FaceLandmarksFromPoseToRecropRoi, "../../mediapipe/modules/holistic_landmark/face_landmarks_from_pose_to_recrop_roi.pbtxt");
-    DEFINE_SUBGRAPH(FaceDetectionShortRangeByRoiCpu, "face_detection_short_range_by_roi_cpu.pbtxt"); // ../../mediapipe/modules/face_detection
-      DEFINE_SUBGRAPH(FaceDetectionShortRangeCommon, "../../mediapipe/modules/face_detection/face_detection_short_range_common.pbtxt");
+    DEFINE_SUBGRAPH(FaceDetectionShortRangeByRoiCpu, "../../mediapipe/modules/face_detection/face_detection_short_range_by_roi_cpu.pbtxt");
+      DEFINE_SUBGRAPH(FaceDetectionShortRange, "../face_detection/face_detection_short_range.pbtxt");
+        DEFINE_SUBGRAPH(FaceDetection, "../../mediapipe/modules/face_detection/face_detection.pbtxt");
     DEFINE_SUBGRAPH(FaceDetectionFrontDetectionsToRoi, "../../mediapipe/modules/holistic_landmark/face_detection_front_detections_to_roi.pbtxt");
     DEFINE_SUBGRAPH(FaceTracking, "../../mediapipe/modules/holistic_landmark/face_tracking.pbtxt");
       DEFINE_SUBGRAPH(FaceLandmarksToRoi, "../../mediapipe/modules/holistic_landmark/face_landmarks_to_roi.pbtxt");
@@ -42,6 +44,18 @@ DEFINE_SUBGRAPH(HolisticLandmarkCpu, "../../mediapipe/modules/holistic_landmark/
 DEFINE_SUBGRAPH(HolisticTrackingToRenderData, "../../mediapipe/graphs/holistic_tracking/holistic_tracking_to_render_data.pbtxt");
   DEFINE_SUBGRAPH(HandWristForPose, "../../mediapipe/modules/holistic_landmark/hand_wrist_for_pose.pbtxt");
 } // namespace mediapipe
+
+absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
+  // register options
+  register_face_detection_options();
+
+  // config
+  mediapipe::CalculatorGraphConfig config;
+  if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
+    return graph.Initialize(config);
+  }
+  return absl::NotFoundError(calculator_graph_config_file);
+}
 
 // the program entrance point, the main().
 // If you have main() already, don't include this.

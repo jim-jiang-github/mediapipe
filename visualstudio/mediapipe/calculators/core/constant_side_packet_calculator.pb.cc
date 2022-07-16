@@ -59,6 +59,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fcalculators_2fcore
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   PROTOBUF_FIELD_OFFSET(::mediapipe::ConstantSidePacketCalculatorOptions_ConstantSidePacket, value_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::mediapipe::ConstantSidePacketCalculatorOptions, _internal_metadata_),
@@ -69,7 +70,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fcalculators_2fcore
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::mediapipe::ConstantSidePacketCalculatorOptions_ConstantSidePacket)},
-  { 13, -1, sizeof(::mediapipe::ConstantSidePacketCalculatorOptions)},
+  { 14, -1, sizeof(::mediapipe::ConstantSidePacketCalculatorOptions)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -83,19 +84,20 @@ const char descriptor_table_protodef_mediapipe_2fcalculators_2fcore_2fconstant_5
   "ediapipe/framework/calculator.proto\0320med"
   "iapipe/framework/formats/classification."
   "proto\032*mediapipe/framework/formats/landm"
-  "ark.proto\"\345\003\n#ConstantSidePacketCalculat"
+  "ark.proto\"\375\003\n#ConstantSidePacketCalculat"
   "orOptions\022Q\n\006packet\030\001 \003(\0132A.mediapipe.Co"
   "nstantSidePacketCalculatorOptions.Consta"
-  "ntSidePacket\032\213\002\n\022ConstantSidePacket\022\023\n\ti"
+  "ntSidePacket\032\243\002\n\022ConstantSidePacket\022\023\n\ti"
   "nt_value\030\001 \001(\005H\000\022\025\n\013float_value\030\002 \001(\002H\000\022"
   "\024\n\nbool_value\030\003 \001(\010H\000\022\026\n\014string_value\030\004 "
   "\001(\tH\000\022\026\n\014uint64_value\030\005 \001(\004H\000\022B\n\031classif"
   "ication_list_value\030\006 \001(\0132\035.mediapipe.Cla"
   "ssificationListH\000\0226\n\023landmark_list_value"
-  "\030\007 \001(\0132\027.mediapipe.LandmarkListH\000B\007\n\005val"
-  "ue2]\n\003ext\022\034.mediapipe.CalculatorOptions\030"
-  "\205\252\356\212\001 \001(\0132..mediapipe.ConstantSidePacket"
-  "CalculatorOptionsB\014\242\002\tMediaPipe"
+  "\030\007 \001(\0132\027.mediapipe.LandmarkListH\000\022\026\n\014dou"
+  "ble_value\030\t \001(\001H\000B\007\n\005value2]\n\003ext\022\034.medi"
+  "apipe.CalculatorOptions\030\205\252\356\212\001 \001(\0132..medi"
+  "apipe.ConstantSidePacketCalculatorOption"
+  "sB\014\242\002\tMediaPipe"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto_deps[3] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
@@ -104,7 +106,7 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto = {
-  false, false, 711, descriptor_table_protodef_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto, "mediapipe/calculators/core/constant_side_packet_calculator.proto", 
+  false, false, 735, descriptor_table_protodef_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto, "mediapipe/calculators/core/constant_side_packet_calculator.proto", 
   &descriptor_table_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto_deps, 3, 2,
   schemas, file_default_instances, TableStruct_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto::offsets,
   file_level_metadata_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto, file_level_enum_descriptors_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto, file_level_service_descriptors_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto,
@@ -218,6 +220,10 @@ ConstantSidePacketCalculatorOptions_ConstantSidePacket::ConstantSidePacketCalcul
       _internal_mutable_landmark_list_value()->::mediapipe::LandmarkList::MergeFrom(from._internal_landmark_list_value());
       break;
     }
+    case kDoubleValue: {
+      _internal_set_double_value(from._internal_double_value());
+      break;
+    }
     case VALUE_NOT_SET: {
       break;
     }
@@ -285,6 +291,10 @@ void ConstantSidePacketCalculatorOptions_ConstantSidePacket::clear_value() {
       if (GetArena() == nullptr) {
         delete value_.landmark_list_value_;
       }
+      break;
+    }
+    case kDoubleValue: {
+      // No need to clear
       break;
     }
     case VALUE_NOT_SET: {
@@ -364,6 +374,13 @@ const char* ConstantSidePacketCalculatorOptions_ConstantSidePacket::_InternalPar
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
+      // double double_value = 9;
+      case 9:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 73)) {
+          _internal_set_double_value(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr));
+          ptr += sizeof(double);
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag == 0) || ((tag & 7) == 4)) {
@@ -437,6 +454,11 @@ failure:
           7, _Internal::landmark_list_value(this), target, stream);
       break;
     }
+    case kDoubleValue: {
+      target = stream->EnsureSpace(target);
+      target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(9, this->_internal_double_value(), target);
+      break;
+    }
     default: ;
   }
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -501,6 +523,11 @@ size_t ConstantSidePacketCalculatorOptions_ConstantSidePacket::ByteSizeLong() co
           *value_.landmark_list_value_);
       break;
     }
+    // double double_value = 9;
+    case kDoubleValue: {
+      total_size += 1 + 8;
+      break;
+    }
     case VALUE_NOT_SET: {
       break;
     }
@@ -563,6 +590,10 @@ void ConstantSidePacketCalculatorOptions_ConstantSidePacket::MergeFrom(const Con
     }
     case kLandmarkListValue: {
       _internal_mutable_landmark_list_value()->::mediapipe::LandmarkList::MergeFrom(from._internal_landmark_list_value());
+      break;
+    }
+    case kDoubleValue: {
+      _internal_set_double_value(from._internal_double_value());
       break;
     }
     case VALUE_NOT_SET: {

@@ -1,7 +1,14 @@
 #include "../calculator_graph_util.h"
 
-// define graph loading function
-DEFINE_LOAD_GRAPH("template_matching_desktop_live.pbtxt")
+// name of file containing text format CalculatorGraphConfig proto
+constexpr char const* calculator_graph_config_file = "template_matching_desktop_live.pbtxt";
+ absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
+  mediapipe::CalculatorGraphConfig config;
+  if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
+    return graph.Initialize(config);
+  }
+  return absl::NotFoundError(calculator_graph_config_file);
+}
 
 // the program entrance point, the main().
 // If you have main() already, don't include this.

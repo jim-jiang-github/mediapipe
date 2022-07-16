@@ -1,16 +1,22 @@
 #include "../calculator_graph_util.h"
 
-// define graph loading function
-DEFINE_LOAD_GRAPH("../../mediapipe/graphs/tracking/object_detection_tracking_desktop_live.pbtxt")
+// name of file containing text format CalculatorGraphConfig proto
+constexpr char const* calculator_graph_config_file = "../../mediapipe/graphs/tracking/object_detection_tracking_desktop_live.pbtxt";
 
 // subgraphs
 namespace mediapipe {
 DEFINE_SUBGRAPH(ObjectDetectionSubgraphCpu, "object_detection_cpu.pbtxt");
-
 DEFINE_SUBGRAPH(ObjectTrackingSubgraphCpu, "../../mediapipe/graphs/tracking/subgraphs/object_tracking_cpu.pbtxt");
   DEFINE_SUBGRAPH(BoxTrackingSubgraphCpu, "../../mediapipe/graphs/tracking/subgraphs/box_tracking_cpu.pbtxt");
-
 DEFINE_SUBGRAPH(RendererSubgraphCpu, "../../mediapipe/graphs/tracking/subgraphs/renderer_cpu.pbtxt");
+}
+
+absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
+  mediapipe::CalculatorGraphConfig config;
+  if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
+    return graph.Initialize(config);
+  }
+  return absl::NotFoundError(calculator_graph_config_file);
 }
 
 // the program entrance point, the main().

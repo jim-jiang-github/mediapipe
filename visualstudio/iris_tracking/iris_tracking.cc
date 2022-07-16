@@ -1,12 +1,15 @@
 #include "../calculator_graph_util.h"
+#include "../register_options.h"
 
-// define graph loading function
-DEFINE_LOAD_GRAPH("../../mediapipe/graphs/iris_tracking/iris_tracking_cpu.pbtxt")
+// name of file containing text format CalculatorGraphConfig proto
+constexpr char const* calculator_graph_config_file = "../../mediapipe/graphs/iris_tracking/iris_tracking_cpu.pbtxt";
 
 namespace mediapipe {
 DEFINE_SUBGRAPH(FaceLandmarkFrontCpu, "../../mediapipe/modules/face_landmark/face_landmark_front_cpu.pbtxt");
-  DEFINE_SUBGRAPH(FaceDetectionShortRangeCpu, "../face_detection/face_detection_short_range_cpu.pbtxt");
-    DEFINE_SUBGRAPH(FaceDetectionShortRangeCommon, "../../mediapipe/modules/face_detection/face_detection_short_range_common.pbtxt");
+  DEFINE_SUBGRAPH(FaceDetectionShortRangeCpu, "../../mediapipe/modules/face_detection/face_detection_short_range_cpu.pbtxt");
+    DEFINE_SUBGRAPH(FaceDetectionShortRange, "../face_detection/face_detection_short_range.pbtxt");
+      DEFINE_SUBGRAPH(FaceDetection, "../../mediapipe/modules/face_detection/face_detection.pbtxt");
+
   DEFINE_SUBGRAPH(FaceDetectionFrontDetectionToRoi, "../../mediapipe/modules/face_landmark/face_detection_front_detection_to_roi.pbtxt");
   DEFINE_SUBGRAPH(FaceLandmarkCpu, "../../mediapipe/modules/face_landmark/face_landmark_cpu.pbtxt");
     DEFINE_SUBGRAPH(FaceLandmarksModelLoader, "../face_mesh/face_landmarks_model_loader.pbtxt");
@@ -19,6 +22,18 @@ DEFINE_SUBGRAPH(IrisLandmarkLeftAndRightCpu, "../../mediapipe/modules/iris_landm
   DEFINE_SUBGRAPH(IrisLandmarkCpu, "iris_landmark_cpu.pbtxt");  // ../../mediapipe/modules/iris_landmark
 
 DEFINE_SUBGRAPH(IrisRendererCpu, "../../mediapipe/graphs/iris_tracking/subgraphs/iris_renderer_cpu.pbtxt");
+}
+
+absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
+  // register options
+  register_face_detection_options();
+
+  // config
+  mediapipe::CalculatorGraphConfig config;
+  if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
+    return graph.Initialize(config);
+  }
+  return absl::NotFoundError(calculator_graph_config_file);
 }
 
 // the program entrance point, the main().

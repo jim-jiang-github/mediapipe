@@ -1,11 +1,45 @@
 #include "../calculator_graph_util.h"
+#include "../register_options.h"
 
-// define graph loading function
-DEFINE_LOAD_GRAPH("../../mediapipe/graphs/face_detection/face_detection_desktop_live.pbtxt")
+// name of file containing text format CalculatorGraphConfig proto
+constexpr char const* calculator_graph_config_file =
+    "../../mediapipe/graphs/face_detection/face_detection_desktop_live.pbtxt";
 
+// subgraphs
 namespace mediapipe {
-DEFINE_SUBGRAPH(FaceDetectionShortRangeCpu, "face_detection_short_range_cpu.pbtxt");  // ../../mediapipe/modules/face_detection
-  DEFINE_SUBGRAPH(FaceDetectionShortRangeCommon, "../../mediapipe/modules/face_detection/face_detection_short_range_common.pbtxt");
+DEFINE_SUBGRAPH(FaceDetectionShortRangeCpu, "../../mediapipe/modules/face_detection/face_detection_short_range_cpu.pbtxt");
+  DEFINE_SUBGRAPH(FaceDetectionShortRange, "./face_detection_short_range.pbtxt"); // ../../mediapipe/modules/face_detection/face_detection_short_range.pbtxt
+    DEFINE_SUBGRAPH(FaceDetection, "../../mediapipe/modules/face_detection/face_detection.pbtxt");
+}
+
+absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
+  // register something...
+  register_face_detection_options();
+
+  mediapipe::CalculatorGraphConfig config;
+  if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
+#if 0
+    {
+      // ref /mediapipe/mediapipe/modules/face_detection/face_detection_test.cc
+      mediapipe::CalculatorGraphConfig face_detectioni_short_range_config;
+      if (read_config_from_pbtxt(face_detectioni_short_range_config, "./face_detection_short_range.pbtxt")) {
+        mediapipe::tool::OptionsMap map;
+        map.Initialize(face_detectioni_short_range_config.node(0));
+        mediapipe::FaceDetectionOptions face_options = map.Get<mediapipe::FaceDetectionOptions>();
+
+        // cpu
+        face_options.mutable_delegate()->xnnpack();
+
+        // insert the options
+        config.clear_graph_options();
+        config.add_graph_options()->PackFrom(face_options);
+      }
+    }
+#endif
+
+    return graph.Initialize(config);
+  }
+  return absl::NotFoundError(calculator_graph_config_file);
 }
 
 // the program entrance point, the main().

@@ -66,26 +66,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
@@ -133,7 +133,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>TFL_STATIC_LIBRARY_BUILD;GLOG_STATIC_DEFINE;MEDIAPIPE_DISABLE_GPU=1;_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CONSOLE;_WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./;../;../../;../../third_party/abseil;../../third_party/glew/include;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/protobuf/src;../../third_party/tensorflow/third_party/eigen3</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;../;../../;../../third_party/abseil;../../third_party/glew/include;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/protobuf/src;../../third_party/protobuf/third_party/zlib;../../third_party/tensorflow/third_party/eigen3</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -155,7 +155,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>TFL_STATIC_LIBRARY_BUILD;GLOG_STATIC_DEFINE;MEDIAPIPE_DISABLE_GPU=1;_CRT_SECURE_NO_WARNINGS;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CONSOLE;_WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./;../;../../;../../third_party/abseil;../../third_party/glew/include;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/protobuf/src;../../third_party/tensorflow/third_party/eigen3</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;../;../../;../../third_party/abseil;../../third_party/glew/include;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/protobuf/src;../../third_party/protobuf/third_party/zlib;../../third_party/tensorflow/third_party/eigen3</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -177,7 +177,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>TFL_STATIC_LIBRARY_BUILD;GLOG_STATIC_DEFINE;MEDIAPIPE_DISABLE_GPU=1;_CRT_SECURE_NO_WARNINGS;_CONSOLE;_WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./;../;../../;../../third_party/abseil;../../third_party/glew/include;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/protobuf/src;../../third_party/tensorflow/third_party/eigen3</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;../;../../;../../third_party/abseil;../../third_party/glew/include;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/protobuf/src;../../third_party/protobuf/third_party/zlib;../../third_party/tensorflow/third_party/eigen3</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
@@ -204,7 +204,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>TFL_STATIC_LIBRARY_BUILD;GLOG_STATIC_DEFINE;MEDIAPIPE_DISABLE_GPU=1;_CRT_SECURE_NO_WARNINGS;_CONSOLE;_WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./;../;../../;../../third_party/abseil;../../third_party/glew/include;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/protobuf/src;../../third_party/tensorflow/third_party/eigen3</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;../;../../;../../third_party/abseil;../../third_party/glew/include;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/protobuf/src;../../third_party/protobuf/third_party/zlib;../../third_party/tensorflow/third_party/eigen3</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <ObjectFileName>$(IntDir)</ObjectFileName>

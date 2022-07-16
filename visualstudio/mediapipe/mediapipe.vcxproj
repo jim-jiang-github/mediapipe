@@ -151,6 +151,7 @@
     <ClCompile Include="..\..\mediapipe\framework\formats\location.cc" />
     <ClCompile Include="..\..\mediapipe\framework\formats\matrix.cc" />
     <ClCompile Include="..\..\mediapipe\framework\formats\tensor.cc" />
+    <ClCompile Include="..\..\mediapipe\framework\formats\tensor_ahwb.cc" />
     <ClCompile Include="..\..\mediapipe\framework\graph_output_stream.cc" />
     <ClCompile Include="..\..\mediapipe\framework\graph_service_manager.cc" />
     <ClCompile Include="..\..\mediapipe\framework\input_side_packet_handler.cc" />
@@ -389,6 +390,7 @@
     <ClCompile Include="graphs\object_detection_3d\calculators\annotations_to_render_data_calculator.pb.cc" />
     <ClCompile Include="graphs\object_detection_3d\calculators\gl_animation_overlay_calculator.pb.cc" />
     <ClCompile Include="graphs\object_detection_3d\calculators\model_matrix.pb.cc" />
+    <ClCompile Include="modules\face_detection\face_detection.pb.cc" />
     <ClCompile Include="modules\face_geometry\env_generator_calculator.pb.cc" />
     <ClCompile Include="modules\face_geometry\geometry_pipeline_calculator.pb.cc" />
     <ClCompile Include="modules\face_geometry\protos\environment.pb.cc" />
@@ -619,6 +621,7 @@
     <ClInclude Include="graphs\object_detection_3d\calculators\annotations_to_render_data_calculator.pb.h" />
     <ClInclude Include="graphs\object_detection_3d\calculators\gl_animation_overlay_calculator.pb.h" />
     <ClInclude Include="graphs\object_detection_3d\calculators\model_matrix.pb.h" />
+    <ClInclude Include="modules\face_detection\face_detection.pb.h" />
     <ClInclude Include="modules\face_geometry\env_generator_calculator.pb.h" />
     <ClInclude Include="modules\face_geometry\geometry_pipeline_calculator.pb.h" />
     <ClInclude Include="modules\face_geometry\protos\environment.pb.h" />

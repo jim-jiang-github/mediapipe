@@ -11,18 +11,22 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 #include "../calculator_graph_util.h"
+#include "../register_options.h"
 
-// define graph loading function
-//DEFINE_LOAD_GRAPH("../../mediapipe/graphs/face_mesh/face_mesh_desktop_live.pbtxt")
-DEFINE_LOAD_GRAPH("face_mesh_geometry_test_live.pbtxt")
+// name of file containing text format CalculatorGraphConfig proto
+constexpr char const* calculator_graph_config_file =
+#ifdef NDEBUG
+  "../../mediapipe/graphs/face_mesh/face_mesh_desktop_live.pbtxt";
+#else
+  "face_mesh_geometry_test_live.pbtxt";
+#endif
 
 namespace mediapipe {
-
 DEFINE_SUBGRAPH(FaceLandmarkFrontCpu, "../../mediapipe/modules/face_landmark/face_landmark_front_cpu.pbtxt");
-  DEFINE_SUBGRAPH(FaceDetectionShortRangeCpu, "../face_detection/face_detection_short_range_cpu.pbtxt"); // ../../mediapipe/modules/face_detection
-    DEFINE_SUBGRAPH(FaceDetectionShortRangeCommon, "../../mediapipe/modules/face_detection/face_detection_short_range_common.pbtxt");
+  DEFINE_SUBGRAPH(FaceDetectionShortRangeCpu, "../../mediapipe/modules/face_detection/face_detection_short_range_cpu.pbtxt");
+    DEFINE_SUBGRAPH(FaceDetectionShortRange, "../face_detection/face_detection_short_range.pbtxt");
+      DEFINE_SUBGRAPH(FaceDetection, "../../mediapipe/modules/face_detection/face_detection.pbtxt");
   DEFINE_SUBGRAPH(FaceDetectionFrontDetectionToRoi, "../../mediapipe/modules/face_landmark/face_detection_front_detection_to_roi.pbtxt");
   DEFINE_SUBGRAPH(FaceLandmarkCpu, "../../mediapipe/modules/face_landmark/face_landmark_cpu.pbtxt");
     DEFINE_SUBGRAPH(FaceLandmarksModelLoader, "face_landmarks_model_loader.pbtxt"); // ../../mediapipe/modules/face_landmark
@@ -31,22 +35,19 @@ DEFINE_SUBGRAPH(FaceLandmarkFrontCpu, "../../mediapipe/modules/face_landmark/fac
   DEFINE_SUBGRAPH(FaceLandmarkLandmarksToRoi, "../../mediapipe/modules/face_landmark/face_landmark_landmarks_to_roi.pbtxt");
 
 DEFINE_SUBGRAPH(FaceRendererCpu, "../../mediapipe/graphs/face_mesh/subgraphs/face_renderer_cpu.pbtxt");
+}
 
-#if 0
-// quick debug/test
-struct FaceLandmarksSmoothing : public Subgraph {
-  absl::StatusOr<CalculatorGraphConfig> GetConfig(SubgraphOptions const&) override {
-    CalculatorGraphConfig config;
-    if (read_config_from_pbtxt(config, "face_landmarks_smoothing.pbtxt")) {
-      return config;
-    }
-    return absl::InternalError("Could not parse subgraph.");
+absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
+  // register options
+  register_face_detection_options();
+
+  // config
+  mediapipe::CalculatorGraphConfig config;
+  if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
+    return graph.Initialize(config);
   }
-};
-REGISTER_MEDIAPIPE_GRAPH(FaceLandmarksSmoothing);
-#endif
-
-}  // namespace mediapipe
+  return absl::NotFoundError(calculator_graph_config_file);
+}
 
 // the program entrance point, the main().
 // If you have main() already, don't include this.

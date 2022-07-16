@@ -30,6 +30,9 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/map.h>  // IWYU pragma: export
+#include <google/protobuf/map_entry.h>
+#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "mediapipe/framework/calculator.pb.h"
 #include "mediapipe/util/label_map.pb.h"
@@ -48,7 +51,7 @@ struct TableStruct_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[1]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[2]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -59,13 +62,40 @@ namespace mediapipe {
 class DetectionLabelIdToTextCalculatorOptions;
 struct DetectionLabelIdToTextCalculatorOptionsDefaultTypeInternal;
 extern DetectionLabelIdToTextCalculatorOptionsDefaultTypeInternal _DetectionLabelIdToTextCalculatorOptions_default_instance_;
+class DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUse;
+struct DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUseDefaultTypeInternal;
+extern DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUseDefaultTypeInternal _DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUse_default_instance_;
 }  // namespace mediapipe
 PROTOBUF_NAMESPACE_OPEN
 template<> ::mediapipe::DetectionLabelIdToTextCalculatorOptions* Arena::CreateMaybeMessage<::mediapipe::DetectionLabelIdToTextCalculatorOptions>(Arena*);
+template<> ::mediapipe::DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUse* Arena::CreateMaybeMessage<::mediapipe::DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUse>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace mediapipe {
 
 // ===================================================================
+
+class DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUse, 
+    ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_INT64,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> {
+public:
+  typedef ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUse, 
+    ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_INT64,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> SuperType;
+  DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUse();
+  explicit constexpr DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUse(
+      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  explicit DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  void MergeFrom(const DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUse& other);
+  static const DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUse*>(&_DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUse_default_instance_); }
+  static bool ValidateKey(void*) { return true; }
+  static bool ValidateValue(void*) { return true; }
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& other) final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+};
+
+// -------------------------------------------------------------------
 
 class DetectionLabelIdToTextCalculatorOptions PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:mediapipe.DetectionLabelIdToTextCalculatorOptions) */ {
@@ -117,7 +147,7 @@ class DetectionLabelIdToTextCalculatorOptions PROTOBUF_FINAL :
                &_DetectionLabelIdToTextCalculatorOptions_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    1;
 
   friend void swap(DetectionLabelIdToTextCalculatorOptions& a, DetectionLabelIdToTextCalculatorOptions& b) {
     a.Swap(&b);
@@ -178,12 +208,13 @@ class DetectionLabelIdToTextCalculatorOptions PROTOBUF_FINAL :
 
   // nested types ----------------------------------------------------
 
+
   // accessors -------------------------------------------------------
 
   enum : int {
     kLabelFieldNumber = 2,
+    kLabelItemsFieldNumber = 4,
     kLabelMapPathFieldNumber = 1,
-    kLabelMapFieldNumber = 4,
     kKeepLabelIdFieldNumber = 3,
   };
   // repeated string label = 2;
@@ -210,6 +241,23 @@ class DetectionLabelIdToTextCalculatorOptions PROTOBUF_FINAL :
   std::string* _internal_add_label();
   public:
 
+  // map<int64, .mediapipe.LabelMapItem> label_items = 4;
+  int label_items_size() const;
+  private:
+  int _internal_label_items_size() const;
+  public:
+  void clear_label_items();
+  private:
+  const ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >&
+      _internal_label_items() const;
+  ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >*
+      _internal_mutable_label_items();
+  public:
+  const ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >&
+      label_items() const;
+  ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >*
+      mutable_label_items();
+
   // optional string label_map_path = 1;
   bool has_label_map_path() const;
   private:
@@ -227,24 +275,6 @@ class DetectionLabelIdToTextCalculatorOptions PROTOBUF_FINAL :
   void _internal_set_label_map_path(const std::string& value);
   std::string* _internal_mutable_label_map_path();
   public:
-
-  // optional .mediapipe.LabelMap label_map = 4;
-  bool has_label_map() const;
-  private:
-  bool _internal_has_label_map() const;
-  public:
-  void clear_label_map();
-  const ::mediapipe::LabelMap& label_map() const;
-  PROTOBUF_FUTURE_MUST_USE_RESULT ::mediapipe::LabelMap* release_label_map();
-  ::mediapipe::LabelMap* mutable_label_map();
-  void set_allocated_label_map(::mediapipe::LabelMap* label_map);
-  private:
-  const ::mediapipe::LabelMap& _internal_label_map() const;
-  ::mediapipe::LabelMap* _internal_mutable_label_map();
-  public:
-  void unsafe_arena_set_allocated_label_map(
-      ::mediapipe::LabelMap* label_map);
-  ::mediapipe::LabelMap* unsafe_arena_release_label_map();
 
   // optional bool keep_label_id = 3;
   bool has_keep_label_id() const;
@@ -273,8 +303,12 @@ class DetectionLabelIdToTextCalculatorOptions PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> label_;
+  ::PROTOBUF_NAMESPACE_ID::internal::MapField<
+      DetectionLabelIdToTextCalculatorOptions_LabelItemsEntry_DoNotUse,
+      ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem,
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_INT64,
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> label_items_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr label_map_path_;
-  ::mediapipe::LabelMap* label_map_;
   bool keep_label_id_;
   friend struct ::TableStruct_mediapipe_2fcalculators_2futil_2fdetection_5flabel_5fid_5fto_5ftext_5fcalculator_2eproto;
 };
@@ -287,6 +321,8 @@ class DetectionLabelIdToTextCalculatorOptions PROTOBUF_FINAL :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // DetectionLabelIdToTextCalculatorOptions
 
 // optional string label_map_path = 1;
@@ -422,7 +458,7 @@ DetectionLabelIdToTextCalculatorOptions::mutable_label() {
 
 // optional bool keep_label_id = 3;
 inline bool DetectionLabelIdToTextCalculatorOptions::_internal_has_keep_label_id() const {
-  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
   return value;
 }
 inline bool DetectionLabelIdToTextCalculatorOptions::has_keep_label_id() const {
@@ -430,7 +466,7 @@ inline bool DetectionLabelIdToTextCalculatorOptions::has_keep_label_id() const {
 }
 inline void DetectionLabelIdToTextCalculatorOptions::clear_keep_label_id() {
   keep_label_id_ = false;
-  _has_bits_[0] &= ~0x00000004u;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline bool DetectionLabelIdToTextCalculatorOptions::_internal_keep_label_id() const {
   return keep_label_id_;
@@ -440,7 +476,7 @@ inline bool DetectionLabelIdToTextCalculatorOptions::keep_label_id() const {
   return _internal_keep_label_id();
 }
 inline void DetectionLabelIdToTextCalculatorOptions::_internal_set_keep_label_id(bool value) {
-  _has_bits_[0] |= 0x00000004u;
+  _has_bits_[0] |= 0x00000002u;
   keep_label_id_ = value;
 }
 inline void DetectionLabelIdToTextCalculatorOptions::set_keep_label_id(bool value) {
@@ -448,88 +484,37 @@ inline void DetectionLabelIdToTextCalculatorOptions::set_keep_label_id(bool valu
   // @@protoc_insertion_point(field_set:mediapipe.DetectionLabelIdToTextCalculatorOptions.keep_label_id)
 }
 
-// optional .mediapipe.LabelMap label_map = 4;
-inline bool DetectionLabelIdToTextCalculatorOptions::_internal_has_label_map() const {
-  bool value = (_has_bits_[0] & 0x00000002u) != 0;
-  PROTOBUF_ASSUME(!value || label_map_ != nullptr);
-  return value;
+// map<int64, .mediapipe.LabelMapItem> label_items = 4;
+inline int DetectionLabelIdToTextCalculatorOptions::_internal_label_items_size() const {
+  return label_items_.size();
 }
-inline bool DetectionLabelIdToTextCalculatorOptions::has_label_map() const {
-  return _internal_has_label_map();
+inline int DetectionLabelIdToTextCalculatorOptions::label_items_size() const {
+  return _internal_label_items_size();
 }
-inline const ::mediapipe::LabelMap& DetectionLabelIdToTextCalculatorOptions::_internal_label_map() const {
-  const ::mediapipe::LabelMap* p = label_map_;
-  return p != nullptr ? *p : reinterpret_cast<const ::mediapipe::LabelMap&>(
-      ::mediapipe::_LabelMap_default_instance_);
+inline const ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >&
+DetectionLabelIdToTextCalculatorOptions::_internal_label_items() const {
+  return label_items_.GetMap();
 }
-inline const ::mediapipe::LabelMap& DetectionLabelIdToTextCalculatorOptions::label_map() const {
-  // @@protoc_insertion_point(field_get:mediapipe.DetectionLabelIdToTextCalculatorOptions.label_map)
-  return _internal_label_map();
+inline const ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >&
+DetectionLabelIdToTextCalculatorOptions::label_items() const {
+  // @@protoc_insertion_point(field_map:mediapipe.DetectionLabelIdToTextCalculatorOptions.label_items)
+  return _internal_label_items();
 }
-inline void DetectionLabelIdToTextCalculatorOptions::unsafe_arena_set_allocated_label_map(
-    ::mediapipe::LabelMap* label_map) {
-  if (GetArena() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(label_map_);
-  }
-  label_map_ = label_map;
-  if (label_map) {
-    _has_bits_[0] |= 0x00000002u;
-  } else {
-    _has_bits_[0] &= ~0x00000002u;
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:mediapipe.DetectionLabelIdToTextCalculatorOptions.label_map)
+inline ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >*
+DetectionLabelIdToTextCalculatorOptions::_internal_mutable_label_items() {
+  return label_items_.MutableMap();
 }
-inline ::mediapipe::LabelMap* DetectionLabelIdToTextCalculatorOptions::release_label_map() {
-  _has_bits_[0] &= ~0x00000002u;
-  ::mediapipe::LabelMap* temp = label_map_;
-  label_map_ = nullptr;
-  if (GetArena() != nullptr) {
-    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  }
-  return temp;
-}
-inline ::mediapipe::LabelMap* DetectionLabelIdToTextCalculatorOptions::unsafe_arena_release_label_map() {
-  // @@protoc_insertion_point(field_release:mediapipe.DetectionLabelIdToTextCalculatorOptions.label_map)
-  _has_bits_[0] &= ~0x00000002u;
-  ::mediapipe::LabelMap* temp = label_map_;
-  label_map_ = nullptr;
-  return temp;
-}
-inline ::mediapipe::LabelMap* DetectionLabelIdToTextCalculatorOptions::_internal_mutable_label_map() {
-  _has_bits_[0] |= 0x00000002u;
-  if (label_map_ == nullptr) {
-    auto* p = CreateMaybeMessage<::mediapipe::LabelMap>(GetArena());
-    label_map_ = p;
-  }
-  return label_map_;
-}
-inline ::mediapipe::LabelMap* DetectionLabelIdToTextCalculatorOptions::mutable_label_map() {
-  // @@protoc_insertion_point(field_mutable:mediapipe.DetectionLabelIdToTextCalculatorOptions.label_map)
-  return _internal_mutable_label_map();
-}
-inline void DetectionLabelIdToTextCalculatorOptions::set_allocated_label_map(::mediapipe::LabelMap* label_map) {
-  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
-  if (message_arena == nullptr) {
-    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(label_map_);
-  }
-  if (label_map) {
-    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(label_map)->GetArena();
-    if (message_arena != submessage_arena) {
-      label_map = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, label_map, submessage_arena);
-    }
-    _has_bits_[0] |= 0x00000002u;
-  } else {
-    _has_bits_[0] &= ~0x00000002u;
-  }
-  label_map_ = label_map;
-  // @@protoc_insertion_point(field_set_allocated:mediapipe.DetectionLabelIdToTextCalculatorOptions.label_map)
+inline ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >*
+DetectionLabelIdToTextCalculatorOptions::mutable_label_items() {
+  // @@protoc_insertion_point(field_mutable_map:mediapipe.DetectionLabelIdToTextCalculatorOptions.label_items)
+  return _internal_mutable_label_items();
 }
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 

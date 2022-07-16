@@ -32,17 +32,12 @@
 #include "mediapipe/framework/port/parse_text_proto.h"
 #include "mediapipe/framework/port/status.h"
 
-// forward declaration
-absl::Status load_calculator_graph(mediapipe::CalculatorGraph& graph, char const* config_file);
-
 constexpr char const* kWindowName = "MediaPipe";
 
 constexpr char const* kInputStream = "input_video";
 constexpr char const* kUserInput = "user_input";
 constexpr char const* kOutputStream = "output_video";
 
-ABSL_FLAG(std::string, calculator_graph_config_file, "",
-          "Name of file containing text format CalculatorGraphConfig proto.");
 ABSL_FLAG(std::string, input_video_path, "",
           "Full path of video to load. "
           "If not provided, attempt to use a webcam.");
@@ -61,14 +56,9 @@ void mouse_event(int event, int x, int y, int flags, void* user_data) {
 }
 
 absl::Status RunMPPGraph() {
-  std::string calculator_graph_config_contents;
-  mediapipe::file::GetContents(
-      absl::GetFlag(FLAGS_calculator_graph_config_file),
-      &calculator_graph_config_contents);
-
   LOG(INFO) << "Initialize the calculator graph.";
   mediapipe::CalculatorGraph graph;
-  MP_RETURN_IF_ERROR(load_calculator_graph(graph, calculator_graph_config_contents.c_str()));
+  MP_RETURN_IF_ERROR(init_calculator_graph(graph));
 
   LOG(INFO) << "Initialize the camera or load the video.";
   cv::VideoCapture capture;

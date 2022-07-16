@@ -30,8 +30,12 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/map.h>  // IWYU pragma: export
+#include <google/protobuf/map_entry.h>
+#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "mediapipe/framework/calculator.pb.h"
+#include "mediapipe/util/label_map.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fclassification_5fcalculator_2eproto
@@ -47,7 +51,7 @@ struct TableStruct_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fclassificat
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[3]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[4]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -58,6 +62,9 @@ namespace mediapipe {
 class TensorsToClassificationCalculatorOptions;
 struct TensorsToClassificationCalculatorOptionsDefaultTypeInternal;
 extern TensorsToClassificationCalculatorOptionsDefaultTypeInternal _TensorsToClassificationCalculatorOptions_default_instance_;
+class TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse;
+struct TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUseDefaultTypeInternal;
+extern TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUseDefaultTypeInternal _TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse_default_instance_;
 class TensorsToClassificationCalculatorOptions_LabelMap;
 struct TensorsToClassificationCalculatorOptions_LabelMapDefaultTypeInternal;
 extern TensorsToClassificationCalculatorOptions_LabelMapDefaultTypeInternal _TensorsToClassificationCalculatorOptions_LabelMap_default_instance_;
@@ -67,6 +74,7 @@ extern TensorsToClassificationCalculatorOptions_LabelMap_EntryDefaultTypeInterna
 }  // namespace mediapipe
 PROTOBUF_NAMESPACE_OPEN
 template<> ::mediapipe::TensorsToClassificationCalculatorOptions* Arena::CreateMaybeMessage<::mediapipe::TensorsToClassificationCalculatorOptions>(Arena*);
+template<> ::mediapipe::TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse* Arena::CreateMaybeMessage<::mediapipe::TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse>(Arena*);
 template<> ::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap* Arena::CreateMaybeMessage<::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap>(Arena*);
 template<> ::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap_Entry* Arena::CreateMaybeMessage<::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap_Entry>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
@@ -386,6 +394,29 @@ class TensorsToClassificationCalculatorOptions_LabelMap PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
+class TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse, 
+    ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_INT64,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> {
+public:
+  typedef ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse, 
+    ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_INT64,
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> SuperType;
+  TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse();
+  explicit constexpr TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse(
+      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  explicit TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  void MergeFrom(const TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse& other);
+  static const TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse*>(&_TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse_default_instance_); }
+  static bool ValidateKey(void*) { return true; }
+  static bool ValidateValue(void*) { return true; }
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& other) final;
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+};
+
+// -------------------------------------------------------------------
+
 class TensorsToClassificationCalculatorOptions PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:mediapipe.TensorsToClassificationCalculatorOptions) */ {
  public:
@@ -436,7 +467,7 @@ class TensorsToClassificationCalculatorOptions PROTOBUF_FINAL :
                &_TensorsToClassificationCalculatorOptions_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(TensorsToClassificationCalculatorOptions& a, TensorsToClassificationCalculatorOptions& b) {
     a.Swap(&b);
@@ -502,12 +533,77 @@ class TensorsToClassificationCalculatorOptions PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kLabelItemsFieldNumber = 6,
+    kIgnoreClassesFieldNumber = 7,
+    kAllowClassesFieldNumber = 8,
     kLabelMapPathFieldNumber = 3,
     kLabelMapFieldNumber = 5,
     kMinScoreThresholdFieldNumber = 1,
     kTopKFieldNumber = 2,
+    kSortByDescendingScoreFieldNumber = 9,
     kBinaryClassificationFieldNumber = 4,
   };
+  // map<int64, .mediapipe.LabelMapItem> label_items = 6;
+  int label_items_size() const;
+  private:
+  int _internal_label_items_size() const;
+  public:
+  void clear_label_items();
+  private:
+  const ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >&
+      _internal_label_items() const;
+  ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >*
+      _internal_mutable_label_items();
+  public:
+  const ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >&
+      label_items() const;
+  ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >*
+      mutable_label_items();
+
+  // repeated int32 ignore_classes = 7 [packed = true];
+  int ignore_classes_size() const;
+  private:
+  int _internal_ignore_classes_size() const;
+  public:
+  void clear_ignore_classes();
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_ignore_classes(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      _internal_ignore_classes() const;
+  void _internal_add_ignore_classes(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      _internal_mutable_ignore_classes();
+  public:
+  ::PROTOBUF_NAMESPACE_ID::int32 ignore_classes(int index) const;
+  void set_ignore_classes(int index, ::PROTOBUF_NAMESPACE_ID::int32 value);
+  void add_ignore_classes(::PROTOBUF_NAMESPACE_ID::int32 value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      ignore_classes() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      mutable_ignore_classes();
+
+  // repeated int32 allow_classes = 8 [packed = true];
+  int allow_classes_size() const;
+  private:
+  int _internal_allow_classes_size() const;
+  public:
+  void clear_allow_classes();
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_allow_classes(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      _internal_allow_classes() const;
+  void _internal_add_allow_classes(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      _internal_mutable_allow_classes();
+  public:
+  ::PROTOBUF_NAMESPACE_ID::int32 allow_classes(int index) const;
+  void set_allow_classes(int index, ::PROTOBUF_NAMESPACE_ID::int32 value);
+  void add_allow_classes(::PROTOBUF_NAMESPACE_ID::int32 value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      allow_classes() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      mutable_allow_classes();
+
   // optional string label_map_path = 3;
   bool has_label_map_path() const;
   private:
@@ -570,6 +666,19 @@ class TensorsToClassificationCalculatorOptions PROTOBUF_FINAL :
   void _internal_set_top_k(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
+  // optional bool sort_by_descending_score = 9;
+  bool has_sort_by_descending_score() const;
+  private:
+  bool _internal_has_sort_by_descending_score() const;
+  public:
+  void clear_sort_by_descending_score();
+  bool sort_by_descending_score() const;
+  void set_sort_by_descending_score(bool value);
+  private:
+  bool _internal_sort_by_descending_score() const;
+  void _internal_set_sort_by_descending_score(bool value);
+  public:
+
   // optional bool binary_classification = 4;
   bool has_binary_classification() const;
   private:
@@ -596,10 +705,20 @@ class TensorsToClassificationCalculatorOptions PROTOBUF_FINAL :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::internal::MapField<
+      TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse,
+      ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem,
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_INT64,
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> label_items_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 > ignore_classes_;
+  mutable std::atomic<int> _ignore_classes_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 > allow_classes_;
+  mutable std::atomic<int> _allow_classes_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr label_map_path_;
   ::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap* label_map_;
   float min_score_threshold_;
   ::PROTOBUF_NAMESPACE_ID::int32 top_k_;
+  bool sort_by_descending_score_;
   bool binary_classification_;
   friend struct ::TableStruct_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fclassification_5fcalculator_2eproto;
 };
@@ -744,6 +863,8 @@ TensorsToClassificationCalculatorOptions_LabelMap::entries() const {
 
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
 // TensorsToClassificationCalculatorOptions
 
 // optional float min_score_threshold = 1;
@@ -800,6 +921,34 @@ inline void TensorsToClassificationCalculatorOptions::_internal_set_top_k(::PROT
 inline void TensorsToClassificationCalculatorOptions::set_top_k(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_top_k(value);
   // @@protoc_insertion_point(field_set:mediapipe.TensorsToClassificationCalculatorOptions.top_k)
+}
+
+// optional bool sort_by_descending_score = 9;
+inline bool TensorsToClassificationCalculatorOptions::_internal_has_sort_by_descending_score() const {
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  return value;
+}
+inline bool TensorsToClassificationCalculatorOptions::has_sort_by_descending_score() const {
+  return _internal_has_sort_by_descending_score();
+}
+inline void TensorsToClassificationCalculatorOptions::clear_sort_by_descending_score() {
+  sort_by_descending_score_ = false;
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline bool TensorsToClassificationCalculatorOptions::_internal_sort_by_descending_score() const {
+  return sort_by_descending_score_;
+}
+inline bool TensorsToClassificationCalculatorOptions::sort_by_descending_score() const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToClassificationCalculatorOptions.sort_by_descending_score)
+  return _internal_sort_by_descending_score();
+}
+inline void TensorsToClassificationCalculatorOptions::_internal_set_sort_by_descending_score(bool value) {
+  _has_bits_[0] |= 0x00000010u;
+  sort_by_descending_score_ = value;
+}
+inline void TensorsToClassificationCalculatorOptions::set_sort_by_descending_score(bool value) {
+  _internal_set_sort_by_descending_score(value);
+  // @@protoc_insertion_point(field_set:mediapipe.TensorsToClassificationCalculatorOptions.sort_by_descending_score)
 }
 
 // optional string label_map_path = 3;
@@ -942,9 +1091,35 @@ inline void TensorsToClassificationCalculatorOptions::set_allocated_label_map(::
   // @@protoc_insertion_point(field_set_allocated:mediapipe.TensorsToClassificationCalculatorOptions.label_map)
 }
 
+// map<int64, .mediapipe.LabelMapItem> label_items = 6;
+inline int TensorsToClassificationCalculatorOptions::_internal_label_items_size() const {
+  return label_items_.size();
+}
+inline int TensorsToClassificationCalculatorOptions::label_items_size() const {
+  return _internal_label_items_size();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >&
+TensorsToClassificationCalculatorOptions::_internal_label_items() const {
+  return label_items_.GetMap();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >&
+TensorsToClassificationCalculatorOptions::label_items() const {
+  // @@protoc_insertion_point(field_map:mediapipe.TensorsToClassificationCalculatorOptions.label_items)
+  return _internal_label_items();
+}
+inline ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >*
+TensorsToClassificationCalculatorOptions::_internal_mutable_label_items() {
+  return label_items_.MutableMap();
+}
+inline ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >*
+TensorsToClassificationCalculatorOptions::mutable_label_items() {
+  // @@protoc_insertion_point(field_mutable_map:mediapipe.TensorsToClassificationCalculatorOptions.label_items)
+  return _internal_mutable_label_items();
+}
+
 // optional bool binary_classification = 4;
 inline bool TensorsToClassificationCalculatorOptions::_internal_has_binary_classification() const {
-  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  bool value = (_has_bits_[0] & 0x00000020u) != 0;
   return value;
 }
 inline bool TensorsToClassificationCalculatorOptions::has_binary_classification() const {
@@ -952,7 +1127,7 @@ inline bool TensorsToClassificationCalculatorOptions::has_binary_classification(
 }
 inline void TensorsToClassificationCalculatorOptions::clear_binary_classification() {
   binary_classification_ = false;
-  _has_bits_[0] &= ~0x00000010u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline bool TensorsToClassificationCalculatorOptions::_internal_binary_classification() const {
   return binary_classification_;
@@ -962,7 +1137,7 @@ inline bool TensorsToClassificationCalculatorOptions::binary_classification() co
   return _internal_binary_classification();
 }
 inline void TensorsToClassificationCalculatorOptions::_internal_set_binary_classification(bool value) {
-  _has_bits_[0] |= 0x00000010u;
+  _has_bits_[0] |= 0x00000020u;
   binary_classification_ = value;
 }
 inline void TensorsToClassificationCalculatorOptions::set_binary_classification(bool value) {
@@ -970,9 +1145,105 @@ inline void TensorsToClassificationCalculatorOptions::set_binary_classification(
   // @@protoc_insertion_point(field_set:mediapipe.TensorsToClassificationCalculatorOptions.binary_classification)
 }
 
+// repeated int32 ignore_classes = 7 [packed = true];
+inline int TensorsToClassificationCalculatorOptions::_internal_ignore_classes_size() const {
+  return ignore_classes_.size();
+}
+inline int TensorsToClassificationCalculatorOptions::ignore_classes_size() const {
+  return _internal_ignore_classes_size();
+}
+inline void TensorsToClassificationCalculatorOptions::clear_ignore_classes() {
+  ignore_classes_.Clear();
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToClassificationCalculatorOptions::_internal_ignore_classes(int index) const {
+  return ignore_classes_.Get(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToClassificationCalculatorOptions::ignore_classes(int index) const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToClassificationCalculatorOptions.ignore_classes)
+  return _internal_ignore_classes(index);
+}
+inline void TensorsToClassificationCalculatorOptions::set_ignore_classes(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
+  ignore_classes_.Set(index, value);
+  // @@protoc_insertion_point(field_set:mediapipe.TensorsToClassificationCalculatorOptions.ignore_classes)
+}
+inline void TensorsToClassificationCalculatorOptions::_internal_add_ignore_classes(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  ignore_classes_.Add(value);
+}
+inline void TensorsToClassificationCalculatorOptions::add_ignore_classes(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_add_ignore_classes(value);
+  // @@protoc_insertion_point(field_add:mediapipe.TensorsToClassificationCalculatorOptions.ignore_classes)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+TensorsToClassificationCalculatorOptions::_internal_ignore_classes() const {
+  return ignore_classes_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+TensorsToClassificationCalculatorOptions::ignore_classes() const {
+  // @@protoc_insertion_point(field_list:mediapipe.TensorsToClassificationCalculatorOptions.ignore_classes)
+  return _internal_ignore_classes();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+TensorsToClassificationCalculatorOptions::_internal_mutable_ignore_classes() {
+  return &ignore_classes_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+TensorsToClassificationCalculatorOptions::mutable_ignore_classes() {
+  // @@protoc_insertion_point(field_mutable_list:mediapipe.TensorsToClassificationCalculatorOptions.ignore_classes)
+  return _internal_mutable_ignore_classes();
+}
+
+// repeated int32 allow_classes = 8 [packed = true];
+inline int TensorsToClassificationCalculatorOptions::_internal_allow_classes_size() const {
+  return allow_classes_.size();
+}
+inline int TensorsToClassificationCalculatorOptions::allow_classes_size() const {
+  return _internal_allow_classes_size();
+}
+inline void TensorsToClassificationCalculatorOptions::clear_allow_classes() {
+  allow_classes_.Clear();
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToClassificationCalculatorOptions::_internal_allow_classes(int index) const {
+  return allow_classes_.Get(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToClassificationCalculatorOptions::allow_classes(int index) const {
+  // @@protoc_insertion_point(field_get:mediapipe.TensorsToClassificationCalculatorOptions.allow_classes)
+  return _internal_allow_classes(index);
+}
+inline void TensorsToClassificationCalculatorOptions::set_allow_classes(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
+  allow_classes_.Set(index, value);
+  // @@protoc_insertion_point(field_set:mediapipe.TensorsToClassificationCalculatorOptions.allow_classes)
+}
+inline void TensorsToClassificationCalculatorOptions::_internal_add_allow_classes(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  allow_classes_.Add(value);
+}
+inline void TensorsToClassificationCalculatorOptions::add_allow_classes(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_add_allow_classes(value);
+  // @@protoc_insertion_point(field_add:mediapipe.TensorsToClassificationCalculatorOptions.allow_classes)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+TensorsToClassificationCalculatorOptions::_internal_allow_classes() const {
+  return allow_classes_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+TensorsToClassificationCalculatorOptions::allow_classes() const {
+  // @@protoc_insertion_point(field_list:mediapipe.TensorsToClassificationCalculatorOptions.allow_classes)
+  return _internal_allow_classes();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+TensorsToClassificationCalculatorOptions::_internal_mutable_allow_classes() {
+  return &allow_classes_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+TensorsToClassificationCalculatorOptions::mutable_allow_classes() {
+  // @@protoc_insertion_point(field_mutable_list:mediapipe.TensorsToClassificationCalculatorOptions.allow_classes)
+  return _internal_mutable_allow_classes();
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

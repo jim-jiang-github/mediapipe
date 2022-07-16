@@ -31,18 +31,6 @@ inline bool read_config_from_pbtxt(mediapipe::CalculatorGraphConfig& config, cha
   return result;
 }
 
-#define DEFINE_LOAD_GRAPH(default_config) \
-absl::Status load_calculator_graph(mediapipe::CalculatorGraph& graph, char const* config_file) { \
-  if (nullptr==config_file || '\0'==config_file[0]) { \
-    config_file = default_config; \
-  } \
-  mediapipe::CalculatorGraphConfig config; \
-  if (read_config_from_pbtxt(config, config_file)) { \
-    return graph.Initialize(config); \
-  } \
-  return absl::NotFoundError(config_file); \
-}
-
 #define DEFINE_SUBGRAPH(class_name, pbtxt) \
 struct class_name : public Subgraph { \
   absl::StatusOr<CalculatorGraphConfig> GetConfig(SubgraphOptions const&) override { \

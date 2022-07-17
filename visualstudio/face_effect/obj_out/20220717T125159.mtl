@@ -1,0 +1,16 @@
+# face_effect OBJ mtl exporter by andre.hl.chen@gmail.com 2022
+# File created 2022/07/17 12:51:59
+
+newmtl face_from_camera
+  Ka 1.000 1.000 1.000
+  Kd 1.000 1.000 1.000
+  Ks 0.000 0.000 0.000
+  Ke 0.000 0.000 0.000
+  Tf 1.0000 1.0000 1.0000
+  Ns 1.000
+  d 1.000
+  Tr 0.000
+  Ni 1.500
+  illum 2
+  map_Ka 20220717T125159.jpg
+  map_Kd 20220717T125159.jpg

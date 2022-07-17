@@ -51,6 +51,7 @@ void print_help() {
   printf("          Effect: '1', '2', '3' or SPACEBAR\n");
   printf("       Primitive: 'm' for triangles, lines or points\n");
   printf(" Canonical Model: 'k'\n");
+  printf(" Export OBJ file: 'o'\n");
   printf("      Camera FOV: 'a' or 's'\n");
   printf("     Model Scale: 'z' or 'x'\n");
   printf("            HELP: 'h'\n\n");
@@ -67,6 +68,8 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
   // to solve landmarks from image space to metric space
   WeightedOrthogonalProblemSolver wop_solver_;
   std::vector<int> procrustes_landmark_indices_;
+
+  std::vector<int> triangle_list_;
 
   // effect to show
   DrawMesh effect_meshes_[num_effect_meshes];
@@ -103,7 +106,8 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
   uint8_t current_effect_{0};
   uint8_t draw_mode_:2;
   uint8_t view_angle_3d_:1;
-  uint8_t show_canonical_landmarks_:2,:3;
+  uint8_t show_canonical_landmarks_:2;
+  uint8_t trigger_save_OBJ_file_:1,:2;
 
   //
   // solve face landmark from weak perspective projection model to 3D metric space
@@ -293,6 +297,7 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
     draw_mode_ = 0;
     view_angle_3d_ = false;
     show_canonical_landmarks_ = 0;
+    trigger_save_OBJ_file_ = false;
     print_pose_transform_error_threshold_ = 0.01f;
 
     print_help();
@@ -341,6 +346,8 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
           printf("[INFO] Camera FOV= %.1f\n", camera_vertical_fov_);
           OpenGLRenderer::SetCameraPerspective(camera_vertical_fov_);
         }
+      } else if ('o'==input.wait_key) {
+        trigger_save_OBJ_file_ = true;
       } else if ('k'==input.wait_key) {
         show_canonical_landmarks_ = (show_canonical_landmarks_+1)%3;
       } else if ('e'==input.wait_key) {
@@ -467,6 +474,9 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
       }
       OpenGLRenderer::SetCameraPerspective(camera_vertical_fov_, 1.0f, 100.0f);
 
+      // save indices (for saving obj files)
+      triangle_list_ = mesh.indices;
+
       //
       // [0] : glasses.pbtxt + glasses.pngblob
       // [1] : axis.pbtxt + axis.pngblob
@@ -504,7 +514,7 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
       // draw each landmarks
       if (render_task_.landmark_set) {
         Vector3 landmarks[478]; // landmarks in metric 3D space
-        Vector2 texcoords[478]; // landmarks in metric 3D space
+        Vector2 texcoords[478]; // texture coordinates (normalized_landmarks)
         Matrix3 xform; // transform canonical face model to landmarks in metric 3D space
         Matrix3 view;  // view transform as identity
 
@@ -540,6 +550,99 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
         for (auto const& normalized_landmarks: *render_task_.landmark_set) {
           int const num_landmarks = normalized_landmarks.landmark_size();
           if (SolveFaceLandmark3D_(xform, landmarks, normalized_landmarks)) {
+            //
+            // export Wavefront .obj file
+            if (trigger_save_OBJ_file_) {
+              time_t rawtime;
+              time(&rawtime);
+              struct tm* time = localtime(&rawtime);
+              char filename[64];
+              if (time) {
+                sprintf(filename, "%4d%02d%02dT%02d%02d%02d",
+                        time->tm_year + 1900, time->tm_mon + 1,  time->tm_mday,
+                        time->tm_hour, time->tm_min, time->tm_sec);
+              } else {
+                static int s_obj_file_id = 0; // no worry
+                sprintf(filename, "%06d", ++s_obj_file_id);
+              }
+
+              char fullpath[64];
+              sprintf(fullpath, "./obj_out/%s.obj", filename);
+              printf("exporting obj file => '%s'\n", fullpath);
+              FILE* file = fopen(fullpath, "wb");
+              if (file) {
+                int const total_triangles = (int) triangle_list_.size()/3;
+
+                fprintf(file, "# face mesh OBJ exporter by andre.hl.chen@gmail.com 2022\n");
+                if (time) {
+                  fprintf(file, "# File created %d/%02d/%02d %02d:%02d:%02d\n",
+                          time->tm_year + 1900, time->tm_mon + 1,  time->tm_mday,
+                          time->tm_hour, time->tm_min, time->tm_sec);
+                }
+                fprintf(file, "# reference: modules/face_geometry/data/canonical_face_model.obj\n\n");
+
+                fprintf(file, "mtllib %s.mtl\n\n", filename);
+                fprintf(file, "#\n# 468 vertices, %d triangles\n#\n\n", total_triangles);
+                fprintf(file, "usemtl face_from_camera\n");
+
+                auto const& v0 = landmarks[4];
+                for (int i=0; i<468; ++i) {
+                  auto const& v = landmarks[i];
+                  fprintf(file, "v %.4f %.4f %.4f\n", v.x-v0.x, v.y-v0.y, v.z-v0.z);
+                }
+                //
+                // TO-DO : export normal vectors, vn
+                //
+                for (int i=0; i<468; ++i) {
+                  auto const& vt = normalized_landmarks.landmark(i);
+                  fprintf(file, "vt %.4f %.4f\n", vt.x(), 1.0f-vt.y());
+                }
+
+                int const* indices = triangle_list_.data();
+                int a, b, c; // obj file uses 1-index
+                for (int i=0; i<total_triangles; ++i) {
+                  a = (*indices++) + 1;
+                  b = (*indices++) + 1;
+                  c = (*indices++) + 1;
+                  fprintf(file, "f %d/%d %d/%d %d/%d\n", a, a, b, b, c, c);
+                }
+                fclose(file);
+
+                // material
+                sprintf(fullpath, "./obj_out/%s.mtl", filename);
+                file = fopen(fullpath, "wb");
+                if (file) {
+                  fprintf(file, "# face mesh OBJ mtl exporter by andre.hl.chen@gmail.com 2022\n");
+                  if (time) {
+                    fprintf(file, "# File created %d/%02d/%02d %02d:%02d:%02d\n",
+                            time->tm_year + 1900, time->tm_mon + 1,  time->tm_mday,
+                            time->tm_hour, time->tm_min, time->tm_sec);
+                  }
+                  fprintf(file, "\nnewmtl face_from_camera\n");
+                  fprintf(file, "  Ka 1.000 1.000 1.000\n"); // ambient
+                  fprintf(file, "  Kd 1.000 1.000 1.000\n"); // diffuse
+                  fprintf(file, "  Ks 0.000 0.000 0.000\n"); // specular
+                  fprintf(file, "  Ke 0.000 0.000 0.000\n"); // emissive
+                  fprintf(file, "  Tf 1.0000 1.0000 1.0000\n"); // Transmission Filter Color
+                  fprintf(file, "  Ns 1.000\n"); // specular exponent
+                  fprintf(file, "  d 1.000\n"); // opacity = 1.0, fully
+                  fprintf(file, "  Tr 0.000\n"); // transparency = 1.0 - opacity
+                  fprintf(file, "  Ni 1.500\n"); // optical density for its surface. i.e. index of refraction.
+                  fprintf(file, "  illum 2\n"); // illumination model = 0 ~ 10
+                  fprintf(file, "  map_Ka %s.jpg\n", filename); // ambient texture map
+                  fprintf(file, "  map_Kd %s.jpg\n", filename); // diffuse texture map
+                  fclose(file);
+
+                  // texture file
+                  sprintf(fullpath, "./obj_out/%s.jpg", filename);
+                  cv::Mat img;
+                  cvtColor(cv::Mat(render_task_.height, render_task_.width, CV_8UC3, (void*)render_task_.background), img, CV_RGB2BGR);
+                  cv::imwrite(fullpath, img);
+                }
+              }
+
+              trigger_save_OBJ_file_ = false;
+            }
 
             // compare face_geometry::pose_transformation_matrix with our transform
             if (geometry_list) {

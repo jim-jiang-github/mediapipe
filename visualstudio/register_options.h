@@ -1,21 +1,18 @@
-//
-// options registry taken from //mediapipe/framework/tool/options_lib_template.cc
-//
-
 #if __cplusplus >= 201703L
 
 #ifdef _WIN32
 //
-// error C4996: 'std::iterator<std::forward_iterator_tag,T,ptrdiff_t,T *,T &>': warning STL4015:
-// The std::iterator class template (used as a base class to provide typedefs) is deprecated in C++17.
-// (The <iterator> header is NOT deprecated.) The C++ Standard has never required user-defined
-// iterators to derive from std::iterator. To fix this warning, stop deriving from std::iterator
-// and start providing publicly accessible typedefs named iterator_category, value_type,
-// difference_type, pointer, and reference. Note that value_type is required to be non-const,
-// even for constant iterators.
+// error C4996: 'std::iterator<std::forward_iterator_tag,T,ptrdiff_t,T *,T &>':
+// warning STL4015: The std::iterator class template (used as a base class to
+// provide typedefs) is deprecated in C++17. (The <iterator> header is NOT
+// deprecated.) The C++ Standard has never required user-defined iterators to
+// derive from std::iterator. Stop deriving from std::iterator and
+// start providing publicly accessible typedefs named iterator_category,
+// value_type, difference_type, pointer, and reference. Note that value_type
+// is required to be non-const, even for constant iterators.
 //
-//
-// or do this in project Properties: C/C++ -> Advanced -> Disable Specific Warnings -> 4996 
+// or do this in project Properties:
+//   C/C++ -> Advanced -> Disable Specific Warnings -> 4996 
 #pragma warning(disable:4996)
 #endif
 
@@ -96,13 +93,14 @@ void register_option_data(mediapipe::FieldData const& result) {
 // bazel build outputs few intermediate files to be used for the final build stage.
 // (e.g. #include notorious .inc files to define C++ string laterials)
 //
-// It's just, to me, over complicated(and ugly) and really pushes people
+// It's just, to me, over complicated(, ugly) and really pushes people
 // away from mediapipe + bazel.
 //
-// Since all protos are well defined, so there is no reasons that it cannot retrieve
-// all necessary data for registration during run-time. Keep everything simple, man!
+// Since all proto messagess are well defined in the code, it should be
+// able to collect necessary proto data for registration during runtime.
+// Anyway, Keep it simple, man!
 //
-// See below for details bazel do if you are really interested...
+// See below for details data you need to register 'options'....
 //
 inline void register_face_detection_options() {
   FileDescriptorSetBuilder fds_builder;
@@ -126,8 +124,8 @@ inline void register_face_detection_options() {
 //
 // bazel build detail explaination...
 //
-// Tracing down face_detection build, a module named 'face_detection_proto' is in the list...
-// (//mediapipe/modules/face_detection/BUILD, line 113)
+// In the process of face_detection bazel build, 'face_detection_proto' module
+// caught my eyes... //mediapipe/modules/face_detection/BUILD (line 113)
 //
 // mediapipe_proto_library(
 //    name = "face_detection_proto",
@@ -143,7 +141,8 @@ inline void register_face_detection_options() {
 //    ],
 // )
 //
-// Continue to build rule mediapipe_proto_library() in //mediapipe/framework/port/build_config.bzl (line 35)
+// Let's check out the build rule mediapipe_proto_library(), which is
+// defined in //mediapipe/framework/port/build_config.bzl (line 35)...
 // def mediapipe_proto_library(
 //          name,
 //          srcs,
@@ -168,7 +167,8 @@ inline void register_face_detection_options() {
 //      ))
 //
 //
-// Keep going, mediapipe_options_library() is defined in //mediapipe/framework/tool/mediapipe_graph.bzl (line 205)
+// Again, mediapipe_options_library() is triggered. its definition can be found
+// in //mediapipe/framework/tool/mediapipe_graph.bzl (line 205)...
 // def mediapipe_options_library(
 //        name,
 //        proto_lib,
@@ -191,14 +191,16 @@ inline void register_face_detection_options() {
 //    ......
 //    ......
 //
-// transitive_descriptor_set() is in //mediapipe/framework/deps/descriptor_set.bzl and
-// it serializes FileDescriptorSet containing proto_lib and all dependencies into a binary file
-// named face_detection_proto_transitive-transitive-descriptor-set.proto.bin.
+// transitive_descriptor_set() is in //mediapipe/framework/deps/descriptor_set.bzl
+// and it serializes FileDescriptorSet containing proto_lib with all
+// 'transitive dependencies' into a binary file named
+// face_detection_proto_transitive-transitive-descriptor-set.proto.bin.
 //
 // next, data_as_c_string() converts the binary file into a bad-taste text file,
-// face_detection_proto_descriptors.inc. (same usage as subgraphs)
+// face_detection_proto_descriptors.inc. (same usage as subgraphs).
 //
-// you can check both files out using notepad++, or refer following test function for better understanding.
+// you can check both files out using notepad++, or run through below test function
+// to have better understanding.
 //
 constexpr char const* transitive_descriptor_set =
     "../face_detection/face_detection_proto_transitive-transitive-descriptor-set.proto.bin";

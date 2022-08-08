@@ -1,3 +1,6 @@
+mtllib canonical_face_model.mtl
+usemtl face_from_camera
+
 v 0.000000 -3.406404 5.979507
 v 0.000000 -1.126865 7.475604
 v 0.000000 -2.089024 6.058267

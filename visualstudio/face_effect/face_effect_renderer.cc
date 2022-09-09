@@ -590,13 +590,13 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
                   auto const& v = landmarks[i];
                   fprintf(file, "v %.4f %.4f %.4f\n", v.x-v0.x, v.y-v0.y, v.z-v0.z);
                 }
-                //
-                // TO-DO : export normal vectors, vn
-                //
                 for (int i=0; i<468; ++i) {
                   auto const& vt = normalized_landmarks.landmark(i);
                   fprintf(file, "vt %.4f %.4f\n", vt.x(), 1.0f-vt.y());
                 }
+                //
+                // TO-DO : export normal vectors, vn
+                //
 
                 int const* indices = triangle_list_.data();
                 int a, b, c; // obj file uses 1-index

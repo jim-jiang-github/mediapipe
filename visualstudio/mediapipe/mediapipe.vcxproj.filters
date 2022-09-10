@@ -1287,6 +1287,15 @@
     <ClCompile Include="modules\face_detection\face_detection.pb.cc">
       <Filter>modules\face_detection</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_interpreter_delegate_runner.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_utils.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_xnnpack.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\mediapipe\framework\tool\options_util.h">
@@ -1981,6 +1990,15 @@
     </ClInclude>
     <ClInclude Include="modules\face_detection\face_detection.pb.h">
       <Filter>modules\face_detection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\calculators\tensor\inference_interpreter_delegate_runner.h">
+      <Filter>calculators\tensor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\calculators\tensor\inference_calculator_utils.h">
+      <Filter>calculators\tensor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\calculators\tensor\inference_runner.h">
+      <Filter>calculators\tensor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

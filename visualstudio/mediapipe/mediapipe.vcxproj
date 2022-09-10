@@ -62,6 +62,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_utils.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_xnnpack.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_interpreter_delegate_runner.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_classification_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_detections_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\tensor\tensors_to_floats_calculator.cc" />
@@ -429,6 +432,9 @@
     <ClCompile Include="util\tracking\tone_models.pb.cc" />
     <ClCompile Include="util\tracking\tracked_detection_manager_config.pb.cc" />
     <ClCompile Include="util\tracking\tracking.pb.cc" />
+    <ClInclude Include="..\..\mediapipe\calculators\tensor\inference_calculator_utils.h" />
+    <ClInclude Include="..\..\mediapipe\calculators\tensor\inference_interpreter_delegate_runner.h" />
+    <ClInclude Include="..\..\mediapipe\calculators\tensor\inference_runner.h" />
     <ClInclude Include="..\..\mediapipe\framework\api2\node.h" />
     <ClInclude Include="..\..\mediapipe\framework\api2\packet.h" />
     <ClInclude Include="..\..\mediapipe\framework\calculator_base.h" />

@@ -1,11 +1,15 @@
 #include "../calculator_graph_util.h"
 
+// resource root to locate tflite and other files
+// see also mediapipe/mediapipe/util/resource_util_default.cc
+constexpr char const* resource_root = "../";
+
 // name of file containing text format CalculatorGraphConfig proto
 constexpr char const* calculator_graph_config_file = "../../mediapipe/graphs/tracking/object_detection_tracking_desktop_live.pbtxt";
 
 // subgraphs
 namespace mediapipe {
-DEFINE_SUBGRAPH(ObjectDetectionSubgraphCpu, "object_detection_cpu.pbtxt");
+DEFINE_SUBGRAPH(ObjectDetectionSubgraphCpu, "../../mediapipe/graphs/tracking/subgraphs/object_detection_cpu.pbtxt");
 DEFINE_SUBGRAPH(ObjectTrackingSubgraphCpu, "../../mediapipe/graphs/tracking/subgraphs/object_tracking_cpu.pbtxt");
   DEFINE_SUBGRAPH(BoxTrackingSubgraphCpu, "../../mediapipe/graphs/tracking/subgraphs/box_tracking_cpu.pbtxt");
 DEFINE_SUBGRAPH(RendererSubgraphCpu, "../../mediapipe/graphs/tracking/subgraphs/renderer_cpu.pbtxt");
@@ -14,6 +18,8 @@ DEFINE_SUBGRAPH(RendererSubgraphCpu, "../../mediapipe/graphs/tracking/subgraphs/
 absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
   mediapipe::CalculatorGraphConfig config;
   if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
+    download_mediapipe_asset_from_GCS("../mediapipe/models/ssdlite_object_detection.tflite");
+    download_mediapipe_asset_from_GCS("../mediapipe/models/ssdlite_object_detection_labelmap.txt");
     return graph.Initialize(config);
   }
   return absl::NotFoundError(calculator_graph_config_file);

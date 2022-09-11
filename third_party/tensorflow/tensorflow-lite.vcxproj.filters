@@ -64,9 +64,6 @@
     <ClCompile Include=".\tensorflow\lite\kernels\cast.cc">
       <Filter>tflite\kernels</Filter>
     </ClCompile>
-    <ClCompile Include=".\tensorflow\lite\c\common.c">
-      <Filter>tflite\c</Filter>
-    </ClCompile>
     <ClCompile Include=".\tensorflow\lite\kernels\complex_support.cc">
       <Filter>tflite\kernels</Filter>
     </ClCompile>
@@ -556,8 +553,41 @@
     <ClCompile Include="tensorflow\lite\experimental\resource\initialization_status.cc">
       <Filter>tflite\experimental\resource</Filter>
     </ClCompile>
-    <ClCompile Include="tensorflow\lite\tools\optimize\sparsity\format_converter.cc">
-      <Filter>tflite\tools\optimize\sparsity</Filter>
+    <ClCompile Include="tensorflow\lite\c\common.cc">
+      <Filter>tflite\c</Filter>
+    </ClCompile>
+    <ClCompile Include="tensorflow\lite\kernels\atan2.cc">
+      <Filter>tflite\kernels</Filter>
+    </ClCompile>
+    <ClCompile Include="tensorflow\lite\kernels\sign.cc">
+      <Filter>tflite\kernels</Filter>
+    </ClCompile>
+    <ClCompile Include="tensorflow\lite\kernels\dynamic_update_slice.cc">
+      <Filter>tflite\kernels</Filter>
+    </ClCompile>
+    <ClCompile Include="tensorflow\lite\kernels\random_ops.cc">
+      <Filter>tflite\kernels</Filter>
+    </ClCompile>
+    <ClCompile Include="tensorflow\lite\kernels\random_standard_normal_custom.cc">
+      <Filter>tflite\kernels</Filter>
+    </ClCompile>
+    <ClCompile Include="tensorflow\lite\kernels\random_uniform_custom.cc">
+      <Filter>tflite\kernels</Filter>
+    </ClCompile>
+    <ClCompile Include="tensorflow\lite\kernels\unsorted_segment.cc">
+      <Filter>tflite\kernels</Filter>
+    </ClCompile>
+    <ClCompile Include="tensorflow\lite\kernels\bucketize.cc">
+      <Filter>tflite\kernels</Filter>
+    </ClCompile>
+    <ClCompile Include="tensorflow\lite\profiling\root_profiler.cc">
+      <Filter>tflite\profiling</Filter>
+    </ClCompile>
+    <ClCompile Include="tensorflow\lite\signature_runner.cc">
+      <Filter>tflite</Filter>
+    </ClCompile>
+    <ClCompile Include="tensorflow\lite\kernels\internal\utils\sparsity_format_converter.cc">
+      <Filter>tflite\kernels\internal\utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -603,12 +633,6 @@
     <Filter Include="tflite\kernels\internal\reference">
       <UniqueIdentifier>{ce6f648c-7430-4a7b-85fe-141d82354c1d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="tflite\tools">
-      <UniqueIdentifier>{0238540a-83ea-41f3-b6ff-a74bee41cac7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="tflite\tools\optimize">
-      <UniqueIdentifier>{e70f1c6e-8578-4236-8a60-1dc6fc1cf4e0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="tflite\delegates">
       <UniqueIdentifier>{bfaf5387-3fed-4d3e-8398-81493282c0e5}</UniqueIdentifier>
     </Filter>
@@ -624,22 +648,22 @@
     <Filter Include="tflite\kernels\internal\optimized">
       <UniqueIdentifier>{3d2e4edf-1365-4f82-a3cd-9bf1f19f385d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="tflite\tools\optimize\sparsity">
-      <UniqueIdentifier>{ec641811-443f-47cc-aa89-620ec73661da}</UniqueIdentifier>
-    </Filter>
     <Filter Include="tflite\kernels\internal\utils">
-      <UniqueIdentifier>{0e244445-8fa5-4956-b608-ea7ee66d7f48}</UniqueIdentifier>
+      <UniqueIdentifier>{95179c04-328a-45fd-a318-e0df5c0485b9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".\tensorflow\lite\c\common.h">
       <Filter>tflite\c</Filter>
     </ClInclude>
-    <ClInclude Include="tensorflow\lite\tools\optimize\sparsity\format_converter.h">
-      <Filter>tflite\tools\optimize\sparsity</Filter>
-    </ClInclude>
     <ClInclude Include="tensorflow\lite\c\c_api_types.h">
       <Filter>tflite\c</Filter>
+    </ClInclude>
+    <ClInclude Include="tensorflow\lite\signature_runner.h">
+      <Filter>tflite</Filter>
+    </ClInclude>
+    <ClInclude Include="tensorflow\lite\kernels\internal\utils\sparsity_format_converter.h">
+      <Filter>tflite\kernels\internal\utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

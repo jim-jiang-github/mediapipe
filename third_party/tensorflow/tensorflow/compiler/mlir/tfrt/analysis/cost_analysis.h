@@ -17,7 +17,10 @@ limitations under the License.
 #define TENSORFLOW_COMPILER_MLIR_TFRT_ANALYSIS_COST_ANALYSIS_H_
 
 #include "absl/strings/string_view.h"
+#include "mlir/Dialect/Func/IR/FuncOps.h"  // from @llvm-project
 #include "mlir/IR/BuiltinOps.h"  // from @llvm-project
+#include "tensorflow/core/platform/status.h"
+#include "tensorflow/core/tfrt/fallback/op_cost_map.pb.h"
 
 namespace tensorflow {
 namespace tfrt_compiler {
@@ -33,8 +36,9 @@ namespace tfrt_compiler {
 //
 class CostAnalysis {
  public:
-  explicit CostAnalysis(mlir::FuncOp func_op) {
+  explicit CostAnalysis(mlir::func::FuncOp func_op) {
     AnalyzeArguments(func_op);
+    TF_CHECK_OK(ReadMeasuredCosts());
     AnalyzeBlock(&func_op.front());
   }
 
@@ -44,12 +48,15 @@ class CostAnalysis {
   }
 
  private:
-  void AnalyzeArguments(mlir::FuncOp func_op);
+  void AnalyzeArguments(mlir::func::FuncOp func_op);
   void AnalyzeBlock(mlir::Block* block);
   void EvaluateCost(mlir::Operation* op);
+  Status ReadMeasuredCosts();
 
   int64_t max_arg_size_ = 1;
   llvm::DenseMap<mlir::Operation*, int64_t> cost_map_;
+  tfrt_stub::OpCostMapProto op_cost_map_proto_;
+  bool is_cost_measured_ = false;
 };
 
 struct CostContext {

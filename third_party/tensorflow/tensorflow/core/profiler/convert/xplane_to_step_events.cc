@@ -26,6 +26,7 @@ limitations under the License.
 #include "tensorflow/core/profiler/protobuf/steps_db.pb.h"
 #include "tensorflow/core/profiler/protobuf/xplane.pb.h"
 #include "tensorflow/core/profiler/utils/event_span.h"
+#include "tensorflow/core/profiler/utils/tf_op_utils.h"
 #include "tensorflow/core/profiler/utils/tf_xplane_visitor.h"
 #include "tensorflow/core/profiler/utils/timespan.h"
 #include "tensorflow/core/profiler/utils/trace_utils.h"
@@ -85,11 +86,12 @@ EventType ClassifyGpuCompute(absl::string_view event_name,
 
 EventType ClassifyGpuEvent(absl::string_view event_name,
                            absl::string_view tensor_shapes) {
-  if (absl::StartsWithIgnoreCase(event_name, "MEMCPYHtoD")) {
+  TfOp tf_op = ParseTfOpFullname(event_name);
+  if (IsMemcpyHToDOp(tf_op)) {
     return HOST_TO_DEVICE;
-  } else if (absl::StartsWithIgnoreCase(event_name, "MEMCPYDtoH")) {
+  } else if (IsMemcpyDToHOp(tf_op)) {
     return DEVICE_TO_HOST;
-  } else if (absl::StartsWithIgnoreCase(event_name, "MEMCPYDtoD")) {
+  } else if (IsMemcpyDToDOp(tf_op)) {
     return DEVICE_TO_DEVICE;
   } else if (absl::StartsWithIgnoreCase(event_name, "nccl")) {
     return DEVICE_COLLECTIVES;
@@ -100,10 +102,10 @@ EventType ClassifyGpuEvent(absl::string_view event_name,
 
 EventType ClassifyCpuEvent(absl::string_view event_name, bool has_device,
                            bool has_correlation_id) {
-  if (absl::StartsWithIgnoreCase(event_name, "MEMCPYHtoD") ||
-      absl::StrContains(event_name, "Infeed")) {
+  TfOp tf_op = ParseTfOpFullname(event_name);
+  if (IsInfeedEnqueueOp(tf_op) || IsMemcpyHToDOp(tf_op)) {
     return HOST_TO_DEVICE;
-  } else if (absl::StartsWithIgnoreCase(event_name, "MEMCPYHtoH")) {
+  } else if (IsMemcpyHToHOp(tf_op)) {
     return HOST_TO_HOST;
   } else if (has_device && (has_correlation_id ||
                             absl::StartsWithIgnoreCase(
@@ -226,7 +228,6 @@ StepEvents ConvertDeviceTraceXLineToStepEvents(const uint64 device_id,
       switch (event_type) {
         case DEVICE_COLLECTIVES: {
           AllReduceInfo collective_ops;
-          collective_ops.set_name(string(event.Name()));
           collective_ops.set_start_time_ps(event.TimestampPs());
           collective_ops.set_end_time_ps(event.EndOffsetPs());
           // TODO(jiesun): figure out how to get size info etc.

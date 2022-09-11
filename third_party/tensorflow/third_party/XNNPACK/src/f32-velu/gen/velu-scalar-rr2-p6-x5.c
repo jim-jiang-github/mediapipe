@@ -11,9 +11,8 @@
 #include <math.h>
 
 #include <xnnpack/common.h>
+#include <xnnpack/math.h>
 #include <xnnpack/vunary.h>
-
-#include <fp16/bitcasts.h>
 
 
 void xnn_f32_velu_ukernel__scalar_rr2_p6_x5(
@@ -24,21 +23,20 @@ void xnn_f32_velu_ukernel__scalar_rr2_p6_x5(
 {
   assert(n % sizeof(float) == 0);
 
-  const float vprescale = params->scalar.prescale;
-  const float valpha = params->scalar.alpha;
-  const float vbeta = params->scalar.beta;
-
-  const float vmagic_bias = 0x1.8000FEp23f;
-  const float vlog2e = 0x1.715476p+0f;
-  const float vsat_cutoff = -0x1.154246p+4f;
-  const float vminus_ln2_hi = -0x1.62E440p-1f;
-  const float vminus_ln2_lo = 0x1.0105C6p-21f;
-  const float vc6 = 0x1.6b7338p-10f;
-  const float vc5 = 0x1.12278Ep-7f;
-  const float vc4 = 0x1.555716p-5f;
-  const float vc3 = 0x1.5554B0p-3f;
-  const float vc2 = 0x1.FFFFFEp-2f;
-  const float vone = 1.0f;
+  const float vprescale = params->scalar_rr2_p6.prescale;
+  const float valpha = params->scalar_rr2_p6.alpha;
+  const float vbeta = params->scalar_rr2_p6.beta;
+  const float vmagic_bias = params->scalar_rr2_p6.magic_bias;
+  const float vlog2e = params->scalar_rr2_p6.log2e;
+  const float vsat_cutoff = params->scalar_rr2_p6.sat_cutoff;
+  const float vminus_ln2_hi = params->scalar_rr2_p6.minus_ln2_hi;
+  const float vminus_ln2_lo = params->scalar_rr2_p6.minus_ln2_lo;
+  const float vc6 = params->scalar_rr2_p6.c6;
+  const float vc5 = params->scalar_rr2_p6.c5;
+  const float vc4 = params->scalar_rr2_p6.c4;
+  const float vc3 = params->scalar_rr2_p6.c3;
+  const float vc2 = params->scalar_rr2_p6.c2;
+  const float vone = params->scalar_rr2_p6.one;
 
   for (; n >= 5 * sizeof(float); n -= 5 * sizeof(float)) {
     float vx0 = x[0];
@@ -60,15 +58,15 @@ void xnn_f32_velu_ukernel__scalar_rr2_p6_x5(
     float vn3 = vz3 * vlog2e + vmagic_bias;
     float vn4 = vz4 * vlog2e + vmagic_bias;
 
-    float vs0 = fp32_from_bits(fp32_to_bits(vn0) << 23);
+    float vs0 = uint32_as_float(float_as_uint32(vn0) << 23);
     vn0 -= vmagic_bias;
-    float vs1 = fp32_from_bits(fp32_to_bits(vn1) << 23);
+    float vs1 = uint32_as_float(float_as_uint32(vn1) << 23);
     vn1 -= vmagic_bias;
-    float vs2 = fp32_from_bits(fp32_to_bits(vn2) << 23);
+    float vs2 = uint32_as_float(float_as_uint32(vn2) << 23);
     vn2 -= vmagic_bias;
-    float vs3 = fp32_from_bits(fp32_to_bits(vn3) << 23);
+    float vs3 = uint32_as_float(float_as_uint32(vn3) << 23);
     vn3 -= vmagic_bias;
-    float vs4 = fp32_from_bits(fp32_to_bits(vn4) << 23);
+    float vs4 = uint32_as_float(float_as_uint32(vn4) << 23);
     vn4 -= vmagic_bias;
 
     float vt0 = vn0 * vminus_ln2_hi + vz0;
@@ -192,7 +190,7 @@ void xnn_f32_velu_ukernel__scalar_rr2_p6_x5(
       const float vz = vx * vprescale;
 
       float vn = vz * vlog2e + vmagic_bias;
-      float vs = fp32_from_bits(fp32_to_bits(vn) << 23);
+      float vs = uint32_as_float(float_as_uint32(vn) << 23);
       vn -= vmagic_bias;
 
       float vt = vn * vminus_ln2_hi + vz;

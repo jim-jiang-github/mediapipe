@@ -90,15 +90,14 @@ const char descriptor_table_protodef_mediapipe_2fcalculators_2fcore_2fsplit_5fve
   "apipe.Range\022\033\n\014element_only\030\002 \001(\010:\005false"
   "\022\036\n\017combine_outputs\030\003 \001(\010:\005false2U\n\003ext\022"
   "\034.mediapipe.CalculatorOptions\030\216\355\332{ \001(\0132\'"
-  ".mediapipe.SplitVectorCalculatorOptionsB"
-  "\014\242\002\tMediaPipe"
+  ".mediapipe.SplitVectorCalculatorOptions"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fcalculators_2fcore_2fsplit_5fvector_5fcalculator_2eproto_deps[1] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fcalculators_2fcore_2fsplit_5fvector_5fcalculator_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fcalculators_2fcore_2fsplit_5fvector_5fcalculator_2eproto = {
-  false, false, 373, descriptor_table_protodef_mediapipe_2fcalculators_2fcore_2fsplit_5fvector_5fcalculator_2eproto, "mediapipe/calculators/core/split_vector_calculator.proto", 
+  false, false, 359, descriptor_table_protodef_mediapipe_2fcalculators_2fcore_2fsplit_5fvector_5fcalculator_2eproto, "mediapipe/calculators/core/split_vector_calculator.proto", 
   &descriptor_table_mediapipe_2fcalculators_2fcore_2fsplit_5fvector_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2fcore_2fsplit_5fvector_5fcalculator_2eproto_deps, 1, 2,
   schemas, file_default_instances, TableStruct_mediapipe_2fcalculators_2fcore_2fsplit_5fvector_5fcalculator_2eproto::offsets,
   file_level_metadata_mediapipe_2fcalculators_2fcore_2fsplit_5fvector_5fcalculator_2eproto, file_level_enum_descriptors_mediapipe_2fcalculators_2fcore_2fsplit_5fvector_5fcalculator_2eproto, file_level_service_descriptors_mediapipe_2fcalculators_2fcore_2fsplit_5fvector_5fcalculator_2eproto,

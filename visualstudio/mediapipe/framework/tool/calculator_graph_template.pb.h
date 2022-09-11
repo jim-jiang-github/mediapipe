@@ -32,6 +32,7 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
 #include "mediapipe/framework/calculator.pb.h"
+#include "mediapipe/framework/calculator_options.pb.h"
 #include "mediapipe/framework/deps/proto_descriptor.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>

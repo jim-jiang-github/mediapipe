@@ -19,23 +19,20 @@ limitations under the License.
 
 #include <algorithm>
 #include <functional>
+#include <numeric>
 #include <random>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
+#include "absl/hash/hash.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
-#include "tensorflow/compiler/xla/protobuf_util.h"
 #include "tensorflow/compiler/xla/shape_util.h"
 #include "tensorflow/compiler/xla/status_macros.h"
 #include "tensorflow/compiler/xla/types.h"
 #include "tensorflow/compiler/xla/util.h"
 #include "tensorflow/core/lib/core/errors.h"
-#include "tensorflow/core/lib/hash/hash.h"
-#include "tensorflow/core/lib/strings/numbers.h"
 #include "tensorflow/core/platform/logging.h"
-#include "tensorflow/core/platform/protobuf.h"
 
 namespace xla {
 namespace {
@@ -56,7 +53,7 @@ void SetDefaultLayoutToContainer(T* minor_to_major) {
 }  // namespace
 
 /* static */ Layout LayoutUtil::MakeLayout(
-    absl::Span<const int64> minor_to_major, absl::Span<const Tile> tiles,
+    absl::Span<const int64_t> minor_to_major, absl::Span<const Tile> tiles,
     int64_t element_size_in_bits, int64_t memory_space) {
   Layout layout;
   layout.set_format(DENSE);
@@ -66,9 +63,10 @@ void SetDefaultLayoutToContainer(T* minor_to_major) {
   for (const Tile& tile : tiles) {
     for (int64_t dim : tile.dimensions()) {
       if (dim < 0 && dim != Tile::kCombineDimension) {
-        LOG(FATAL) << "Tile dimension size needs to be minimum int64 value if "
-                      "it's negative. Value is "
-                   << dim;
+        LOG(FATAL)
+            << "Tile dimension size needs to be minimum int64_t value if "
+               "it's negative. Value is "
+            << dim;
       }
     }
     *layout.add_tiles() = tile;
@@ -79,19 +77,19 @@ void SetDefaultLayoutToContainer(T* minor_to_major) {
 }
 
 /* static */ Layout LayoutUtil::MakeDescendingLayout(int64_t rank) {
-  std::vector<int64> layout(rank);
-  std::iota(layout.rbegin(), layout.rend(), static_cast<int64>(0));
+  std::vector<int64_t> layout(rank);
+  std::iota(layout.rbegin(), layout.rend(), static_cast<int64_t>(0));
   return MakeLayout(layout);
 }
 
 /* static */ Layout LayoutUtil::MakeAscendingLayout(int64_t rank) {
-  std::vector<int64> layout(rank);
-  std::iota(layout.begin(), layout.end(), static_cast<int64>(0));
+  std::vector<int64_t> layout(rank);
+  std::iota(layout.begin(), layout.end(), static_cast<int64_t>(0));
   return MakeLayout(layout);
 }
 
 /* static */ Layout LayoutUtil::MakeLayoutFromMajorToMinor(
-    absl::Span<const int64> major_to_minor) {
+    absl::Span<const int64_t> major_to_minor) {
   Layout layout;
   layout.set_format(DENSE);
   for (int i = major_to_minor.size() - 1; i >= 0; i--) {
@@ -183,11 +181,11 @@ Layout CreateDefaultLayoutForRank(int64_t rank) {
       TF_RETURN_IF_ERROR(
           ValidateLayoutInShape(element_shape, allow_missing_layouts));
     }
-    return Status::OK();
+    return OkStatus();
   } else if (shape.IsArray()) {
     if (!shape.has_layout()) {
       if (allow_missing_layouts) {
-        return Status::OK();
+        return OkStatus();
       }
       return InvalidArgument("shape %s does not have a layout",
                              ShapeUtil::HumanString(shape));
@@ -200,7 +198,7 @@ Layout CreateDefaultLayoutForRank(int64_t rank) {
           "shape of primitive type %s should not have a layout",
           PrimitiveType_Name(shape.element_type()));
     }
-    return Status::OK();
+    return OkStatus();
   }
 }
 
@@ -216,7 +214,7 @@ Layout CreateDefaultLayoutForRank(int64_t rank) {
           "shape of primitive type %s should not have a non-trivial layout",
           PrimitiveType_Name(shape.element_type()));
     }
-    return Status::OK();
+    return OkStatus();
   }
 
   if (layout.format() == INVALID_FORMAT || !Format_IsValid(layout.format())) {
@@ -255,7 +253,7 @@ Layout CreateDefaultLayoutForRank(int64_t rank) {
     }
   }
 
-  return Status::OK();
+  return OkStatus();
 }
 
 /* static */ void LayoutUtil::ClearLayout(Shape* shape) {
@@ -289,7 +287,7 @@ Layout CreateDefaultLayoutForRank(int64_t rank) {
 /* static */ bool LayoutUtil::IsMonotonicWithDim0Major(const Layout& layout) {
   CHECK(layout.format() == DENSE);
   return std::is_sorted(layout.minor_to_major().begin(),
-                        layout.minor_to_major().end(), std::greater<int64>());
+                        layout.minor_to_major().end(), std::greater<int64_t>());
 }
 
 /* static */ bool LayoutUtil::HasLayout(const Shape& shape) {
@@ -317,37 +315,37 @@ Layout CreateDefaultLayoutForRank(int64_t rank) {
   return lhs == rhs;
 }
 
-/* static */ absl::Span<const int64> LayoutUtil::MinorToMajor(
+/* static */ absl::Span<const int64_t> LayoutUtil::MinorToMajor(
     const Shape& shape) {
   CHECK(IsDenseArray(shape));
-  return AsInt64Slice(shape.layout().minor_to_major());
+  return shape.layout().minor_to_major();
 }
 
-/* static */ absl::Span<const int64> LayoutUtil::MinorToMajor(
+/* static */ absl::Span<const int64_t> LayoutUtil::MinorToMajor(
     const Layout& layout) {
   CHECK(layout.format() == DENSE);
-  return AsInt64Slice(layout.minor_to_major());
+  return layout.minor_to_major();
 }
 
-/* static */ int64 LayoutUtil::Major(const Layout& layout,
-                                     int64_t physical_dimension_number) {
+/* static */ int64_t LayoutUtil::Major(const Layout& layout,
+                                       int64_t physical_dimension_number) {
   CHECK_LE(0, physical_dimension_number);
   CHECK_LT(physical_dimension_number, layout.minor_to_major_size());
   return Minor(layout,
                layout.minor_to_major_size() - 1 - physical_dimension_number);
 }
 
-/* static */ int64 LayoutUtil::Minor(const Layout& layout,
-                                     int64_t physical_dimension_number) {
+/* static */ int64_t LayoutUtil::Minor(const Layout& layout,
+                                       int64_t physical_dimension_number) {
   CHECK_EQ(layout.format(), DENSE);
   CHECK_LE(0, physical_dimension_number);
   CHECK_LT(physical_dimension_number, layout.minor_to_major_size());
   return layout.minor_to_major(physical_dimension_number);
 }
 
-/* static */ std::vector<int64> LayoutUtil::MakeLogicalToPhysical(
+/* static */ std::vector<int64_t> LayoutUtil::MakeLogicalToPhysical(
     const Layout& layout) {
-  std::vector<int64> logical_to_physical(layout.minor_to_major_size());
+  std::vector<int64_t> logical_to_physical(layout.minor_to_major_size());
   for (int64_t physical = 0, end = logical_to_physical.size(); physical < end;
        ++physical) {
     const int64_t logical = Major(layout, physical);
@@ -356,7 +354,7 @@ Layout CreateDefaultLayoutForRank(int64_t rank) {
   return logical_to_physical;
 }
 
-/* static */ string LayoutUtil::HumanString(const Layout& layout) {
+/* static */ std::string LayoutUtil::HumanString(const Layout& layout) {
   return layout.ToString();
 }
 
@@ -390,7 +388,7 @@ Status CopyLayoutInternal(const Shape& src, Shape* dst) {
       dst->clear_layout();
     }
   }
-  return Status::OK();
+  return OkStatus();
 }
 
 }  // namespace
@@ -423,9 +421,9 @@ Status LayoutUtil::CopyLayoutBetweenShapes(const Shape& src, Shape* dst) {
 }
 
 /* static */ bool LayoutUtil::AreDimensionsConsecutive(
-    const Layout& layout, absl::Span<const int64> dims) {
+    const Layout& layout, absl::Span<const int64_t> dims) {
   CHECK(IsDense(layout));
-  std::vector<int64> positions_in_layout;
+  absl::InlinedVector<int64_t, 8> positions_in_layout;
   for (int64_t dim : dims) {
     positions_in_layout.push_back(
         PositionInContainer(layout.minor_to_major(), dim));
@@ -453,24 +451,52 @@ Status LayoutUtil::CopyLayoutBetweenShapes(const Shape& src, Shape* dst) {
   return ret;
 }
 
-/*static*/ size_t LayoutUtil::Hash(const Layout& layout) {
-  using tensorflow::hash;
-  using tensorflow::Hash64Combine;
+/*static*/ int64_t LayoutUtil::LinearIndex(const Shape& shape,
+                                           absl::Span<const int64_t> indices) {
+  CHECK(shape.IsArray());
+  CHECK(shape.has_layout());
+  const int rank = shape.rank();
+  CHECK_EQ(rank, indices.size());
 
-  size_t hash_value = hash<Format>()(layout.format());
-
-  for (int64_t minor_to_major : layout.minor_to_major()) {
-    hash_value = Hash64Combine(hash_value, hash<int64>()(minor_to_major));
+  if (rank == 0) {
+    return 0;
   }
-  for (const Tile& tile : layout.tiles()) {
-    for (int64_t tile_dim : tile.dimensions()) {
-      hash_value = Hash64Combine(hash_value, hash<int64>()(tile_dim));
+  if (rank == 1) {
+    return indices[0];
+  }
+
+  Tile tile = {};
+  if (!shape.layout().tiles().empty()) {
+    tile = shape.layout().tiles()[0];
+  }
+
+  int64_t linear_index = 0;
+  int64_t tile_multiplier = 1;
+  // Initialize to number of elements in a tile.
+  for (int64_t i : tile.dimensions()) {
+    tile_multiplier *= i;
+  }
+  int64_t within_tile_multiplier = 1;
+
+  // We only look at the top-level tile.
+  for (int64_t minor = 0; minor < rank; minor++) {
+    int64_t logical_dim = Minor(shape.layout(), minor);
+    int64_t shape_dim_size = shape.dimensions(logical_dim);
+    int64_t index = indices[logical_dim];
+
+    if (minor < tile.dimensions().size()) {
+      int64_t tile_dim_size =
+          tile.dimensions()[tile.dimensions().size() - 1 - minor];
+      linear_index += tile_multiplier * (index / tile_dim_size) +
+                      within_tile_multiplier * (index % tile_dim_size);
+      tile_multiplier *= CeilOfRatio(shape_dim_size, tile_dim_size);
+      within_tile_multiplier *= tile_dim_size;
+    } else {
+      linear_index += index * tile_multiplier;
+      tile_multiplier *= shape_dim_size;
     }
   }
-  hash_value = Hash64Combine(hash_value, layout.element_size_in_bits());
-  hash_value = Hash64Combine(hash_value, layout.memory_space());
-
-  return hash_value;
+  return linear_index;
 }
 
 }  // namespace xla

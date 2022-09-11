@@ -13,10 +13,6 @@
 # limitations under the License.
 # ==============================================================================
 """Tests for `tf.data.Dataset.interleave()`."""
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import multiprocessing
 import os
 
@@ -60,12 +56,18 @@ def _interleave(lists, cycle_length, block_length, num_parallel_calls=None):
   open_iterators = []
   if cycle_length is None:
     # The logic here needs to match interleave C++ kernels.
+    cpu_count = multiprocessing.cpu_count()
+    if hasattr(os, "sched_getaffinity"):
+      try:
+        cpu_count = len(os.sched_getaffinity(0))
+      except NotImplementedError:
+        pass
     if num_parallel_calls is None:
-      cycle_length = multiprocessing.cpu_count()
+      cycle_length = cpu_count
     elif num_parallel_calls == dataset_ops.AUTOTUNE:
-      cycle_length = (multiprocessing.cpu_count() + 2) // 3
+      cycle_length = (cpu_count + 2) // 3
     else:
-      cycle_length = min(num_parallel_calls, multiprocessing.cpu_count())
+      cycle_length = min(num_parallel_calls, cpu_count)
 
   for i in range(cycle_length):
     if all_iterators:
@@ -285,7 +287,7 @@ class InterleaveTest(test_base.DatasetTestBase, parameterized.TestCase):
             lambda x: dataset_ops.Dataset.from_tensors(x).repeat(x),
             cycle_length, block_length, num_parallel_calls)
     options = options_lib.Options()
-    options.experimental_deterministic = False
+    options.deterministic = False
     dataset = dataset.with_options(options)
     expected_output = [
         element for element in _interleave(
@@ -351,11 +353,36 @@ class InterleaveTest(test_base.DatasetTestBase, parameterized.TestCase):
           num_parallel_calls=10,
           deterministic=local_determinism)
       opts = options_lib.Options()
-      opts.experimental_deterministic = global_determinism
+      opts.deterministic = global_determinism
       dataset = dataset.with_options(opts)
       return dataset
 
     self.checkDeterminism(dataset_fn, expect_determinism, elements)
+
+  @combinations.generate(
+      combinations.times(test_base.default_test_combinations(),
+                         combinations.combine(num_parallel_calls=[None, 1])))
+  def testName(self, num_parallel_calls):
+
+    def fn(x):
+      return dataset_ops.Dataset.from_tensors(x)
+
+    dataset = dataset_ops.Dataset.from_tensors(42).interleave(
+        fn, num_parallel_calls=num_parallel_calls, name="interleave")
+    self.assertDatasetProduces(dataset, [42])
+
+  @combinations.generate(
+      combinations.times(test_base.default_test_combinations(),
+                         combinations.combine(num_parallel_calls=[None, 1])))
+  def testMapFuncMustReturnDataset(self, num_parallel_calls):
+
+    def map_fn(x):
+      return [x]
+
+    with self.assertRaisesRegex(
+        TypeError, "The `map_func` argument must return a `Dataset` object."):
+      dataset_ops.Dataset.from_tensors(42).interleave(
+          map_fn, num_parallel_calls=num_parallel_calls)
 
 
 class InterleaveDatasetCheckpointTest(checkpoint_test_base.CheckpointTestBase,

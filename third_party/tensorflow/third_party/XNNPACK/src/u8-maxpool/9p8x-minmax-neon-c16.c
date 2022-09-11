@@ -13,7 +13,7 @@
 #include <xnnpack/maxpool.h>
 
 
-XNN_DISABLE_TSAN void xnn_u8_maxpool_minmax_ukernel_9p8x__neon_c16(
+void xnn_u8_maxpool_minmax_ukernel_9p8x__neon_c16(
     size_t output_pixels,
     size_t kernel_elements,
     size_t channels,
@@ -22,14 +22,14 @@ XNN_DISABLE_TSAN void xnn_u8_maxpool_minmax_ukernel_9p8x__neon_c16(
     uint8_t* output,
     size_t input_increment,
     size_t output_increment,
-    const union xnn_u8_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN
+    const union xnn_u8_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
   assert(output_pixels != 0);
   assert(kernel_elements != 0);
   assert(channels != 0);
 
-  const uint8x16_t voutput_max = vld1q_dup_u8(&params->scalar.max);
-  const uint8x16_t voutput_min = vld1q_dup_u8(&params->scalar.min);
+  const uint8x16_t voutput_max = vld1q_dup_u8(&params->neon.max);
+  const uint8x16_t voutput_min = vld1q_dup_u8(&params->neon.min);
   do {
     uint8_t* o = output;
     {
@@ -127,11 +127,11 @@ XNN_DISABLE_TSAN void xnn_u8_maxpool_minmax_ukernel_9p8x__neon_c16(
           vout_lo = vget_high_u8(vout);
         }
         if (c & 4) {
-          vst1_lane_u32(__builtin_assume_aligned(o, 1), vreinterpret_u32_u8(vout_lo), 0); o += 4;
+          vst1_lane_u32((void*) o, vreinterpret_u32_u8(vout_lo), 0); o += 4;
           vout_lo = vext_u8(vout_lo, vout_lo, 4);
         }
         if (c & 2) {
-          vst1_lane_u16(__builtin_assume_aligned(o, 1), vreinterpret_u16_u8(vout_lo), 0); o += 2;
+          vst1_lane_u16((void*) o, vreinterpret_u16_u8(vout_lo), 0); o += 2;
           vout_lo = vext_u8(vout_lo, vout_lo, 2);
         }
         if (c & 1) {
@@ -231,11 +231,11 @@ XNN_DISABLE_TSAN void xnn_u8_maxpool_minmax_ukernel_9p8x__neon_c16(
           vout_lo = vget_high_u8(vout);
         }
         if (c & 4) {
-          vst1_lane_u32(__builtin_assume_aligned(o, 1), vreinterpret_u32_u8(vout_lo), 0); o += 4;
+          vst1_lane_u32((void*) o, vreinterpret_u32_u8(vout_lo), 0); o += 4;
           vout_lo = vext_u8(vout_lo, vout_lo, 4);
         }
         if (c & 2) {
-          vst1_lane_u16(__builtin_assume_aligned(o, 1), vreinterpret_u16_u8(vout_lo), 0); o += 2;
+          vst1_lane_u16((void*) o, vreinterpret_u16_u8(vout_lo), 0); o += 2;
           vout_lo = vext_u8(vout_lo, vout_lo, 2);
         }
         if (c & 1) {

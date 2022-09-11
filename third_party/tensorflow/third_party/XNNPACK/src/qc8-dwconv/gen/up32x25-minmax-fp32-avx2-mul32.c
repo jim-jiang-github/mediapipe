@@ -12,6 +12,7 @@
 #include <immintrin.h>
 
 #include <xnnpack/dwconv.h>
+#include <xnnpack/unaligned.h>
 
 
 void xnn_qc8_dwconv_minmax_fp32_ukernel_up32x25__avx2_mul32(
@@ -24,7 +25,7 @@ void xnn_qc8_dwconv_minmax_fp32_ukernel_up32x25__avx2_mul32(
     size_t output_increment,
     size_t input_offset,
     const int8_t* zero,
-    const union xnn_qs8_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN XNN_DISABLE_MSAN
+    const union xnn_qs8_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
   assert(channels != 0);
   assert(output_width != 0);
@@ -558,6 +559,12 @@ void xnn_qc8_dwconv_minmax_fp32_ukernel_up32x25__avx2_mul32(
       vscaledGHIJKLMN = _mm256_mul_ps(vscaledGHIJKLMN, vscaleGHIJKLMN);
       vscaledOPQRSTUV = _mm256_mul_ps(vscaledOPQRSTUV, vscaleOPQRSTUV);
 
+      const __m256 voutput_max_less_zero_point = _mm256_load_ps(params->avx2.output_max_less_zero_point);
+      vscaled01234567 = _mm256_min_ps(vscaled01234567, voutput_max_less_zero_point);
+      vscaled89ABCDEF = _mm256_min_ps(vscaled89ABCDEF, voutput_max_less_zero_point);
+      vscaledGHIJKLMN = _mm256_min_ps(vscaledGHIJKLMN, voutput_max_less_zero_point);
+      vscaledOPQRSTUV = _mm256_min_ps(vscaledOPQRSTUV, voutput_max_less_zero_point);
+
       vacc01234567 = _mm256_cvtps_epi32(vscaled01234567);
       vacc89ABCDEF = _mm256_cvtps_epi32(vscaled89ABCDEF);
       vaccGHIJKLMN = _mm256_cvtps_epi32(vscaledGHIJKLMN);
@@ -573,10 +580,6 @@ void xnn_qc8_dwconv_minmax_fp32_ukernel_up32x25__avx2_mul32(
       const __m128i voutput_min = _mm_load_si128((const __m128i*) params->avx2.output_min);
       vout0123456789ABCDEF = _mm_max_epi8(vout0123456789ABCDEF, voutput_min);
       voutGHIJKLMNOPQRSTUV = _mm_max_epi8(voutGHIJKLMNOPQRSTUV, voutput_min);
-
-      const __m128i voutput_max = _mm_load_si128((const __m128i*) params->avx2.output_max);
-      vout0123456789ABCDEF = _mm_min_epi8(vout0123456789ABCDEF, voutput_max);
-      voutGHIJKLMNOPQRSTUV = _mm_min_epi8(voutGHIJKLMNOPQRSTUV, voutput_max);
 
       _mm_storeu_si128((__m128i*) output, vout0123456789ABCDEF);
       _mm_storeu_si128((__m128i*) (output + 16), voutGHIJKLMNOPQRSTUV);
@@ -743,6 +746,7 @@ void xnn_qc8_dwconv_minmax_fp32_ukernel_up32x25__avx2_mul32(
         __m256 vscaled01234567 = _mm256_cvtepi32_ps(vacc01234567);
         const __m256 vscale01234567 = _mm256_loadu_ps((const float*) ((uintptr_t) w + 32 * sizeof(int32_t) + 800 * sizeof(int8_t)));
         vscaled01234567 = _mm256_mul_ps(vscaled01234567, vscale01234567);
+        vscaled01234567 = _mm256_min_ps(vscaled01234567, _mm256_load_ps(params->avx2.output_max_less_zero_point));
         vacc01234567 = _mm256_cvtps_epi32(vscaled01234567);
 
         w = (const void*) ((const int32_t*) w + 8);
@@ -751,9 +755,6 @@ void xnn_qc8_dwconv_minmax_fp32_ukernel_up32x25__avx2_mul32(
         __m128i vout01234567 = _mm_adds_epi16(_mm_packs_epi32(_mm256_castsi256_si128(vacc01234567), _mm256_extracti128_si256(vacc01234567, 1)), voutput_zero_point);
 
         __m128i vout0123456701234567 = _mm_packs_epi16(vout01234567, vout01234567);
-
-        const __m128i voutput_max = _mm_load_si128((const __m128i*) params->avx2.output_max);
-        vout0123456701234567 = _mm_min_epi8(vout0123456701234567, voutput_max);
 
         const __m128i voutput_min = _mm_load_si128((const __m128i*) params->avx2.output_min);
         vout0123456701234567 = _mm_max_epi8(vout0123456701234567, voutput_min);
@@ -764,12 +765,12 @@ void xnn_qc8_dwconv_minmax_fp32_ukernel_up32x25__avx2_mul32(
           c -= 8;
         } else {
           if (c & 4) {
-            *((uint32_t*) output) = (uint32_t) _mm_cvtsi128_si32(vout0123456701234567);
+            unaligned_store_u32(output, (uint32_t) _mm_cvtsi128_si32(vout0123456701234567));
             vout0123456701234567 = _mm_srli_epi64(vout0123456701234567, 32);
             output += 4;
           }
           if (c & 2) {
-            *((uint16_t*) output) = (uint16_t) _mm_extract_epi16(vout0123456701234567, 0);
+            unaligned_store_u16(output, (uint16_t) _mm_extract_epi16(vout0123456701234567, 0));
             vout0123456701234567 = _mm_srli_epi32(vout0123456701234567, 16);
             output += 2;
           }

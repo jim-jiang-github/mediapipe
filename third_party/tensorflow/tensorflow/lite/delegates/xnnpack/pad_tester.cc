@@ -15,6 +15,7 @@ limitations under the License.
 
 #include "tensorflow/lite/delegates/xnnpack/pad_tester.h"
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <functional>
@@ -130,7 +131,7 @@ std::vector<char> PadTester::CreateTfLiteModel() const {
       CreateBuffer(builder,
                    builder.CreateVector(
                        reinterpret_cast<const uint8_t*>(paddings.data()),
-                       sizeof(float) * paddings.size())),
+                       sizeof(int32_t) * paddings.size())),
   }};
 
   const std::vector<int32_t> output_shape = OutputShape();

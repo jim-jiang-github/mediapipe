@@ -108,13 +108,13 @@ const char descriptor_table_protodef_mediapipe_2fframework_2fformats_2fclassific
   "tionList\0221\n\016classification\030\001 \003(\0132\031.media"
   "pipe.Classification\"Z\n\034ClassificationLis"
   "tCollection\022:\n\023classification_list\030\001 \003(\013"
-  "2\035.mediapipe.ClassificationListBE\n\"com.g"
+  "2\035.mediapipe.ClassificationListB9\n\"com.g"
   "oogle.mediapipe.formats.protoB\023Classific"
-  "ationProto\242\002\tMediaPipe"
+  "ationProto"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fframework_2fformats_2fclassification_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fframework_2fformats_2fclassification_2eproto = {
-  false, false, 382, descriptor_table_protodef_mediapipe_2fframework_2fformats_2fclassification_2eproto, "mediapipe/framework/formats/classification.proto", 
+  false, false, 370, descriptor_table_protodef_mediapipe_2fframework_2fformats_2fclassification_2eproto, "mediapipe/framework/formats/classification.proto", 
   &descriptor_table_mediapipe_2fframework_2fformats_2fclassification_2eproto_once, nullptr, 0, 3,
   schemas, file_default_instances, TableStruct_mediapipe_2fframework_2fformats_2fclassification_2eproto::offsets,
   file_level_metadata_mediapipe_2fframework_2fformats_2fclassification_2eproto, file_level_enum_descriptors_mediapipe_2fframework_2fformats_2fclassification_2eproto, file_level_service_descriptors_mediapipe_2fframework_2fformats_2fclassification_2eproto,

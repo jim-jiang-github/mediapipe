@@ -6,6 +6,7 @@
 #pragma once
 
 #include <xnnpack/common.h>
+#include <xnnpack/unaligned.h>
 
 
 #if defined(__SSE2__)
@@ -19,13 +20,13 @@
     (defined(__INTEL_COMPILER) && (__INTEL_COMPILER < 1600))
 
 static XNN_INTRINSIC
-__m128i _mm_loadu_si32(const void* address) {
-  return _mm_cvtsi32_si128(*((const int*) address));
+void _mm_storeu_si32(void* address, __m128i v) {
+  unaligned_store_u32(address, (uint32_t) _mm_cvtsi128_si32(v));
 }
 
 static XNN_INTRINSIC
-void _mm_storeu_si32(const void* address, __m128i v) {
-  *((int*) address) = _mm_cvtsi128_si32(v);
+void _mm_storeu_si16(void* address, __m128i v) {
+  unaligned_store_u16(address, (uint16_t) _mm_extract_epi16(v, 0));
 }
 #endif  // GCC pre-11, Clang pre-8, Android NDK Clang pre-8.0.7, Apple Clang pre-11, and ICC pre-16
 #endif  // SSE2
@@ -131,6 +132,17 @@ __m512i _mm512_set_epi8(
 
 #endif  // __AVX512F__
 
+#if XNN_ARCH_ARM
+
+// AArch32 GCC 10+ implements arm_acle.h header, but lacks __ror intrinsic
+#if defined(__GNUC__) && !defined(__clang__)
+static XNN_INTRINSIC uint32_t __ror(uint32_t x, uint32_t y) {
+   return (x >> y) | (x << (32 - y));
+}
+#endif  // AArch32 GCC
+
+#endif  // ARM
+
 #if XNN_ARCH_ARM && (defined(__ARM_NEON) || defined(__ARM_NEON__))
 #include <arm_neon.h>
 
@@ -138,8 +150,6 @@ __m512i _mm512_set_epi8(
 // - https://gcc.gnu.org/bugzilla/show_bug.cgi?id=71233
 // - https://gcc.gnu.org/bugzilla/show_bug.cgi?id=95399
 #if defined(__GNUC__) && !defined(__clang__) && (__ARM_ARCH >= 8)
-#include <arm_neon.h>
-
 static XNN_INTRINSIC
 int32x4_t vcvtnq_s32_f32(float32x4_t v) {
   return vcvtq_s32_f32(vrndnq_f32(v));
@@ -148,3 +158,21 @@ int32x4_t vcvtnq_s32_f32(float32x4_t v) {
 
 #endif  // ARM NEON
 
+#if XNN_ARCH_ARM64
+#include <arm_neon.h>
+
+// AArch64 GCC pre-8, 8.1-8.4, 9.1-9.3
+#if defined(__GNUC__) && !defined(__clang__) && \
+  (__GNUC__ < 8 || __GNUC__ == 8 && __GNUC_MINOR__ < 5 || __GNUC__ == 9 && __GNUC_MINOR__ < 4)
+static XNN_INTRINSIC
+uint8x16x4_t vld1q_u8_x4(const uint8_t* address) {
+  uint8x16x4_t result;
+  result.val[0] = vld1q_u8(address);
+  result.val[1] = vld1q_u8(address + 16);
+  result.val[2] = vld1q_u8(address + 32);
+  result.val[3] = vld1q_u8(address + 48);
+  return result;
+}
+#endif  // AArch64 GCC pre-8, 8.1-8.4, 9.1-9.3
+
+#endif  // ARM64 NEON

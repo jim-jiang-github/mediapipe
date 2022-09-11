@@ -181,7 +181,33 @@ absl::Status RunMPPGraph() {
 
 int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
-  absl::ParseCommandLine(argc, argv);
+
+  // workaround tflite model path
+  {
+    std::vector<char*> argvv(argc);
+    bool find_resource_root = false;
+    for (int i=0; i<argc; ++i) {
+      argvv[i] = argv[i];
+      if (!find_resource_root) {
+        char* c = argv[i];
+        if ('-'==*c) {
+          ++c;
+          if ('-'==*c) {
+            ++c;
+          }
+        }
+        find_resource_root = 0==memcpy(c, "resource_root_dir=", 18);
+      }
+    }
+
+    char resource_root_dir[128];
+    if (!find_resource_root) {
+      sprintf(resource_root_dir, "--resource_root_dir=%s", resource_root);
+      argvv.push_back(resource_root_dir);
+    }
+    absl::ParseCommandLine((int)argvv.size(), argvv.data());
+  }
+
   absl::Status run_status = RunMPPGraph();
   if (!run_status.ok()) {
     std::cout << "Failed to run the graph: " << run_status.message() << "\n";

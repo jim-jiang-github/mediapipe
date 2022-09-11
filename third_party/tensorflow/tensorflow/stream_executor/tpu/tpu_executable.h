@@ -42,14 +42,14 @@ class TpuExecutable : public xla::TpuExecutableInterface {
   // format).
   StatusOr<std::string> Serialize() const;
   static StatusOr<std::unique_ptr<TpuExecutable>> Deserialize(
-      absl::string_view serialized, std::unique_ptr<HloModule> hlo_module);
+      absl::string_view serialized);
 
  private:
   Status LoadProgramAndEnqueueToStream(
       const ServiceExecutableRunOptions& run_options,
       absl::Span<const stream_executor::DeviceMemoryBase> arguments,
       stream_executor::DeviceMemoryBase result,
-      absl::optional<stream_executor::DeviceMemoryBase>
+      std::optional<stream_executor::DeviceMemoryBase>
           cross_program_prefetch_addr) override {
     LOG(FATAL) << "LoadProgramAndEnqueueToStream unimplemented";
   }
@@ -58,7 +58,7 @@ class TpuExecutable : public xla::TpuExecutableInterface {
     LOG(FATAL) << "HostShapeToDeviceShape unimplemented";
   }
 
-  int64 ShapeSize(const Shape& shape) override {
+  int64_t ShapeSize(const Shape& shape) override {
     LOG(FATAL) << "ShapeSize unimplemented";
   }
 

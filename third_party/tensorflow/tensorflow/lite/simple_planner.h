@@ -90,6 +90,9 @@ class SimplePlanner : public MemoryPlanner {
   TfLiteStatus ReleaseNonPersistentMemory() override;
   TfLiteStatus AcquireNonPersistentMemory() override;
   bool HasNonPersistentMemory() override { return true; };
+  void DumpDebugInfo(const std::vector<int>& execution_plan) const override{};
+  void GetAllocInfo(size_t* arena_size,
+                    size_t* arena_persist_size) const override{};
 
  private:
   // Free all the all allocations.

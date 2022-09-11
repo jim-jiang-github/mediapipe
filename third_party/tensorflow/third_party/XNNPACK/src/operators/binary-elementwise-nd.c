@@ -15,7 +15,7 @@
 #include <xnnpack/allocator.h>
 #include <xnnpack/log.h>
 #include <xnnpack/operator.h>
-#include <xnnpack/params-init.h>
+#include <xnnpack/microparams-init.h>
 #include <xnnpack/params.h>
 
 
@@ -96,9 +96,11 @@ static enum xnn_status create_binary_elementwise_nd_f16(
     return xnn_status_invalid_parameter;
   }
 
-  struct xnn_f16_minmax_params params;
-  xnn_init_f16_minmax_params(
-    &params, fp16_ieee_from_fp32_value(output_min), fp16_ieee_from_fp32_value(output_max));
+  union xnn_f16_minmax_params params;
+  if (vbinary->init.f16_minmax != NULL) {
+    vbinary->init.f16_minmax(&params,
+      fp16_ieee_from_fp32_value(output_min), fp16_ieee_from_fp32_value(output_max));
+  }
   return create_binary_elementwise_nd(
     flags,
     &params,
@@ -151,7 +153,9 @@ static enum xnn_status create_binary_elementwise_nd_f32(
   }
 
   union xnn_f32_minmax_params params;
-  xnn_init_f32_minmax_params(&params, output_min, output_max);
+  if (vbinary->init.f32_minmax != NULL) {
+    vbinary->init.f32_minmax(&params, output_min, output_max);
+  }
   return create_binary_elementwise_nd(
     flags,
     &params,
@@ -219,15 +223,17 @@ enum xnn_status xnn_create_add_nd_qs8(
   }
 
   struct {
-    union xnn_qs8_add_minmax_params qs8_add;
-    union xnn_qs8_add_minmax_params qs8_radd;
+    union xnn_qs8_add_minmax_params qs8_addsub;
+    union xnn_qs8_add_minmax_params qs8_raddsub;
   } params;
-  xnn_params.qs8.vadd.init.qs8_add(
-    &params.qs8_add, input1_zero_point, input2_zero_point, output_zero_point,
-    input1_output_scale, input2_output_scale, output_min, output_max);
-  xnn_params.qs8.vadd.init.qs8_add(
-    &params.qs8_radd, input2_zero_point, input1_zero_point, output_zero_point,
-    input2_output_scale, input1_output_scale, output_min, output_max);
+  if (xnn_params.qs8.vadd.init.qs8_addsub != NULL) {
+    xnn_params.qs8.vadd.init.qs8_addsub(
+      &params.qs8_addsub, input1_zero_point, input2_zero_point, output_zero_point,
+      input1_output_scale, input2_output_scale, output_min, output_max);
+    xnn_params.qs8.vadd.init.qs8_addsub(
+      &params.qs8_raddsub, input2_zero_point, input1_zero_point, output_zero_point,
+      input2_output_scale, input1_output_scale, output_min, output_max);
+  }
   return create_binary_elementwise_nd(
     flags,
     &params,
@@ -295,15 +301,17 @@ enum xnn_status xnn_create_add_nd_qu8(
   }
 
   struct {
-    union xnn_qu8_add_minmax_params qu8_add;
-    union xnn_qu8_add_minmax_params qu8_radd;
+    union xnn_qu8_add_minmax_params qu8_addsub;
+    union xnn_qu8_add_minmax_params qu8_raddsub;
   } params;
-  xnn_params.qu8.vadd.init.qu8_add(
-    &params.qu8_add, input1_zero_point, input2_zero_point, output_zero_point,
-    input1_output_scale, input2_output_scale, output_min, output_max);
-  xnn_params.qu8.vadd.init.qu8_add(
-    &params.qu8_radd, input2_zero_point, input1_zero_point, output_zero_point,
-    input2_output_scale, input1_output_scale, output_min, output_max);
+  if (xnn_params.qu8.vadd.init.qu8_addsub != NULL) {
+    xnn_params.qu8.vadd.init.qu8_addsub(
+      &params.qu8_addsub, input1_zero_point, input2_zero_point, output_zero_point,
+      input1_output_scale, input2_output_scale, output_min, output_max);
+    xnn_params.qu8.vadd.init.qu8_addsub(
+      &params.qu8_raddsub, input2_zero_point, input1_zero_point, output_zero_point,
+      input2_output_scale, input1_output_scale, output_min, output_max);
+  }
   return create_binary_elementwise_nd(
     flags,
     &params,
@@ -344,6 +352,21 @@ enum xnn_status xnn_create_add_nd_f32(
     add_op_out);
 }
 
+enum xnn_status xnn_create_divide_nd_f16(
+    float output_min,
+    float output_max,
+    uint32_t flags,
+    xnn_operator_t* divide_op_out)
+{
+  return create_binary_elementwise_nd_f16(
+    output_min,
+    output_max,
+    flags,
+    xnn_operator_type_divide_nd_f16,
+    &xnn_params.f16.vdiv,
+    divide_op_out);
+}
+
 enum xnn_status xnn_create_divide_nd_f32(
     float output_min,
     float output_max,
@@ -359,28 +382,64 @@ enum xnn_status xnn_create_divide_nd_f32(
     divide_op_out);
 }
 
-enum xnn_status xnn_create_maximum_nd_f32(
+enum xnn_status xnn_create_maximum_nd_f16(
     uint32_t flags,
     xnn_operator_t* maximum_op_out)
 {
   return create_binary_elementwise_nd(
     flags,
-    NULL /* params */,
-    0 /* params size */,
+    NULL,
+    0,
+    XNN_INIT_FLAG_F16,
+    xnn_operator_type_maximum_nd_f16,
+    &xnn_params.f16.vmax.minmax,
+    maximum_op_out);
+}
+
+enum xnn_status xnn_create_maximum_nd_f32(
+    uint32_t flags,
+    xnn_operator_t* maximum_op_out)
+{
+  union xnn_f32_default_params params;
+  if (xnn_params.f32.vmin.init.f32_default != NULL) {
+    xnn_params.f32.vmin.init.f32_default(&params);
+  }
+  return create_binary_elementwise_nd(
+    flags,
+    &params,
+    sizeof(params),
     XNN_INIT_FLAG_F32,
     xnn_operator_type_maximum_nd_f32,
     &xnn_params.f32.vmax.minmax,
     maximum_op_out);
 }
 
-enum xnn_status xnn_create_minimum_nd_f32(
+enum xnn_status xnn_create_minimum_nd_f16(
     uint32_t flags,
     xnn_operator_t* minimum_op_out)
 {
   return create_binary_elementwise_nd(
     flags,
-    NULL /* params */,
-    0 /* params size */,
+    NULL,
+    0,
+    XNN_INIT_FLAG_F16,
+    xnn_operator_type_minimum_nd_f16,
+    &xnn_params.f16.vmin.minmax,
+    minimum_op_out);
+}
+
+enum xnn_status xnn_create_minimum_nd_f32(
+    uint32_t flags,
+    xnn_operator_t* minimum_op_out)
+{
+  union xnn_f32_default_params params;
+  if (xnn_params.f32.vmin.init.f32_default != NULL) {
+    xnn_params.f32.vmin.init.f32_default(&params);
+  }
+  return create_binary_elementwise_nd(
+    flags,
+    &params,
+    sizeof(params),
     XNN_INIT_FLAG_F32,
     xnn_operator_type_minimum_nd_f32,
     &xnn_params.f32.vmin.minmax,
@@ -417,18 +476,193 @@ enum xnn_status xnn_create_multiply_nd_f32(
     multiply_op_out);
 }
 
-enum xnn_status xnn_create_squared_difference_nd_f32(
+enum xnn_status xnn_create_multiply_nd_qs8(
+    int8_t input1_zero_point,
+    float input1_scale,
+    int8_t input2_zero_point,
+    float input2_scale,
+    int8_t output_zero_point,
+    float output_scale,
+    int8_t output_min,
+    int8_t output_max,
+    uint32_t flags,
+    xnn_operator_t* multiply_op_out)
+{
+  if (input1_scale <= 0.0f || !isnormal(input1_scale)) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g input 1 scale: scale must be finite and positive",
+      xnn_operator_type_to_string(xnn_operator_type_multiply_nd_qs8), input1_scale);
+    return xnn_status_invalid_parameter;
+  }
+
+  if (input2_scale <= 0.0f || !isnormal(input2_scale)) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g input 2 scale: scale must be finite and positive",
+      xnn_operator_type_to_string(xnn_operator_type_multiply_nd_qs8), input2_scale);
+    return xnn_status_invalid_parameter;
+  }
+
+  if (output_scale <= 0.0f || !isnormal(output_scale)) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g output scale: scale must be finite and positive",
+      xnn_operator_type_to_string(xnn_operator_type_multiply_nd_qs8), output_scale);
+    return xnn_status_invalid_parameter;
+  }
+
+  if (output_min >= output_max) {
+    xnn_log_error(
+      "failed to create %s operator with [%" PRId8 ", %" PRId8 "] output range: lower bound must be below upper bound",
+      xnn_operator_type_to_string(xnn_operator_type_multiply_nd_qs8), output_min, output_max);
+    return xnn_status_invalid_parameter;
+  }
+
+  const float product_scale = input1_scale * input2_scale;
+  const float product_output_scale = product_scale / output_scale;
+  if (product_output_scale < 0x1.0p-16f || product_output_scale >= 0x1.0p+8f) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g product-to-output scale ratio: scale ratio must be in [2**-16, 2**8) range",
+      xnn_operator_type_to_string(xnn_operator_type_multiply_nd_qs8), product_output_scale);
+    return xnn_status_unsupported_parameter;
+  }
+
+  struct {
+    union xnn_qs8_mul_minmax_params qs8_mul;
+    union xnn_qs8_mul_minmax_params qs8_rmul;
+  } params;
+  if (xnn_params.qs8.vmul.init.qs8_mul != NULL) {
+    xnn_params.qs8.vmul.init.qs8_mul(
+      &params.qs8_mul, input1_zero_point, input2_zero_point, output_zero_point,
+      product_output_scale, output_min, output_max);
+    xnn_params.qs8.vmul.init.qs8_mul(
+      &params.qs8_rmul, input2_zero_point, input1_zero_point, output_zero_point,
+      product_output_scale, output_min, output_max);
+  }
+  return create_binary_elementwise_nd(
+    flags,
+    &params,
+    sizeof(params),
+    XNN_INIT_FLAG_QS8,
+    xnn_operator_type_multiply_nd_qs8,
+    &xnn_params.qs8.vmul.minmax,
+    multiply_op_out);
+}
+
+enum xnn_status xnn_create_multiply_nd_qu8(
+    uint8_t input1_zero_point,
+    float input1_scale,
+    uint8_t input2_zero_point,
+    float input2_scale,
+    uint8_t output_zero_point,
+    float output_scale,
+    uint8_t output_min,
+    uint8_t output_max,
+    uint32_t flags,
+    xnn_operator_t* multiply_op_out)
+{
+  if (input1_scale <= 0.0f || !isnormal(input1_scale)) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g input 1 scale: scale must be finite and positive",
+      xnn_operator_type_to_string(xnn_operator_type_multiply_nd_qu8), input1_scale);
+    return xnn_status_invalid_parameter;
+  }
+
+  if (input2_scale <= 0.0f || !isnormal(input2_scale)) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g input 2 scale: scale must be finite and positive",
+      xnn_operator_type_to_string(xnn_operator_type_multiply_nd_qu8), input2_scale);
+    return xnn_status_invalid_parameter;
+  }
+
+  if (output_scale <= 0.0f || !isnormal(output_scale)) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g output scale: scale must be finite and positive",
+      xnn_operator_type_to_string(xnn_operator_type_multiply_nd_qu8), output_scale);
+    return xnn_status_invalid_parameter;
+  }
+
+  if (output_min >= output_max) {
+    xnn_log_error(
+      "failed to create %s operator with [%" PRIu8 ", %" PRIu8 "] output range: lower bound must be below upper bound",
+      xnn_operator_type_to_string(xnn_operator_type_multiply_nd_qu8), output_min, output_max);
+    return xnn_status_invalid_parameter;
+  }
+
+  const float product_scale = input1_scale * input2_scale;
+  const float product_output_scale = product_scale / output_scale;
+  if (product_output_scale < 0x1.0p-16f || product_output_scale >= 0x1.0p+8f) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g product-to-output scale ratio: scale ratio must be in [2**-16, 2**8) range",
+      xnn_operator_type_to_string(xnn_operator_type_multiply_nd_qu8), product_output_scale);
+    return xnn_status_unsupported_parameter;
+  }
+
+  struct {
+    union xnn_qu8_mul_minmax_params qu8_mul;
+    union xnn_qu8_mul_minmax_params qu8_rmul;
+  } params;
+  if (xnn_params.qu8.vmul.init.qu8_mul != NULL) {
+    xnn_params.qu8.vmul.init.qu8_mul(
+      &params.qu8_mul, input1_zero_point, input2_zero_point, output_zero_point,
+      product_output_scale, output_min, output_max);
+    xnn_params.qu8.vmul.init.qu8_mul(
+      &params.qu8_rmul, input2_zero_point, input1_zero_point, output_zero_point,
+      product_output_scale, output_min, output_max);
+  }
+  return create_binary_elementwise_nd(
+    flags,
+    &params,
+    sizeof(params),
+    XNN_INIT_FLAG_QU8,
+    xnn_operator_type_multiply_nd_qu8,
+    &xnn_params.qu8.vmul.minmax,
+    multiply_op_out);
+}
+
+enum xnn_status xnn_create_squared_difference_nd_f16(
     uint32_t flags,
     xnn_operator_t* squared_difference_op_out)
 {
   return create_binary_elementwise_nd(
     flags,
-    NULL /* params */,
-    0 /* params size */,
+    NULL,
+    0,
+    XNN_INIT_FLAG_F16,
+    xnn_operator_type_squared_difference_nd_f16,
+    &xnn_params.f16.vsqrdiff.minmax,
+    squared_difference_op_out);
+}
+
+enum xnn_status xnn_create_squared_difference_nd_f32(
+    uint32_t flags,
+    xnn_operator_t* squared_difference_op_out)
+{
+  union xnn_f32_default_params params;
+  if (xnn_params.f32.vmin.init.f32_default != NULL) {
+    xnn_params.f32.vmin.init.f32_default(&params);
+  }
+  return create_binary_elementwise_nd(
+    flags,
+    &params,
+    sizeof(params),
     XNN_INIT_FLAG_F32,
     xnn_operator_type_squared_difference_nd_f32,
     &xnn_params.f32.vsqrdiff.minmax,
     squared_difference_op_out);
+}
+
+enum xnn_status xnn_create_subtract_nd_f16(
+    float output_min,
+    float output_max,
+    uint32_t flags,
+    xnn_operator_t* subtract_op_out)
+{
+  return create_binary_elementwise_nd_f16(
+    output_min,
+    output_max,
+    flags,
+    xnn_operator_type_subtract_nd_f16,
+    &xnn_params.f16.vsub,
+    subtract_op_out);
 }
 
 enum xnn_status xnn_create_subtract_nd_f32(
@@ -446,6 +680,162 @@ enum xnn_status xnn_create_subtract_nd_f32(
     subtract_op_out);
 }
 
+enum xnn_status xnn_create_subtract_nd_qs8(
+    int8_t input1_zero_point,
+    float input1_scale,
+    int8_t input2_zero_point,
+    float input2_scale,
+    int8_t output_zero_point,
+    float output_scale,
+    int8_t output_min,
+    int8_t output_max,
+    uint32_t flags,
+    xnn_operator_t* subtract_op_out)
+{
+  if (input1_scale <= 0.0f || !isnormal(input1_scale)) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g input 1 scale: scale must be finite and positive",
+      xnn_operator_type_to_string(xnn_operator_type_subtract_nd_qs8), input1_scale);
+    return xnn_status_invalid_parameter;
+  }
+
+  if (input2_scale <= 0.0f || !isnormal(input2_scale)) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g input 2 scale: scale must be finite and positive",
+      xnn_operator_type_to_string(xnn_operator_type_subtract_nd_qs8), input2_scale);
+    return xnn_status_invalid_parameter;
+  }
+
+  if (output_scale <= 0.0f || !isnormal(output_scale)) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g output scale: scale must be finite and positive",
+      xnn_operator_type_to_string(xnn_operator_type_subtract_nd_qs8), output_scale);
+    return xnn_status_invalid_parameter;
+  }
+
+  if (output_min >= output_max) {
+    xnn_log_error(
+      "failed to create %s operator with [%" PRId8 ", %" PRId8 "] output range: lower bound must be below upper bound",
+      xnn_operator_type_to_string(xnn_operator_type_subtract_nd_qs8), output_min, output_max);
+    return xnn_status_invalid_parameter;
+  }
+
+  const float input1_output_scale = input1_scale / output_scale;
+  if (input1_output_scale < 0x1.0p-10f || input1_output_scale >= 0x1.0p+8f) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g input1-to-output scale ratio: scale ratio must be in [2**-10, 2**8) range",
+      xnn_operator_type_to_string(xnn_operator_type_subtract_nd_qs8), input1_output_scale);
+    return xnn_status_unsupported_parameter;
+  }
+
+  const float input2_output_scale = input2_scale / output_scale;
+  if (input2_output_scale < 0x1.0p-10f || input2_output_scale >= 0x1.0p+8f) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g input2-to-output scale ratio: scale ratio must be in [2**-10, 2**8) range",
+      xnn_operator_type_to_string(xnn_operator_type_subtract_nd_qs8), input2_output_scale);
+    return xnn_status_unsupported_parameter;
+  }
+
+  struct {
+    union xnn_qs8_add_minmax_params qs8_addsub;
+    union xnn_qs8_add_minmax_params qs8_raddsub;
+  } params;
+  if (xnn_params.qs8.vadd.init.qs8_addsub != NULL) {
+    xnn_params.qs8.vadd.init.qs8_addsub(
+      &params.qs8_addsub, input1_zero_point, input2_zero_point, output_zero_point,
+      input1_output_scale, -input2_output_scale, output_min, output_max);
+    xnn_params.qs8.vadd.init.qs8_addsub(
+      &params.qs8_raddsub, input2_zero_point, input1_zero_point, output_zero_point,
+      -input2_output_scale, input1_output_scale, output_min, output_max);
+  }
+  return create_binary_elementwise_nd(
+    flags,
+    &params,
+    sizeof(params),
+    XNN_INIT_FLAG_QS8,
+    xnn_operator_type_subtract_nd_qs8,
+    &xnn_params.qs8.vadd.minmax,
+    subtract_op_out);
+}
+
+enum xnn_status xnn_create_subtract_nd_qu8(
+    uint8_t input1_zero_point,
+    float input1_scale,
+    uint8_t input2_zero_point,
+    float input2_scale,
+    uint8_t output_zero_point,
+    float output_scale,
+    uint8_t output_min,
+    uint8_t output_max,
+    uint32_t flags,
+    xnn_operator_t* subtract_op_out)
+{
+  if (input1_scale <= 0.0f || !isnormal(input1_scale)) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g input 1 scale: scale must be finite and positive",
+      xnn_operator_type_to_string(xnn_operator_type_subtract_nd_qu8), input1_scale);
+    return xnn_status_invalid_parameter;
+  }
+
+  if (input2_scale <= 0.0f || !isnormal(input2_scale)) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g input 2 scale: scale must be finite and positive",
+      xnn_operator_type_to_string(xnn_operator_type_subtract_nd_qu8), input2_scale);
+    return xnn_status_invalid_parameter;
+  }
+
+  if (output_scale <= 0.0f || !isnormal(output_scale)) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g output scale: scale must be finite and positive",
+      xnn_operator_type_to_string(xnn_operator_type_subtract_nd_qu8), output_scale);
+    return xnn_status_invalid_parameter;
+  }
+
+  if (output_min >= output_max) {
+    xnn_log_error(
+      "failed to create %s operator with [%" PRIu8 ", %" PRIu8 "] output range: lower bound must be below upper bound",
+      xnn_operator_type_to_string(xnn_operator_type_subtract_nd_qu8), output_min, output_max);
+    return xnn_status_invalid_parameter;
+  }
+
+  const float input1_output_scale = input1_scale / output_scale;
+  if (input1_output_scale < 0x1.0p-10f || input1_output_scale >= 0x1.0p+8f) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g input1-to-output scale ratio: scale ratio must be in [2**-10, 2**8) range",
+      xnn_operator_type_to_string(xnn_operator_type_subtract_nd_qu8), input1_output_scale);
+    return xnn_status_unsupported_parameter;
+  }
+
+  const float input2_output_scale = input2_scale / output_scale;
+  if (input2_output_scale < 0x1.0p-10f || input2_output_scale >= 0x1.0p+8f) {
+    xnn_log_error(
+      "failed to create %s operator with %.7g input2-to-output scale ratio: scale ratio must be in [2**-10, 2**8) range",
+      xnn_operator_type_to_string(xnn_operator_type_subtract_nd_qu8), input2_output_scale);
+    return xnn_status_unsupported_parameter;
+  }
+
+  struct {
+    union xnn_qu8_add_minmax_params qu8_addsub;
+    union xnn_qu8_add_minmax_params qu8_raddsub;
+  } params;
+  if (xnn_params.qu8.vadd.init.qu8_addsub != NULL) {
+    xnn_params.qu8.vadd.init.qu8_addsub(
+      &params.qu8_addsub, input1_zero_point, input2_zero_point, output_zero_point,
+      input1_output_scale, -input2_output_scale, output_min, output_max);
+    xnn_params.qu8.vadd.init.qu8_addsub(
+      &params.qu8_raddsub, input2_zero_point, input1_zero_point, output_zero_point,
+      -input2_output_scale, input1_output_scale, output_min, output_max);
+  }
+  return create_binary_elementwise_nd(
+    flags,
+    &params,
+    sizeof(params),
+    XNN_INIT_FLAG_QU8,
+    xnn_operator_type_subtract_nd_qu8,
+    &xnn_params.qu8.vadd.minmax,
+    subtract_op_out);
+}
+
 static enum xnn_status setup_binary_elementwise_nd(
     xnn_operator_t binary_elementwise_op,
     enum xnn_operator_type expected_operator_type,
@@ -456,7 +846,6 @@ static enum xnn_status setup_binary_elementwise_nd(
     const void* input1,
     const void* input2,
     void* output,
-    uint32_t datatype_init_flags,
     uint32_t log2_element_size,
     const void* params,
     size_t params_size,
@@ -465,25 +854,18 @@ static enum xnn_status setup_binary_elementwise_nd(
     const struct vbinary_parameters vbinary[restrict XNN_MIN_ELEMENTS(1)],
     size_t num_threads)
 {
+  if (binary_elementwise_op->type != expected_operator_type) {
+    xnn_log_error("failed to setup operator: operator type mismatch (expected %s, got %s)",
+      xnn_operator_type_to_string(expected_operator_type),
+      xnn_operator_type_to_string(binary_elementwise_op->type));
+    return xnn_status_invalid_parameter;
+  }
   binary_elementwise_op->state = xnn_run_state_invalid;
 
   if ((xnn_params.init_flags & XNN_INIT_FLAG_XNNPACK) == 0) {
     xnn_log_error("failed to setup %s operator: XNNPACK is not initialized",
       xnn_operator_type_to_string(binary_elementwise_op->type));
     return xnn_status_uninitialized;
-  }
-
-  if ((xnn_params.init_flags & datatype_init_flags) != datatype_init_flags) {
-    xnn_log_error("failed to setup %s operator: operations on data type are not supported",
-      xnn_operator_type_to_string(binary_elementwise_op->type));
-    return xnn_status_unsupported_hardware;
-  }
-
-  if (binary_elementwise_op->type != expected_operator_type) {
-    xnn_log_error("failed to setup operator: operator type mismatch (expected %s, got %s)",
-      xnn_operator_type_to_string(expected_operator_type),
-      xnn_operator_type_to_string(binary_elementwise_op->type));
-    return xnn_status_invalid_parameter;
   }
 
   if (max(num_input1_dims, num_input2_dims) > XNN_MAX_TENSOR_DIMS) {
@@ -659,7 +1041,6 @@ static enum xnn_status setup_binary_elementwise_nd_f16(
     input1,
     input2,
     output,
-    XNN_INIT_FLAG_F16,
     1 /* log2(sizeof(half)) */,
     &binary_elementwise_op->params.f16_minmax, sizeof(binary_elementwise_op->params.f16_minmax),
     &binary_elementwise_op->params.f16_minmax, sizeof(binary_elementwise_op->params.f16_minmax),
@@ -685,60 +1066,11 @@ static enum xnn_status setup_binary_elementwise_nd_f32(
     num_input1_dims, input1_shape,
     num_input2_dims, input2_shape,
     input1, input2, output,
-    XNN_INIT_FLAG_F32,
     2 /* log2(sizeof(float)) */,
     &binary_elementwise_op->params.f32_minmax, sizeof(binary_elementwise_op->params.f32_minmax),
     &binary_elementwise_op->params.f32_minmax, sizeof(binary_elementwise_op->params.f32_minmax),
     vbinary,
     num_threads);
-}
-
-enum xnn_status xnn_setup_add_nd_qs8(
-    xnn_operator_t add_op,
-    size_t num_input1_dims,
-    const size_t* input1_shape,
-    size_t num_input2_dims,
-    const size_t* input2_shape,
-    const int8_t* input1,
-    const int8_t* input2,
-    int8_t* output,
-    pthreadpool_t threadpool)
-{
-  return setup_binary_elementwise_nd(
-    add_op, xnn_operator_type_add_nd_qs8,
-    num_input1_dims, input1_shape,
-    num_input2_dims, input2_shape,
-    input1, input2, output,
-    XNN_INIT_FLAG_QS8,
-    0 /* log2(sizeof(int8_t))) */,
-    &add_op->params.qs8_add, sizeof(add_op->params.qs8_add),
-    &add_op->params.qs8_radd, sizeof(add_op->params.qs8_radd),
-    &xnn_params.qs8.vadd,
-    pthreadpool_get_threads_count(threadpool));
-}
-
-enum xnn_status xnn_setup_add_nd_qu8(
-    xnn_operator_t add_op,
-    size_t num_input1_dims,
-    const size_t* input1_shape,
-    size_t num_input2_dims,
-    const size_t* input2_shape,
-    const uint8_t* input1,
-    const uint8_t* input2,
-    uint8_t* output,
-    pthreadpool_t threadpool)
-{
-  return setup_binary_elementwise_nd(
-    add_op, xnn_operator_type_add_nd_qu8,
-    num_input1_dims, input1_shape,
-    num_input2_dims, input2_shape,
-    input1, input2, output,
-    XNN_INIT_FLAG_QU8,
-    0 /* log2(sizeof(uint8_t))) */,
-    &add_op->params.qu8_add, sizeof(add_op->params.qu8_add),
-    &add_op->params.qu8_radd, sizeof(add_op->params.qu8_radd),
-    &xnn_params.qu8.vadd,
-    pthreadpool_get_threads_count(threadpool));
 }
 
 enum xnn_status xnn_setup_add_nd_f16(
@@ -781,6 +1113,72 @@ enum xnn_status xnn_setup_add_nd_f32(
     pthreadpool_get_threads_count(threadpool));
 }
 
+enum xnn_status xnn_setup_add_nd_qs8(
+    xnn_operator_t add_op,
+    size_t num_input1_dims,
+    const size_t* input1_shape,
+    size_t num_input2_dims,
+    const size_t* input2_shape,
+    const int8_t* input1,
+    const int8_t* input2,
+    int8_t* output,
+    pthreadpool_t threadpool)
+{
+  return setup_binary_elementwise_nd(
+    add_op, xnn_operator_type_add_nd_qs8,
+    num_input1_dims, input1_shape,
+    num_input2_dims, input2_shape,
+    input1, input2, output,
+    0 /* log2(sizeof(int8_t))) */,
+    &add_op->params.qs8_addsub, sizeof(add_op->params.qs8_addsub),
+    &add_op->params.qs8_raddsub, sizeof(add_op->params.qs8_raddsub),
+    &xnn_params.qs8.vadd,
+    pthreadpool_get_threads_count(threadpool));
+}
+
+enum xnn_status xnn_setup_add_nd_qu8(
+    xnn_operator_t add_op,
+    size_t num_input1_dims,
+    const size_t* input1_shape,
+    size_t num_input2_dims,
+    const size_t* input2_shape,
+    const uint8_t* input1,
+    const uint8_t* input2,
+    uint8_t* output,
+    pthreadpool_t threadpool)
+{
+  return setup_binary_elementwise_nd(
+    add_op, xnn_operator_type_add_nd_qu8,
+    num_input1_dims, input1_shape,
+    num_input2_dims, input2_shape,
+    input1, input2, output,
+    0 /* log2(sizeof(uint8_t))) */,
+    &add_op->params.qu8_addsub, sizeof(add_op->params.qu8_addsub),
+    &add_op->params.qu8_raddsub, sizeof(add_op->params.qu8_raddsub),
+    &xnn_params.qu8.vadd,
+    pthreadpool_get_threads_count(threadpool));
+}
+
+enum xnn_status xnn_setup_divide_nd_f16(
+    xnn_operator_t divide_op,
+    size_t num_input1_dims,
+    const size_t* input1_shape,
+    size_t num_input2_dims,
+    const size_t* input2_shape,
+    const void* input1,
+    const void* input2,
+    void* output,
+    pthreadpool_t threadpool)
+{
+  return setup_binary_elementwise_nd_f16(
+    divide_op, xnn_operator_type_divide_nd_f16,
+    num_input1_dims, input1_shape,
+    num_input2_dims, input2_shape,
+    input1, input2, output,
+    &xnn_params.f16.vdiv,
+    pthreadpool_get_threads_count(threadpool));
+}
+
 enum xnn_status xnn_setup_divide_nd_f32(
     xnn_operator_t divide_op,
     size_t num_input1_dims,
@@ -801,6 +1199,26 @@ enum xnn_status xnn_setup_divide_nd_f32(
     pthreadpool_get_threads_count(threadpool));
 }
 
+enum xnn_status xnn_setup_maximum_nd_f16(
+    xnn_operator_t maximum_op,
+    size_t num_input1_dims,
+    const size_t* input1_shape,
+    size_t num_input2_dims,
+    const size_t* input2_shape,
+    const void* input1,
+    const void* input2,
+    void* output,
+    pthreadpool_t threadpool)
+{
+  return setup_binary_elementwise_nd_f16(
+    maximum_op, xnn_operator_type_maximum_nd_f16,
+    num_input1_dims, input1_shape,
+    num_input2_dims, input2_shape,
+    input1, input2, output,
+    &xnn_params.f16.vmax,
+    pthreadpool_get_threads_count(threadpool));
+}
+
 enum xnn_status xnn_setup_maximum_nd_f32(
     xnn_operator_t maximum_op,
     size_t num_input1_dims,
@@ -818,6 +1236,26 @@ enum xnn_status xnn_setup_maximum_nd_f32(
     num_input2_dims, input2_shape,
     input1, input2, output,
     &xnn_params.f32.vmax,
+    pthreadpool_get_threads_count(threadpool));
+}
+
+enum xnn_status xnn_setup_minimum_nd_f16(
+    xnn_operator_t minimum_op,
+    size_t num_input1_dims,
+    const size_t* input1_shape,
+    size_t num_input2_dims,
+    const size_t* input2_shape,
+    const void* input1,
+    const void* input2,
+    void* output,
+    pthreadpool_t threadpool)
+{
+  return setup_binary_elementwise_nd_f16(
+    minimum_op, xnn_operator_type_minimum_nd_f16,
+    num_input1_dims, input1_shape,
+    num_input2_dims, input2_shape,
+    input1, input2, output,
+    &xnn_params.f16.vmin,
     pthreadpool_get_threads_count(threadpool));
 }
 
@@ -881,6 +1319,72 @@ enum xnn_status xnn_setup_multiply_nd_f32(
     pthreadpool_get_threads_count(threadpool));
 }
 
+enum xnn_status xnn_setup_multiply_nd_qs8(
+    xnn_operator_t multiply_op,
+    size_t num_input1_dims,
+    const size_t* input1_shape,
+    size_t num_input2_dims,
+    const size_t* input2_shape,
+    const int8_t* input1,
+    const int8_t* input2,
+    int8_t* output,
+    pthreadpool_t threadpool)
+{
+  return setup_binary_elementwise_nd(
+    multiply_op, xnn_operator_type_multiply_nd_qs8,
+    num_input1_dims, input1_shape,
+    num_input2_dims, input2_shape,
+    input1, input2, output,
+    0 /* log2(sizeof(int8_t))) */,
+    &multiply_op->params.qs8_mul, sizeof(multiply_op->params.qs8_mul),
+    &multiply_op->params.qs8_rmul, sizeof(multiply_op->params.qs8_rmul),
+    &xnn_params.qs8.vmul,
+    pthreadpool_get_threads_count(threadpool));
+}
+
+enum xnn_status xnn_setup_multiply_nd_qu8(
+    xnn_operator_t multiply_op,
+    size_t num_input1_dims,
+    const size_t* input1_shape,
+    size_t num_input2_dims,
+    const size_t* input2_shape,
+    const uint8_t* input1,
+    const uint8_t* input2,
+    uint8_t* output,
+    pthreadpool_t threadpool)
+{
+  return setup_binary_elementwise_nd(
+    multiply_op, xnn_operator_type_multiply_nd_qu8,
+    num_input1_dims, input1_shape,
+    num_input2_dims, input2_shape,
+    input1, input2, output,
+    0 /* log2(sizeof(uint8_t))) */,
+    &multiply_op->params.qu8_mul, sizeof(multiply_op->params.qu8_mul),
+    &multiply_op->params.qu8_rmul, sizeof(multiply_op->params.qu8_rmul),
+    &xnn_params.qu8.vmul,
+    pthreadpool_get_threads_count(threadpool));
+}
+
+enum xnn_status xnn_setup_squared_difference_nd_f16(
+    xnn_operator_t squared_difference_op,
+    size_t num_input1_dims,
+    const size_t* input1_shape,
+    size_t num_input2_dims,
+    const size_t* input2_shape,
+    const void* input1,
+    const void* input2,
+    void* output,
+    pthreadpool_t threadpool)
+{
+  return setup_binary_elementwise_nd_f16(
+    squared_difference_op, xnn_operator_type_squared_difference_nd_f16,
+    num_input1_dims, input1_shape,
+    num_input2_dims, input2_shape,
+    input1, input2, output,
+    &xnn_params.f16.vsqrdiff,
+    pthreadpool_get_threads_count(threadpool));
+}
+
 enum xnn_status xnn_setup_squared_difference_nd_f32(
     xnn_operator_t squared_difference_op,
     size_t num_input1_dims,
@@ -901,6 +1405,26 @@ enum xnn_status xnn_setup_squared_difference_nd_f32(
     pthreadpool_get_threads_count(threadpool));
 }
 
+enum xnn_status xnn_setup_subtract_nd_f16(
+    xnn_operator_t subtract_op,
+    size_t num_input1_dims,
+    const size_t* input1_shape,
+    size_t num_input2_dims,
+    const size_t* input2_shape,
+    const void* input1,
+    const void* input2,
+    void* output,
+    pthreadpool_t threadpool)
+{
+  return setup_binary_elementwise_nd_f16(
+    subtract_op, xnn_operator_type_subtract_nd_f16,
+    num_input1_dims, input1_shape,
+    num_input2_dims, input2_shape,
+    input1, input2, output,
+    &xnn_params.f16.vsub,
+    pthreadpool_get_threads_count(threadpool));
+}
+
 enum xnn_status xnn_setup_subtract_nd_f32(
     xnn_operator_t subtract_op,
     size_t num_input1_dims,
@@ -918,5 +1442,51 @@ enum xnn_status xnn_setup_subtract_nd_f32(
     num_input2_dims, input2_shape,
     input1, input2, output,
     &xnn_params.f32.vsub,
+    pthreadpool_get_threads_count(threadpool));
+}
+
+enum xnn_status xnn_setup_subtract_nd_qs8(
+    xnn_operator_t subtract_op,
+    size_t num_input1_dims,
+    const size_t* input1_shape,
+    size_t num_input2_dims,
+    const size_t* input2_shape,
+    const int8_t* input1,
+    const int8_t* input2,
+    int8_t* output,
+    pthreadpool_t threadpool)
+{
+  return setup_binary_elementwise_nd(
+    subtract_op, xnn_operator_type_subtract_nd_qs8,
+    num_input1_dims, input1_shape,
+    num_input2_dims, input2_shape,
+    input1, input2, output,
+    0 /* log2(sizeof(int8_t))) */,
+    &subtract_op->params.qs8_addsub, sizeof(subtract_op->params.qs8_addsub),
+    &subtract_op->params.qs8_raddsub, sizeof(subtract_op->params.qs8_raddsub),
+    &xnn_params.qs8.vadd,
+    pthreadpool_get_threads_count(threadpool));
+}
+
+enum xnn_status xnn_setup_subtract_nd_qu8(
+    xnn_operator_t subtract_op,
+    size_t num_input1_dims,
+    const size_t* input1_shape,
+    size_t num_input2_dims,
+    const size_t* input2_shape,
+    const uint8_t* input1,
+    const uint8_t* input2,
+    uint8_t* output,
+    pthreadpool_t threadpool)
+{
+  return setup_binary_elementwise_nd(
+    subtract_op, xnn_operator_type_subtract_nd_qu8,
+    num_input1_dims, input1_shape,
+    num_input2_dims, input2_shape,
+    input1, input2, output,
+    0 /* log2(sizeof(uint8_t))) */,
+    &subtract_op->params.qu8_addsub, sizeof(subtract_op->params.qu8_addsub),
+    &subtract_op->params.qu8_raddsub, sizeof(subtract_op->params.qu8_raddsub),
+    &xnn_params.qu8.vadd,
     pthreadpool_get_threads_count(threadpool));
 }

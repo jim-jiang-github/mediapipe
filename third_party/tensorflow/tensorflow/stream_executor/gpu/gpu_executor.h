@@ -27,9 +27,11 @@ limitations under the License.
 #include <type_traits>
 #include <unordered_map>
 
+#include "absl/base/thread_annotations.h"
+#include "absl/container/flat_hash_map.h"
 #include "absl/strings/string_view.h"
+#include "tensorflow/core/platform/fingerprint.h"
 #include "tensorflow/core/platform/mutex.h"
-#include "tensorflow/core/platform/thread_annotations.h"
 #include "tensorflow/stream_executor/event.h"
 #include "tensorflow/stream_executor/gpu/gpu_kernel.h"
 #include "tensorflow/stream_executor/lib/status.h"
@@ -113,31 +115,37 @@ class GpuExecutor : public internal::StreamExecutorInterface {
                           ModuleHandle* module_handle) override;
   bool UnloadModule(ModuleHandle module_handle) override;
 
+  // Allocates and initializes a new constant on the device with the given
+  // content. Or, if a device with identical content is already on-device,
+  // returns a pointer to that buffer with shared ownership.
+  port::StatusOr<std::shared_ptr<DeviceMemoryBase>> CreateOrShareConstant(
+      Stream* stream, const std::vector<uint8_t>& content) override;
+
   port::Status Launch(Stream* stream, const ThreadDim& thread_dims,
                       const BlockDim& block_dims, const KernelBase& k,
                       const KernelArgsArrayBase& args) override;
 
   // (supported on CUDA only)
   int CalculateOccupancy(const DeviceDescription& device_description,
-                         uint64 registers_per_thread,
-                         uint64 shared_memory_per_block,
+                         uint64_t registers_per_thread,
+                         uint64_t shared_memory_per_block,
                          const ThreadDim& thread_dims, GpuFunctionHandle func);
 
   // (supported on CUDA only)
   int CompareOccupancy(int* initial_blocks,
                        const DeviceDescription& device_description,
-                       uint64 registers_per_thread,
-                       uint64 shared_memory_per_block,
+                       uint64_t registers_per_thread,
+                       uint64_t shared_memory_per_block,
                        const ThreadDim& thread_dims, GpuFunctionHandle func);
 
-  DeviceMemoryBase Allocate(uint64 size, int64_t memory_space) override;
+  DeviceMemoryBase Allocate(uint64_t size, int64_t memory_space) override;
 
-  void* GetSubBuffer(DeviceMemoryBase* mem, uint64 offset_bytes,
-                     uint64 size_bytes) override;
+  void* GetSubBuffer(DeviceMemoryBase* mem, uint64_t offset_bytes,
+                     uint64_t size_bytes) override;
 
   void Deallocate(DeviceMemoryBase* mem) override;
 
-  void* UnifiedMemoryAllocate(uint64 size) override {
+  void* UnifiedMemoryAllocate(uint64_t size) override {
     return GpuDriver::UnifiedMemoryAllocate(context_, size);
   }
 
@@ -149,7 +157,7 @@ class GpuExecutor : public internal::StreamExecutorInterface {
   // internally sets up buffers for DMA operations (and page locks them).
   // There's no external interface for us to otherwise control these DMA
   // settings.
-  void* HostMemoryAllocate(uint64 size) override {
+  void* HostMemoryAllocate(uint64_t size) override {
     return GpuDriver::HostAllocate(context_, size);
   }
 
@@ -157,45 +165,45 @@ class GpuExecutor : public internal::StreamExecutorInterface {
     return GpuDriver::HostDeallocate(context_, location);
   }
 
-  bool HostMemoryRegister(void* location, uint64 size) override;
+  bool HostMemoryRegister(void* location, uint64_t size) override;
 
   bool HostMemoryUnregister(void* location) override;
 
   bool SynchronizeAllActivity() override;
 
   port::Status SynchronousMemZero(DeviceMemoryBase* location,
-                                  uint64 size) override;
+                                  uint64_t size) override;
 
   port::Status SynchronousMemSet(DeviceMemoryBase* location, int value,
-                                 uint64 size) override;
+                                 uint64_t size) override;
 
   port::Status SynchronousMemcpy(DeviceMemoryBase* gpu_dst,
-                                 const void* host_src, uint64 size) override;
+                                 const void* host_src, uint64_t size) override;
 
   port::Status SynchronousMemcpy(void* host_dst,
                                  const DeviceMemoryBase& gpu_src,
-                                 uint64 size) override;
+                                 uint64_t size) override;
 
   port::Status SynchronousMemcpyDeviceToDevice(DeviceMemoryBase* gpu_dst,
                                                const DeviceMemoryBase& gpu_src,
-                                               uint64 size) override;
+                                               uint64_t size) override;
 
   port::Status MemZero(Stream* stream, DeviceMemoryBase* location,
-                       uint64 size) override;
+                       uint64_t size) override;
   port::Status Memset(Stream* stream, DeviceMemoryBase* location, uint8 pattern,
-                      uint64 size) override;
+                      uint64_t size) override;
   port::Status Memset32(Stream* stream, DeviceMemoryBase* location,
-                        uint32 pattern, uint64 size) override;
+                        uint32 pattern, uint64_t size) override;
 
   bool Memcpy(Stream* stream, void* host_dst, const DeviceMemoryBase& gpu_src,
-              uint64 size) override;
+              uint64_t size) override;
 
   bool Memcpy(Stream* stream, DeviceMemoryBase* gpu_dst, const void* host_src,
-              uint64 size) override;
+              uint64_t size) override;
 
   bool MemcpyDeviceToDevice(Stream* stream, DeviceMemoryBase* gpu_dst,
                             const DeviceMemoryBase& gpu_src,
-                            uint64 size) override;
+                            uint64_t size) override;
 
   bool HostCallback(Stream* stream,
                     std::function<port::Status()> callback) override;
@@ -232,10 +240,11 @@ class GpuExecutor : public internal::StreamExecutorInterface {
 
   bool CanEnablePeerAccessTo(StreamExecutorInterface* other) override;
 
-  bool DeviceMemoryUsage(int64* free, int64* total) const override;
+  bool DeviceMemoryUsage(int64_t* free, int64_t* total) const override;
 
-  // Search for the symbol and returns a device pointer and size.
-  // Returns false if symbol does not exist.
+  // Search for the symbol in the given module and returns a device pointer and
+  // size. Returns false if symbol does not exist. 'module_handle' must not
+  // be null.
   bool GetSymbol(const std::string& symbol_name, ModuleHandle module_handle,
                  void** mem, size_t* bytes) override;
 
@@ -289,6 +298,15 @@ class GpuExecutor : public internal::StreamExecutorInterface {
   template <typename T>
   T* getOrCreateXLAState(StreamExecutor* se) {
     return xla_state_.getOrCreate<T>(se);
+  }
+
+  Stream* FindAllocatedStream(void* gpu_stream) override {
+    absl::MutexLock lock(&alive_gpu_streams_mu_);
+    auto it = alive_gpu_streams_.find(gpu_stream);
+    if (it == alive_gpu_streams_.end()) {
+      return nullptr;
+    }
+    return it->second;
   }
 
  private:
@@ -357,11 +375,18 @@ class GpuExecutor : public internal::StreamExecutorInterface {
   std::map<const char*, GpuModuleHandle> in_memory_modules_
       TF_GUARDED_BY(in_memory_modules_mu_);
 
+  absl::Mutex shared_constants_mu_;
+  // On-device constants that can be shared between multiple executables. A
+  // pointer for a given constant will expire when no executables require use
+  // of that constant anymore.
+  std::map<const absl::uint128, std::weak_ptr<DeviceMemoryBase>>
+      shared_constants_ ABSL_GUARDED_BY(shared_constants_mu_);
+
   // Kernel -> loaded GPU binary. Many kernels may load the same binary.
   std::unordered_map<const KernelBase*, const void*> kernel_to_gpu_binary_
       TF_GUARDED_BY(in_memory_modules_mu_);
   // GPU binary (PTX or CUBIN or HSACO) -> {CUDA module, reference count}.
-  std::unordered_map<const void*, std::pair<GpuModuleHandle, uint64>>
+  std::unordered_map<const void*, std::pair<GpuModuleHandle, uint64_t>>
       gpu_binary_to_module_ TF_GUARDED_BY(in_memory_modules_mu_);
 
   // Guards the launched kernel set.
@@ -397,6 +422,12 @@ class GpuExecutor : public internal::StreamExecutorInterface {
 
   // Type erased XLA specific state attached to GpuExecutor.
   Object xla_state_;
+
+  absl::Mutex alive_gpu_streams_mu_;
+
+  // Lookup map for alive streams, from raw stream pointers.
+  absl::flat_hash_map<void*, Stream*> alive_gpu_streams_
+      TF_GUARDED_BY(alive_gpu_streams_mu_);
 
   SE_DISALLOW_COPY_AND_ASSIGN(GpuExecutor);
 };

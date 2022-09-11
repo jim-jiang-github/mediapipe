@@ -18,7 +18,8 @@
 PROTOBUF_PRAGMA_INIT_SEG
 namespace mediapipe {
 constexpr PacketGeneratorOptions::PacketGeneratorOptions(
-  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized){}
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : merge_fields_(true){}
 struct PacketGeneratorOptionsDefaultTypeInternal {
   constexpr PacketGeneratorOptionsDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -51,11 +52,13 @@ static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_mediapipe_2fframework_2fpacket_5fgenerator_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fframework_2fpacket_5fgenerator_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::mediapipe::PacketGeneratorOptions, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::PacketGeneratorOptions, _internal_metadata_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::PacketGeneratorOptions, _extensions_),
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::mediapipe::PacketGeneratorOptions, merge_fields_),
+  0,
   PROTOBUF_FIELD_OFFSET(::mediapipe::PacketGeneratorConfig, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::PacketGeneratorConfig, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -75,8 +78,8 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fframework_2fpacket
   1,
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::mediapipe::PacketGeneratorOptions)},
-  { 5, 16, sizeof(::mediapipe::PacketGeneratorConfig)},
+  { 0, 6, sizeof(::mediapipe::PacketGeneratorOptions)},
+  { 7, 18, sizeof(::mediapipe::PacketGeneratorConfig)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -86,17 +89,19 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 
 const char descriptor_table_protodef_mediapipe_2fframework_2fpacket_5fgenerator_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n*mediapipe/framework/packet_generator.p"
-  "roto\022\tmediapipe\"$\n\026PacketGeneratorOption"
-  "s*\n\010\240\234\001\020\200\200\200\200\002\"\317\001\n\025PacketGeneratorConfig\022"
-  "\030\n\020packet_generator\030\001 \001(\t\022\031\n\021input_side_"
-  "packet\030\002 \003(\t\022\027\n\016external_input\030\352\007 \003(\t\022\032\n"
-  "\022output_side_packet\030\003 \003(\t\022\030\n\017external_ou"
-  "tput\030\353\007 \003(\t\0222\n\007options\030\004 \001(\0132!.mediapipe"
-  ".PacketGeneratorOptions"
+  "roto\022\tmediapipe\"@\n\026PacketGeneratorOption"
+  "s\022\032\n\014merge_fields\030\001 \001(\010:\004true*\n\010\240\234\001\020\200\200\200\200"
+  "\002\"\317\001\n\025PacketGeneratorConfig\022\030\n\020packet_ge"
+  "nerator\030\001 \001(\t\022\031\n\021input_side_packet\030\002 \003(\t"
+  "\022\027\n\016external_input\030\352\007 \003(\t\022\032\n\022output_side"
+  "_packet\030\003 \003(\t\022\030\n\017external_output\030\353\007 \003(\t\022"
+  "2\n\007options\030\004 \001(\0132!.mediapipe.PacketGener"
+  "atorOptionsB2\n\032com.google.mediapipe.prot"
+  "oB\024PacketGeneratorProto"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fframework_2fpacket_5fgenerator_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fframework_2fpacket_5fgenerator_2eproto = {
-  false, false, 303, descriptor_table_protodef_mediapipe_2fframework_2fpacket_5fgenerator_2eproto, "mediapipe/framework/packet_generator.proto", 
+  false, false, 383, descriptor_table_protodef_mediapipe_2fframework_2fpacket_5fgenerator_2eproto, "mediapipe/framework/packet_generator.proto", 
   &descriptor_table_mediapipe_2fframework_2fpacket_5fgenerator_2eproto_once, nullptr, 0, 2,
   schemas, file_default_instances, TableStruct_mediapipe_2fframework_2fpacket_5fgenerator_2eproto::offsets,
   file_level_metadata_mediapipe_2fframework_2fpacket_5fgenerator_2eproto, file_level_enum_descriptors_mediapipe_2fframework_2fpacket_5fgenerator_2eproto, file_level_service_descriptors_mediapipe_2fframework_2fpacket_5fgenerator_2eproto,
@@ -113,6 +118,10 @@ namespace mediapipe {
 
 class PacketGeneratorOptions::_Internal {
  public:
+  using HasBits = decltype(std::declval<PacketGeneratorOptions>()._has_bits_);
+  static void set_has_merge_fields(HasBits* has_bits) {
+    (*has_bits)[0] |= 1u;
+  }
 };
 
 PacketGeneratorOptions::PacketGeneratorOptions(::PROTOBUF_NAMESPACE_ID::Arena* arena)
@@ -123,13 +132,16 @@ PacketGeneratorOptions::PacketGeneratorOptions(::PROTOBUF_NAMESPACE_ID::Arena* a
   // @@protoc_insertion_point(arena_constructor:mediapipe.PacketGeneratorOptions)
 }
 PacketGeneratorOptions::PacketGeneratorOptions(const PacketGeneratorOptions& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      _has_bits_(from._has_bits_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   _extensions_.MergeFrom(from._extensions_);
+  merge_fields_ = from.merge_fields_;
   // @@protoc_insertion_point(copy_constructor:mediapipe.PacketGeneratorOptions)
 }
 
 void PacketGeneratorOptions::SharedCtor() {
+merge_fields_ = true;
 }
 
 PacketGeneratorOptions::~PacketGeneratorOptions() {
@@ -159,14 +171,28 @@ void PacketGeneratorOptions::Clear() {
   (void) cached_has_bits;
 
   _extensions_.Clear();
+  merge_fields_ = true;
+  _has_bits_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* PacketGeneratorOptions::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // optional bool merge_fields = 1 [default = true];
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          _Internal::set_has_merge_fields(&has_bits);
+          merge_fields_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
         if ((tag == 0) || ((tag & 7) == 4)) {
           CHK_(ptr);
           ctx->SetLastTag(tag);
@@ -183,8 +209,11 @@ const char* PacketGeneratorOptions::_InternalParse(const char* ptr, ::PROTOBUF_N
             ptr, ctx);
         CHK_(ptr != nullptr);
         continue;
+      }
+    }  // switch
   }  // while
 success:
+  _has_bits_.Or(has_bits);
   return ptr;
 failure:
   ptr = nullptr;
@@ -197,6 +226,13 @@ failure:
   // @@protoc_insertion_point(serialize_to_array_start:mediapipe.PacketGeneratorOptions)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
+
+  cached_has_bits = _has_bits_[0];
+  // optional bool merge_fields = 1 [default = true];
+  if (cached_has_bits & 0x00000001u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(1, this->_internal_merge_fields(), target);
+  }
 
   // Extension range [20000, 536870912)
   target = _extensions_._InternalSerialize(
@@ -219,6 +255,12 @@ size_t PacketGeneratorOptions::ByteSizeLong() const {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // optional bool merge_fields = 1 [default = true];
+  cached_has_bits = _has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    total_size += 1 + 1;
+  }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
@@ -252,6 +294,9 @@ void PacketGeneratorOptions::MergeFrom(const PacketGeneratorOptions& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from._internal_has_merge_fields()) {
+    _internal_set_merge_fields(from._internal_merge_fields());
+  }
 }
 
 void PacketGeneratorOptions::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
@@ -280,6 +325,8 @@ void PacketGeneratorOptions::InternalSwap(PacketGeneratorOptions* other) {
   using std::swap;
   _extensions_.InternalSwap(&other->_extensions_);
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_has_bits_[0], other->_has_bits_[0]);
+  swap(merge_fields_, other->merge_fields_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata PacketGeneratorOptions::GetMetadata() const {

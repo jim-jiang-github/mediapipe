@@ -26,7 +26,7 @@ void xnn_qc8_gemm_minmax_fp32_ukernel_1x8c4__neondot(
     int8_t* restrict c,
     size_t cm_stride,
     size_t cn_stride,
-    const union xnn_qs8_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN XNN_DISABLE_MSAN
+    const union xnn_qs8_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
   assert(mr != 0);
   assert(mr <= 1);
@@ -83,7 +83,6 @@ void xnn_qc8_gemm_minmax_fp32_ukernel_1x8c4__neondot(
       vacc0x4567 = vdotq_lane_s32(vacc0x4567, vb0123x4567, va0x01234567, 0);
     }
 
-    // Post-accumulation work
     float32x4_t vfpacc0x0123 = vcvtq_f32_s32(vacc0x0123);
     float32x4_t vfpacc0x4567 = vcvtq_f32_s32(vacc0x4567);
 
@@ -95,7 +94,7 @@ void xnn_qc8_gemm_minmax_fp32_ukernel_1x8c4__neondot(
     vacc0x0123 = vcvtnq_s32_f32(vfpacc0x0123);
     vacc0x4567 = vcvtnq_s32_f32(vfpacc0x4567);
 
-    const int16x8_t voutput_zero_point = vld1q_dup_s16(&params->neon.output_zero_point);
+    const int16x8_t voutput_zero_point = vld1q_dup_s16(&params->neonv8.output_zero_point);
 #if XNN_ARCH_ARM64
     const int16x8_t vacc0x01234567 = vqaddq_s16(vqmovn_high_s32(vqmovn_s32(vacc0x0123), vacc0x4567), voutput_zero_point);
 
@@ -105,8 +104,8 @@ void xnn_qc8_gemm_minmax_fp32_ukernel_1x8c4__neondot(
 
     int8x8_t vout0x01234567 = vqmovn_s16(vacc0x01234567);
 #endif
-    const int8x8_t voutput_min = vld1_dup_s8(&params->neon.output_min);
-    const int8x8_t voutput_max = vld1_dup_s8(&params->neon.output_max);
+    const int8x8_t voutput_min = vld1_dup_s8(&params->neonv8.output_min);
+    const int8x8_t voutput_max = vld1_dup_s8(&params->neonv8.output_max);
 
     vout0x01234567 = vmax_s8(vout0x01234567, voutput_min);
 
@@ -125,11 +124,11 @@ void xnn_qc8_gemm_minmax_fp32_ukernel_1x8c4__neondot(
     } else {
       // Final case where not all of the 8 columns fit in the destination.
       if (nc & 4) {
-        vst1_lane_u32(__builtin_assume_aligned(c0, 1), vreinterpret_u32_s8(vout0x01234567), 0); c0 += 4;
+        vst1_lane_u32((void*) c0, vreinterpret_u32_s8(vout0x01234567), 0); c0 += 4;
         vout0x01234567 = vext_s8(vout0x01234567, vout0x01234567, 4);
       }
       if (nc & 2) {
-        vst1_lane_u16(__builtin_assume_aligned(c0, 1), vreinterpret_u16_s8(vout0x01234567), 0); c0 += 2;
+        vst1_lane_u16((void*) c0, vreinterpret_u16_s8(vout0x01234567), 0); c0 += 2;
         vout0x01234567 = vext_s8(vout0x01234567, vout0x01234567, 2);
       }
       if (nc & 1) {

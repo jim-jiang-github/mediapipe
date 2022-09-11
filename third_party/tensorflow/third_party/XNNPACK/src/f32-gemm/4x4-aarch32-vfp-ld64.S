@@ -17,10 +17,11 @@
 //     uint8_t*restrict c,       sp + 104 -> r6
 //     size_t cm_stride,         sp + 108 -> (r7)
 //     size_t cn_stride,         sp + 112 -> r11
-//     const union xnn_f32_default_params params[restrict XNN_MIN_ELEMENTS(1)])  sp + 116 -> (r11)
+//     const union xnn_f32_default_params params)  sp + 116 -> (r11)
 
+// d8-d15, r4-r11,r14(lr) need to be preserved if used. r13(sp),r15(pc) are reserved.
 
-// inner loop registers
+// Register usage
 
 // A0   r3  s0-s1  d0
 // A1  r12  s2-s3  d1
@@ -132,7 +133,7 @@ BEGIN_FUNCTION xnn_f32_gemm_ukernel_4x4__aarch32_vfp_ld64
 
         BHS     1b
 
-        # Is there a remainder?- 1 floats of A (4 bytes)
+        # Is there a remainder?- 1 float of A (4 bytes)
         TST     r5, 4
         BNE     3f
 
@@ -161,7 +162,7 @@ BEGIN_FUNCTION xnn_f32_gemm_ukernel_4x4__aarch32_vfp_ld64
         BX      lr
 
 3:
-        # Remainder- 1 floats of A (4 bytes)
+        # Remainder- 1 float of A (4 bytes)
         VLDM    r3!, {s0}               // A0
         VLDM    r9!, {d6-d7}            // B
         VLDM    r12!, {s1}              // A1

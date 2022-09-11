@@ -13,6 +13,7 @@
 
 #include <xnnpack/gemm.h>
 #include <xnnpack/math.h>
+#include <xnnpack/unaligned.h>
 
 
 
@@ -26,7 +27,7 @@ void xnn_qs8_gemm_minmax_fp32_ukernel_1x4c2__sse41_ld128(
     int8_t* restrict c,
     size_t cm_stride,
     size_t cn_stride,
-    const union xnn_qs8_conv_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN XNN_DISABLE_MSAN
+    const union xnn_qs8_conv_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
   assert(mr != 0);
   assert(mr <= 1);
@@ -37,7 +38,7 @@ void xnn_qs8_gemm_minmax_fp32_ukernel_1x4c2__sse41_ld128(
   assert(w != NULL);
   assert(c != NULL);
 
-  kc = round_up_po2(kc, 2);
+  kc = round_up_po2(kc, 2 * sizeof(int8_t));
   const int8_t* a0 = a;
   int8_t* c0 = c;
 
@@ -52,9 +53,8 @@ void xnn_qs8_gemm_minmax_fp32_ukernel_1x4c2__sse41_ld128(
       a0 += 8;
 
       const __m128i vb01 = _mm_loadu_si128((const __m128i*) w);
-      const __m128i vsb01 = _mm_cmpgt_epi8(_mm_setzero_si128(), vb01);
-      const __m128i vxb0 = _mm_unpacklo_epi8(vb01, vsb01);
-      const __m128i vxb1 = _mm_unpackhi_epi8(vb01, vsb01);
+      const __m128i vxb0 = _mm_cvtepi8_epi16(vb01);
+      const __m128i vxb1 = _mm_srai_epi16(_mm_unpackhi_epi8(vb01, vb01), 8);
 
       vacc0x0123 = _mm_add_epi32(vacc0x0123,
         _mm_madd_epi16(_mm_shuffle_epi32(vxa0, _MM_SHUFFLE(0, 0, 0, 0)), vxb0));
@@ -62,9 +62,8 @@ void xnn_qs8_gemm_minmax_fp32_ukernel_1x4c2__sse41_ld128(
       vacc0x0123 = _mm_add_epi32(vacc0x0123,
         _mm_madd_epi16(_mm_shuffle_epi32(vxa0, _MM_SHUFFLE(1, 1, 1, 1)), vxb1));
       const __m128i vb23 = _mm_loadu_si128((const __m128i*) ((const int8_t*) w + 16));
-      const __m128i vsb23 = _mm_cmpgt_epi8(_mm_setzero_si128(), vb23);
-      const __m128i vxb2 = _mm_unpacklo_epi8(vb23, vsb23);
-      const __m128i vxb3 = _mm_unpackhi_epi8(vb23, vsb23);
+      const __m128i vxb2 = _mm_cvtepi8_epi16(vb23);
+      const __m128i vxb3 = _mm_srai_epi16(_mm_unpackhi_epi8(vb23, vb23), 8);
 
       vacc0x0123 = _mm_add_epi32(vacc0x0123,
         _mm_madd_epi16(_mm_shuffle_epi32(vxa0, _MM_SHUFFLE(2, 2, 2, 2)), vxb2));
@@ -111,6 +110,9 @@ void xnn_qs8_gemm_minmax_fp32_ukernel_1x4c2__sse41_ld128(
     const __m128 vscale = _mm_load_ps(params->fp32_sse4.scale);
     vscaled0x0123 = _mm_mul_ps(vscaled0x0123, vscale);
 
+    const __m128 voutput_max_less_zero_point = _mm_load_ps(params->fp32_sse4.output_max_less_zero_point);
+    vscaled0x0123 = _mm_min_ps(vscaled0x0123, voutput_max_less_zero_point);
+
     vacc0x0123 = _mm_cvtps_epi32(vscaled0x0123);
 
     const __m128i voutput_zero_point = _mm_load_si128((const __m128i*) params->fp32_sse4.output_zero_point);
@@ -120,10 +122,9 @@ void xnn_qs8_gemm_minmax_fp32_ukernel_1x4c2__sse41_ld128(
     __m128i vout = _mm_packs_epi16(vacc00x0123, vacc00x0123);
 
     vout = _mm_max_epi8(vout, _mm_load_si128((const __m128i*) params->fp32_sse4.output_min));
-    vout = _mm_min_epi8(vout, _mm_load_si128((const __m128i*) params->fp32_sse4.output_max));
 
     if (nc >= 4) {
-      *((uint32_t*) c0) = (uint32_t) _mm_cvtsi128_si32(vout);
+      unaligned_store_u32(c0, (uint32_t) _mm_cvtsi128_si32(vout));
 
       c0 = (int8_t*) ((uintptr_t) c0 + cn_stride);
 
@@ -132,7 +133,7 @@ void xnn_qs8_gemm_minmax_fp32_ukernel_1x4c2__sse41_ld128(
       nc -= 4;
     } else {
       if (nc & 2) {
-        *((uint16_t*) c0) = (uint16_t) _mm_extract_epi16(vout, 0);
+        unaligned_store_u16(c0, (uint16_t) _mm_extract_epi16(vout, 0));
         c0 += 2;
         vout = _mm_srli_epi32(vout, 16);
       }

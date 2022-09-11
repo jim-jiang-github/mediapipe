@@ -19,14 +19,14 @@ void xnn_f32_vrelu_ukernel__wasmsimd_x8(
     size_t n,
     const float* x,
     float* y,
-    const union xnn_f32_relu_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN
+    const union xnn_f32_relu_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
   assert(n != 0);
   assert(n % sizeof(float) == 0);
   assert(x != NULL);
   assert(y != NULL);
 
-  const v128_t vzero = wasm_f32x4_splat(0.0f);
+  const v128_t vzero = wasm_i32x4_const_splat(0);
 
   for (; n >= 8 * sizeof(float); n -= 8 * sizeof(float)) {
     v128_t vacc0123 = wasm_v128_load(x);

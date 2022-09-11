@@ -55,11 +55,12 @@ const char descriptor_table_protodef_mediapipe_2fframework_2fformats_2fimage_5ff
   "\022\t\n\005GRAY8\020\003\022\n\n\006GRAY16\020\004\022\r\n\tYCBCR420P\020\005\022\017"
   "\n\013YCBCR420P10\020\006\022\n\n\006SRGB48\020\007\022\013\n\007SRGBA64\020\010"
   "\022\013\n\007VEC32F1\020\t\022\013\n\007VEC32F2\020\014\022\010\n\004LAB8\020\n\022\t\n\005"
-  "SBGRA\020\013"
+  "SBGRA\020\013B6\n\"com.google.mediapipe.formats."
+  "protoB\020ImageFormatProto"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fframework_2fformats_2fimage_5fformat_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fframework_2fformats_2fimage_5fformat_2eproto = {
-  false, false, 247, descriptor_table_protodef_mediapipe_2fframework_2fformats_2fimage_5fformat_2eproto, "mediapipe/framework/formats/image_format.proto", 
+  false, false, 303, descriptor_table_protodef_mediapipe_2fframework_2fformats_2fimage_5fformat_2eproto, "mediapipe/framework/formats/image_format.proto", 
   &descriptor_table_mediapipe_2fframework_2fformats_2fimage_5fformat_2eproto_once, nullptr, 0, 1,
   schemas, file_default_instances, TableStruct_mediapipe_2fframework_2fformats_2fimage_5fformat_2eproto::offsets,
   file_level_metadata_mediapipe_2fframework_2fformats_2fimage_5fformat_2eproto, file_level_enum_descriptors_mediapipe_2fframework_2fformats_2fimage_5fformat_2eproto, file_level_service_descriptors_mediapipe_2fframework_2fformats_2fimage_5fformat_2eproto,

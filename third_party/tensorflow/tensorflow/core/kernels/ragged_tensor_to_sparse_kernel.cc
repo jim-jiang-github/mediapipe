@@ -21,6 +21,7 @@ limitations under the License.
 #include "tensorflow/core/framework/register_types.h"
 #include "tensorflow/core/framework/tensor.h"
 #include "tensorflow/core/framework/tensor_shape.h"
+#include "tensorflow/core/platform/errors.h"
 
 namespace tensorflow {
 
@@ -38,7 +39,8 @@ class RaggedTensorToSparseOp : public OpKernel {
     OP_REQUIRES_OK(
         context, context->input_list("rt_nested_splits", &rt_nested_splits_in));
     const int rt_nested_splits_len = rt_nested_splits_in.size();
-    DCHECK_GT(rt_nested_splits_len, 0);  // Enforced by REGISTER_OP.
+    OP_REQUIRES(context, rt_nested_splits_len > 0,
+                errors::InvalidArgument("rt_nested_splits must be non empty"));
     std::vector<ConstFlatSplits> rt_nested_splits;
     rt_nested_splits.reserve(rt_nested_splits_len);
     for (int i = 0; i < rt_nested_splits_len; ++i) {
@@ -55,8 +57,8 @@ class RaggedTensorToSparseOp : public OpKernel {
     //   dimension.
     // - `index_middle` is the index in the last ragged dimension.
     // - `index_suffix` is the index in the dense value dimensions.
-    std::vector<int64> index_prefix(rt_nested_splits_len);
-    std::vector<std::vector<int64>> index_suffixes =
+    std::vector<int64_t> index_prefix(rt_nested_splits_len);
+    std::vector<std::vector<int64_t>> index_suffixes =
         MakeIndexSuffixes(rt_dense_values_in.shape());
 
     // Allocate the `sparse_indices` output tensor.
@@ -69,12 +71,12 @@ class RaggedTensorToSparseOp : public OpKernel {
     OP_REQUIRES_OK(
         context, context->allocate_output(0, TensorShape({nvals, indices_len}),
                                           &sparse_indices_out));
-    auto sparse_indices = sparse_indices_out->tensor<int64, 2>();
+    auto sparse_indices = sparse_indices_out->tensor<int64_t, 2>();
 
     // pos[i] is the current position in rt_nested_splits[i].  final_pos is a
     // reference to make it easier to refer to pos[-1].
-    std::vector<int64> pos(rt_nested_splits_len);
-    int64& final_pos = pos[rt_nested_splits_len - 1];
+    std::vector<int64_t> pos(rt_nested_splits_len);
+    int64_t& final_pos = pos[rt_nested_splits_len - 1];
 
     // Each iteration through the loop, we increment pos[-1], and add indices
     // for all the values corresponding to
@@ -134,7 +136,7 @@ class RaggedTensorToSparseOp : public OpKernel {
     Tensor* sparse_dense_shape_out = nullptr;
     OP_REQUIRES_OK(context, context->allocate_output(2, TensorShape({ndims}),
                                                      &sparse_dense_shape_out));
-    auto sparse_dense_shape = sparse_dense_shape_out->vec<int64>();
+    auto sparse_dense_shape = sparse_dense_shape_out->vec<int64_t>();
     sparse_dense_shape(0) = rt_nested_splits_in[0].dim_size(0) - 1;
     for (int dim = 0; dim < rt_nested_splits_len; ++dim) {
       const auto& splits = rt_nested_splits[dim];
@@ -162,6 +164,14 @@ class RaggedTensorToSparseOp : public OpKernel {
       if (rt_nested_splits[i](0) != 0) {
         return InvalidArgument("First value of ragged splits must be 0.");
       }
+      for (int j = 1; j < rt_nested_splits[i].size(); ++j) {
+        if (rt_nested_splits[i](j) < rt_nested_splits[i](j - 1)) {
+          return InvalidArgument(
+              "Ragged splits should be non decreasing, but we got ",
+              rt_nested_splits[i](j - 1), " followed by ",
+              rt_nested_splits[i](j));
+        }
+      }
       if (i > 0) {
         SPLITS_TYPE last_split =
             rt_nested_splits[i - 1](rt_nested_splits[i - 1].size() - 1);
@@ -178,7 +188,7 @@ class RaggedTensorToSparseOp : public OpKernel {
           "Final value of ragged splits must match the length "
           "the corresponding ragged values.");
     }
-    return ::tensorflow::Status::OK();
+    return OkStatus();
   }
 
   // Build a list of index suffixes that should be added for each ragged item,
@@ -188,11 +198,11 @@ class RaggedTensorToSparseOp : public OpKernel {
   // values, and we want index suffixes for a single value).  Example:
   // MakeIndexSuffixes(TensorShape({100, 3, 2})
   //   --> {{0, 0}, {0, 1}, {1, 0}, {1, 1}, {2, 0}, {2, 1}}
-  static std::vector<std::vector<int64>> MakeIndexSuffixes(
+  static std::vector<std::vector<int64_t>> MakeIndexSuffixes(
       const TensorShape& values_shape) {
-    std::vector<std::vector<int64>> suffixes{{}};
+    std::vector<std::vector<int64_t>> suffixes{{}};
     for (int dim = 1; dim < values_shape.dims(); ++dim) {
-      std::vector<std::vector<int64>> new_suffixes;
+      std::vector<std::vector<int64_t>> new_suffixes;
       for (const auto& suffix : suffixes) {
         for (int i = 0; i < values_shape.dim_size(dim); ++i) {
           new_suffixes.push_back(suffix);
@@ -208,7 +218,7 @@ class RaggedTensorToSparseOp : public OpKernel {
   // element is completed if we have already generated indices for all of its
   // values.
   static bool IsCompleted(
-      const std::vector<int64>& pos, int dim,
+      const std::vector<int64_t>& pos, int dim,
       const std::vector<ConstFlatSplits>& rt_nested_splits) {
     int64_t current_child = pos[dim + 1];
     int64_t limit_child = rt_nested_splits[dim](pos[dim] + 1);
@@ -223,7 +233,7 @@ REGISTER_KERNEL_BUILDER(Name("RaggedTensorToSparse")
 
 REGISTER_KERNEL_BUILDER(Name("RaggedTensorToSparse")
                             .Device(DEVICE_CPU)
-                            .TypeConstraint<int64>("Tsplits"),
-                        RaggedTensorToSparseOp<int64>);
+                            .TypeConstraint<int64_t>("Tsplits"),
+                        RaggedTensorToSparseOp<int64_t>);
 
 }  // namespace tensorflow

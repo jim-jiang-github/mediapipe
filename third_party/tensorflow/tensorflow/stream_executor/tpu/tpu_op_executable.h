@@ -53,12 +53,12 @@ class TpuOpExecutable : public xla::TpuExecutableInterface {
       const xla::ServiceExecutableRunOptions& run_options,
       absl::Span<const stream_executor::DeviceMemoryBase> arguments,
       stream_executor::DeviceMemoryBase result,
-      absl::optional<stream_executor::DeviceMemoryBase>
+      std::optional<stream_executor::DeviceMemoryBase>
           cross_program_prefetch_addr) override;
 
   xla::Shape HostShapeToDeviceShape(const xla::Shape& host_shape) override;
 
-  int64 ShapeSize(const xla::Shape& shape) override;
+  int64_t ShapeSize(const xla::Shape& shape) override;
 
   const XLA_TpuProgram* const core_program_;
 

@@ -11,7 +11,6 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdlib>
-#include <functional>
 #include <limits>
 #include <random>
 #include <vector>
@@ -80,17 +79,124 @@ class CopyOperatorTester {
     return this->iterations_;
   }
 
+  void TestX8() const {
+    std::random_device random_device;
+    auto rng = std::mt19937(random_device());
+    std::uniform_int_distribution<uint32_t> u8dist(
+      std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max());
+
+    std::vector<uint8_t> input(XNN_EXTRA_BYTES / sizeof(uint8_t) +
+      (batch_size() - 1) * input_stride() + channels());
+    std::vector<uint8_t> output((batch_size() - 1) * output_stride() + channels());
+    std::vector<uint8_t> output_ref(batch_size() * channels());
+    for (size_t iteration = 0; iteration < iterations(); iteration++) {
+      std::generate(input.begin(), input.end(), [&]() { return u8dist(rng); });
+      std::fill(output.begin(), output.end(), UINT8_C(0xFA));
+
+      // Compute reference results.
+      for (size_t i = 0; i < batch_size(); i++) {
+        for (size_t c = 0; c < channels(); c++) {
+          output_ref[i * channels() + c] = input[i * input_stride() + c];
+        }
+      }
+
+      // Create, setup, run, and destroy Copy operator.
+      ASSERT_EQ(xnn_status_success, xnn_initialize(nullptr /* allocator */));
+      xnn_operator_t copy_op = nullptr;
+
+      ASSERT_EQ(xnn_status_success,
+        xnn_create_copy_nc_x8(
+          channels(), input_stride(), output_stride(),
+          0, &copy_op));
+      ASSERT_NE(nullptr, copy_op);
+
+      // Smart pointer to automatically delete copy_op.
+      std::unique_ptr<xnn_operator, decltype(&xnn_delete_operator)> auto_copy_op(copy_op, xnn_delete_operator);
+
+      ASSERT_EQ(xnn_status_success,
+        xnn_setup_copy_nc_x8(
+          copy_op,
+          batch_size(),
+          input.data(), output.data(),
+          nullptr /* thread pool */));
+
+      ASSERT_EQ(xnn_status_success,
+        xnn_run_operator(copy_op, nullptr /* thread pool */));
+
+      // Verify results.
+      for (size_t i = 0; i < batch_size(); i++) {
+        for (size_t c = 0; c < channels(); c++) {
+          ASSERT_EQ(output_ref[i * channels() + c], output[i * output_stride() + c])
+            << "at batch " << i << " / " << batch_size() << ", channel = " << c << " / " << channels();
+        }
+      }
+    }
+  }
+
+  void TestX16() const {
+    std::random_device random_device;
+    auto rng = std::mt19937(random_device());
+    std::uniform_int_distribution<uint16_t> u16dist;
+
+    std::vector<uint16_t> input(XNN_EXTRA_BYTES / sizeof(uint16_t) +
+      (batch_size() - 1) * input_stride() + channels());
+    std::vector<uint16_t> output((batch_size() - 1) * output_stride() + channels());
+    std::vector<uint16_t> output_ref(batch_size() * channels());
+    for (size_t iteration = 0; iteration < iterations(); iteration++) {
+      std::generate(input.begin(), input.end(), [&]() { return u16dist(rng); });
+      std::fill(output.begin(), output.end(), UINT16_C(0xDEAD));
+
+      // Compute reference results.
+      for (size_t i = 0; i < batch_size(); i++) {
+        for (size_t c = 0; c < channels(); c++) {
+          output_ref[i * channels() + c] = input[i * input_stride() + c];
+        }
+      }
+
+      // Create, setup, run, and destroy Copy operator.
+      ASSERT_EQ(xnn_status_success, xnn_initialize(nullptr /* allocator */));
+      xnn_operator_t copy_op = nullptr;
+
+      ASSERT_EQ(xnn_status_success,
+        xnn_create_copy_nc_x16(
+          channels(), input_stride(), output_stride(),
+          0, &copy_op));
+      ASSERT_NE(nullptr, copy_op);
+
+      // Smart pointer to automatically delete copy_op.
+      std::unique_ptr<xnn_operator, decltype(&xnn_delete_operator)> auto_copy_op(copy_op, xnn_delete_operator);
+
+      ASSERT_EQ(xnn_status_success,
+        xnn_setup_copy_nc_x16(
+          copy_op,
+          batch_size(),
+          input.data(), output.data(),
+          nullptr /* thread pool */));
+
+      ASSERT_EQ(xnn_status_success,
+        xnn_run_operator(copy_op, nullptr /* thread pool */));
+
+      // Verify results.
+      for (size_t i = 0; i < batch_size(); i++) {
+        for (size_t c = 0; c < channels(); c++) {
+          ASSERT_EQ(output_ref[i * channels() + c], output[i * output_stride() + c])
+            << "at batch " << i << " / " << batch_size() << ", channel = " << c << " / " << channels();
+        }
+      }
+    }
+  }
+
   void TestX32() const {
     std::random_device random_device;
     auto rng = std::mt19937(random_device());
-    auto u32rng = std::bind(std::uniform_int_distribution<uint32_t>(), rng);
+    std::uniform_int_distribution<uint32_t> u32dist;
 
-    std::vector<uint32_t> input(XNN_EXTRA_BYTES / sizeof(float) +
+    std::vector<uint32_t> input(XNN_EXTRA_BYTES / sizeof(uint32_t) +
       (batch_size() - 1) * input_stride() + channels());
     std::vector<uint32_t> output((batch_size() - 1) * output_stride() + channels());
     std::vector<uint32_t> output_ref(batch_size() * channels());
     for (size_t iteration = 0; iteration < iterations(); iteration++) {
-      std::generate(input.begin(), input.end(), std::ref(u32rng));
+      std::generate(input.begin(), input.end(), [&]() { return u32dist(rng); });
       std::fill(output.begin(), output.end(), UINT32_C(0xDEADBEEF));
 
       // Compute reference results.

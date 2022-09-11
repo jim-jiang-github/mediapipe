@@ -61,6 +61,111 @@ struct compute_parameters {
   size_t tile[2];
 };
 
+struct transpose_context {
+  const void* x;
+  void* y;
+  union {
+    xnn_transposec_ukernel_function const_size_ukernel;
+    xnn_transposev_ukernel_function variable_size_ukernel;
+  };
+  union {
+    size_t element_size;
+    size_t log2_element_size;
+  };
+  size_t input_stride[XNN_MAX_TENSOR_DIMS];
+  size_t output_stride[XNN_MAX_TENSOR_DIMS];
+};
+
+XNN_PRIVATE void xnn_compute_transposec_2d(
+    const struct transpose_context* context,
+    size_t i,
+    size_t j,
+    size_t tile_i,
+    size_t tile_j);
+
+XNN_PRIVATE void xnn_compute_transposec_3d(
+    const struct transpose_context* context,
+    size_t i,
+    size_t j,
+    size_t k,
+    size_t tile_j,
+    size_t tile_k);
+
+XNN_PRIVATE void xnn_compute_transposec_4d(
+    const struct transpose_context* context,
+    size_t i,
+    size_t j,
+    size_t k,
+    size_t l,
+    size_t tile_k,
+    size_t tile_l);
+
+XNN_PRIVATE void xnn_compute_transposec_5d(
+    const struct transpose_context* context,
+    size_t i,
+    size_t j,
+    size_t k,
+    size_t l,
+    size_t m,
+    size_t tile_l,
+    size_t tile_m);
+
+XNN_PRIVATE void xnn_compute_transposec_6d(
+    const struct transpose_context* context,
+    size_t i,
+    size_t j,
+    size_t k,
+    size_t l,
+    size_t m,
+    size_t n,
+    size_t tile_m,
+    size_t tile_n);
+
+XNN_PRIVATE void xnn_compute_transposev_2d(
+    const struct transpose_context* context,
+    size_t i,
+    size_t j,
+    size_t tile_i,
+    size_t tile_j);
+
+XNN_PRIVATE void xnn_compute_transposev_3d(
+    const struct transpose_context* context,
+    size_t i,
+    size_t j,
+    size_t k,
+    size_t tile_j,
+    size_t tile_k);
+
+XNN_PRIVATE void xnn_compute_transposev_4d(
+    const struct transpose_context* context,
+    size_t i,
+    size_t j,
+    size_t k,
+    size_t l,
+    size_t tile_k,
+    size_t tile_l);
+
+XNN_PRIVATE void xnn_compute_transposev_5d(
+    const struct transpose_context* context,
+    size_t i,
+    size_t j,
+    size_t k,
+    size_t l,
+    size_t m,
+    size_t tile_l,
+    size_t tile_m);
+
+XNN_PRIVATE void xnn_compute_transposev_6d(
+    const struct transpose_context* context,
+    size_t i,
+    size_t j,
+    size_t k,
+    size_t l,
+    size_t m,
+    size_t n,
+    size_t tile_m,
+    size_t tile_n);
+
 struct gemm_context {
   size_t k_scaled;
   const void* a;
@@ -77,7 +182,7 @@ struct gemm_context {
   union {
     union xnn_qs8_conv_minmax_params qs8;
     union xnn_qu8_conv_minmax_params qu8;
-    struct xnn_f16_scaleminmax_params f16;
+    union xnn_f16_scaleminmax_params f16;
     union xnn_f32_minmax_params f32;
   } params;
 };
@@ -180,7 +285,7 @@ struct igemm_context {
   union {
     union xnn_qs8_conv_minmax_params qs8;
     union xnn_qu8_conv_minmax_params qu8;
-    struct xnn_f16_scaleminmax_params f16;
+    union xnn_f16_scaleminmax_params f16;
     union xnn_f32_minmax_params f32;
   } params;
 };
@@ -276,7 +381,7 @@ struct subgemm_context {
   union {
     union xnn_qs8_conv_minmax_params qs8;
     union xnn_qu8_conv_minmax_params qu8;
-    struct xnn_f16_scaleminmax_params f16;
+    union xnn_f16_scaleminmax_params f16;
     union xnn_f32_minmax_params f32;
   } params;
 };
@@ -322,7 +427,7 @@ struct subconv_context {
   union {
     union xnn_qs8_conv_minmax_params qs8;
     union xnn_qu8_conv_minmax_params qu8;
-    struct xnn_f16_scaleminmax_params f16;
+    union xnn_f16_scaleminmax_params f16;
     union xnn_f32_minmax_params f32;
   } params;
 };
@@ -396,7 +501,7 @@ struct dwconv_context {
   union {
     union xnn_qs8_conv_minmax_params qs8;
     union xnn_qu8_conv_minmax_params qu8;
-    struct xnn_f16_minmax_params f16;
+    union xnn_f16_minmax_params f16;
     union xnn_f32_minmax_params f32;
   } params;
   union {
@@ -520,7 +625,7 @@ struct unpooling_context {
   const uint32_t* index;
   size_t index_height_stride;
   size_t index_width_stride;
-  void** indirect_output;
+  const void** indirect_output;
   size_t indirect_output_height_stride;
   size_t indirect_output_width_stride;
   size_t pooling_size;
@@ -585,8 +690,9 @@ struct average_pooling_context {
   size_t input_increment;
   size_t output_increment;
   union {
-    union xnn_qu8_avgpool_params qu8;
+    union xnn_f16_scaleminmax_params f16;
     union xnn_f32_scaleminmax_params f32;
+    union xnn_qu8_avgpool_minmax_params qu8;
   } params;
   union {
     xnn_avgpool_unipass_ukernel_function unipass_ukernel;
@@ -623,8 +729,9 @@ struct pixelwise_average_pooling_context {
   size_t input_increment;
   size_t output_increment;
   union {
-    union xnn_u8_minmax_params u8;
+    union xnn_f16_minmax_params f16;
     union xnn_f32_minmax_params f32;
+    union xnn_u8_minmax_params u8;
   } params;
   union {
     xnn_pavgpool_unipass_ukernel_function unipass_ukernel;
@@ -654,9 +761,9 @@ struct global_average_pooling_nwc_context {
   void* output;
   size_t output_batch_stride;
   union {
-    union xnn_qs8_avgpool_params qs8;
-    union xnn_qu8_avgpool_params qu8;
-    struct xnn_f16_scaleminmax_params f16;
+    union xnn_qs8_avgpool_minmax_params qs8;
+    union xnn_qu8_avgpool_minmax_params qu8;
+    union xnn_f16_scaleminmax_params f16;
     union xnn_f32_scaleminmax_params f32;
   } params;
   union {
@@ -767,9 +874,11 @@ struct elementwise_binary_context {
   size_t y_stride[XNN_MAX_TENSOR_DIMS - 1];
   size_t elements;
   union {
-    union xnn_qs8_add_minmax_params qs8;
-    union xnn_qu8_add_minmax_params qu8;
-    struct xnn_f16_minmax_params f16;
+    union xnn_qs8_add_minmax_params qs8_addsub;
+    union xnn_qu8_add_minmax_params qu8_addsub;
+    union xnn_qs8_mul_minmax_params qs8_mul;
+    union xnn_qu8_mul_minmax_params qu8_mul;
+    union xnn_f16_minmax_params f16;
     union xnn_f32_minmax_params f32;
   } params;
   xnn_vbinary_ukernel_function ukernel;
@@ -844,9 +953,35 @@ struct univector_strided_context {
   size_t y_stride;
   xnn_univector_ukernel_function ukernel;
   union {
-    union xnn_u8_minmax_params u8_output;
-    union xnn_f32_minmax_params f32_output;
+    union xnn_f16_abs_params f16_abs;
+    union xnn_f16_default_params f16_default;
+    union xnn_f16_f32_cvt_params f16_f32_cvt;
+    union xnn_f16_hswish_params f16_hswish;
+    union xnn_f16_lrelu_params f16_lrelu;
+    union xnn_f16_minmax_params f16_minmax;
+    union xnn_f16_neg_params f16_neg;
+    union xnn_f16_sigmoid_params f16_sigmoid;
+    union xnn_f32_abs_params f32_abs;
+    union xnn_f32_default_params f32_default;
+    union xnn_f32_elu_params f32_elu;
+    union xnn_f32_f16_cvt_params f32_f16_cvt;
     union xnn_f32_hswish_params f32_hswish;
+    union xnn_f32_lrelu_params f32_lrelu;
+    union xnn_f32_minmax_params f32_minmax;
+    union xnn_f32_neg_params f32_neg;
+    union xnn_f32_qs8_cvt_params f32_qs8_cvt;
+    union xnn_f32_qu8_cvt_params f32_qu8_cvt;
+    union xnn_f32_rnd_params f32_rnd;
+    union xnn_f32_sigmoid_params f32_sigmoid;
+    union xnn_f32_sqrt_params f32_sqrt;
+    union xnn_qs8_cvt_params qs8_cvt;
+    union xnn_qs8_f32_cvt_params qs8_f32_cvt;
+    union xnn_qs8_lrelu_params qs8_lrelu;
+    union xnn_qu8_cvt_params qu8_cvt;
+    union xnn_qu8_f32_cvt_params qu8_f32_cvt;
+    union xnn_qu8_lrelu_params qu8_lrelu;
+    union xnn_s8_minmax_params s8_minmax;
+    union xnn_u8_minmax_params u8_minmax;
   } params;
 };
 
@@ -859,14 +994,40 @@ struct univector_strided_context {
 
 struct univector_contiguous_context {
   const void* x;
-  size_t x_stride;
   void* y;
-  size_t y_stride;
+  uint16_t log2_xsize;
+  uint16_t log2_ysize;
   xnn_univector_ukernel_function ukernel;
   union {
-    union xnn_u8_minmax_params u8_output;
-    union xnn_f32_minmax_params f32_output;
+    union xnn_f16_abs_params f16_abs;
+    union xnn_f16_default_params f16_default;
+    union xnn_f16_f32_cvt_params f16_f32_cvt;
+    union xnn_f16_hswish_params f16_hswish;
+    union xnn_f16_lrelu_params f16_lrelu;
+    union xnn_f16_minmax_params f16_minmax;
+    union xnn_f16_neg_params f16_neg;
+    union xnn_f16_sigmoid_params f16_sigmoid;
+    union xnn_f32_abs_params f32_abs;
+    union xnn_f32_default_params f32_default;
+    union xnn_f32_elu_params f32_elu;
+    union xnn_f32_f16_cvt_params f32_f16_cvt;
     union xnn_f32_hswish_params f32_hswish;
+    union xnn_f32_lrelu_params f32_lrelu;
+    union xnn_f32_minmax_params f32_minmax;
+    union xnn_f32_neg_params f32_neg;
+    union xnn_f32_qs8_cvt_params f32_qs8_cvt;
+    union xnn_f32_qu8_cvt_params f32_qu8_cvt;
+    union xnn_f32_rnd_params f32_rnd;
+    union xnn_f32_sigmoid_params f32_sigmoid;
+    union xnn_f32_sqrt_params f32_sqrt;
+    union xnn_qs8_cvt_params qs8_cvt;
+    union xnn_qs8_f32_cvt_params qs8_f32_cvt;
+    union xnn_qs8_lrelu_params qs8_lrelu;
+    union xnn_qu8_cvt_params qu8_cvt;
+    union xnn_qu8_f32_cvt_params qu8_f32_cvt;
+    union xnn_qu8_lrelu_params qu8_lrelu;
+    union xnn_s8_minmax_params s8_minmax;
+    union xnn_u8_minmax_params u8_minmax;
   } params;
 };
 
@@ -903,7 +1064,7 @@ struct vmulcaddc_context {
   size_t y_stride;
   xnn_vmulcaddc_ukernel_function ukernel;
   union {
-    struct xnn_f16_minmax_params f16;
+    union xnn_f16_minmax_params f16;
     union xnn_f32_minmax_params f32;
   } params;
 };
@@ -952,20 +1113,30 @@ struct u8_softmax_context {
       size_t batch_index);
 #endif
 
-struct f32_three_pass_softmax_context {
+typedef void (*xnn_compute_reciprocal_function)(const void* input, void* output);
+
+struct floating_point_softmax_context {
   size_t n;
   const void* x;
   size_t x_stride;
   void* y;
   size_t y_stride;
-  xnn_f32_rmax_ukernel_function rmax_ukernel;
-  xnn_f32_raddstoreexpminusmax_ukernel_function raddstoreexpminusmax_ukernel;
+  xnn_rmax_ukernel_function rmax_ukernel;
+  xnn_raddstoreexpminusmax_ukernel_function raddstoreexpminusmax_ukernel;
+  xnn_compute_reciprocal_function compute_reciprocal;
   xnn_vbinary_ukernel_function vmulc_ukernel;
-  union xnn_f32_minmax_params params;
+  union {
+    union xnn_f16_minmax_params f16;
+    union xnn_f32_minmax_params f32;
+  } minmax_params;
+  union {
+    union xnn_f16_expminus_params f16;
+    union xnn_f32_expminus_params f32;
+  } expminus_params;
 };
 
 #ifndef __cplusplus
-  XNN_PRIVATE void xnn_compute_f32_three_pass_softmax(
-      const struct f32_three_pass_softmax_context context[restrict XNN_MIN_ELEMENTS(1)],
+  XNN_PRIVATE void xnn_compute_floating_point_softmax(
+      const struct floating_point_softmax_context context[restrict XNN_MIN_ELEMENTS(1)],
       size_t batch_index);
 #endif

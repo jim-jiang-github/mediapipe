@@ -30,9 +30,6 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
-#include <google/protobuf/map.h>  // IWYU pragma: export
-#include <google/protobuf/map_entry.h>
-#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -49,7 +46,7 @@ struct TableStruct_mediapipe_2futil_2flabel_5fmap_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[3]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[1]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -57,20 +54,12 @@ struct TableStruct_mediapipe_2futil_2flabel_5fmap_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2futil_2flabel_5fmap_2eproto;
 namespace mediapipe {
-class LabelMap;
-struct LabelMapDefaultTypeInternal;
-extern LabelMapDefaultTypeInternal _LabelMap_default_instance_;
 class LabelMapItem;
 struct LabelMapItemDefaultTypeInternal;
 extern LabelMapItemDefaultTypeInternal _LabelMapItem_default_instance_;
-class LabelMap_IndexToItemEntry_DoNotUse;
-struct LabelMap_IndexToItemEntry_DoNotUseDefaultTypeInternal;
-extern LabelMap_IndexToItemEntry_DoNotUseDefaultTypeInternal _LabelMap_IndexToItemEntry_DoNotUse_default_instance_;
 }  // namespace mediapipe
 PROTOBUF_NAMESPACE_OPEN
-template<> ::mediapipe::LabelMap* Arena::CreateMaybeMessage<::mediapipe::LabelMap>(Arena*);
 template<> ::mediapipe::LabelMapItem* Arena::CreateMaybeMessage<::mediapipe::LabelMapItem>(Arena*);
-template<> ::mediapipe::LabelMap_IndexToItemEntry_DoNotUse* Arena::CreateMaybeMessage<::mediapipe::LabelMap_IndexToItemEntry_DoNotUse>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace mediapipe {
 
@@ -266,180 +255,6 @@ class LabelMapItem PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> child_name_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr display_name_;
-  friend struct ::TableStruct_mediapipe_2futil_2flabel_5fmap_2eproto;
-};
-// -------------------------------------------------------------------
-
-class LabelMap_IndexToItemEntry_DoNotUse : public ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<LabelMap_IndexToItemEntry_DoNotUse, 
-    ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem,
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_INT64,
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> {
-public:
-  typedef ::PROTOBUF_NAMESPACE_ID::internal::MapEntry<LabelMap_IndexToItemEntry_DoNotUse, 
-    ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem,
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_INT64,
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> SuperType;
-  LabelMap_IndexToItemEntry_DoNotUse();
-  explicit constexpr LabelMap_IndexToItemEntry_DoNotUse(
-      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
-  explicit LabelMap_IndexToItemEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  void MergeFrom(const LabelMap_IndexToItemEntry_DoNotUse& other);
-  static const LabelMap_IndexToItemEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const LabelMap_IndexToItemEntry_DoNotUse*>(&_LabelMap_IndexToItemEntry_DoNotUse_default_instance_); }
-  static bool ValidateKey(void*) { return true; }
-  static bool ValidateValue(void*) { return true; }
-  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& other) final;
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-};
-
-// -------------------------------------------------------------------
-
-class LabelMap PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:mediapipe.LabelMap) */ {
- public:
-  inline LabelMap() : LabelMap(nullptr) {}
-  ~LabelMap() override;
-  explicit constexpr LabelMap(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
-
-  LabelMap(const LabelMap& from);
-  LabelMap(LabelMap&& from) noexcept
-    : LabelMap() {
-    *this = ::std::move(from);
-  }
-
-  inline LabelMap& operator=(const LabelMap& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline LabelMap& operator=(LabelMap&& from) noexcept {
-    if (GetArena() == from.GetArena()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  inline const ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet& unknown_fields() const {
-    return _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance);
-  }
-  inline ::PROTOBUF_NAMESPACE_ID::UnknownFieldSet* mutable_unknown_fields() {
-    return _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
-  }
-
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
-    return default_instance().GetMetadata().descriptor;
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
-    return default_instance().GetMetadata().reflection;
-  }
-  static const LabelMap& default_instance() {
-    return *internal_default_instance();
-  }
-  static inline const LabelMap* internal_default_instance() {
-    return reinterpret_cast<const LabelMap*>(
-               &_LabelMap_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    2;
-
-  friend void swap(LabelMap& a, LabelMap& b) {
-    a.Swap(&b);
-  }
-  inline void Swap(LabelMap* other) {
-    if (other == this) return;
-    if (GetArena() == other->GetArena()) {
-      InternalSwap(other);
-    } else {
-      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(LabelMap* other) {
-    if (other == this) return;
-    GOOGLE_DCHECK(GetArena() == other->GetArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline LabelMap* New() const final {
-    return CreateMaybeMessage<LabelMap>(nullptr);
-  }
-
-  LabelMap* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<LabelMap>(arena);
-  }
-  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const LabelMap& from);
-  void MergeFrom(const LabelMap& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
-  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
-      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  inline void SharedCtor();
-  inline void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(LabelMap* other);
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "mediapipe.LabelMap";
-  }
-  protected:
-  explicit LabelMap(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  private:
-  static void ArenaDtor(void* object);
-  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
-  public:
-
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-
-  // accessors -------------------------------------------------------
-
-  enum : int {
-    kIndexToItemFieldNumber = 1,
-  };
-  // map<int64, .mediapipe.LabelMapItem> index_to_item = 1;
-  int index_to_item_size() const;
-  private:
-  int _internal_index_to_item_size() const;
-  public:
-  void clear_index_to_item();
-  private:
-  const ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >&
-      _internal_index_to_item() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >*
-      _internal_mutable_index_to_item();
-  public:
-  const ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >&
-      index_to_item() const;
-  ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >*
-      mutable_index_to_item();
-
-  // @@protoc_insertion_point(class_scope:mediapipe.LabelMap)
- private:
-  class _Internal;
-
-  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
-  typedef void InternalArenaConstructable_;
-  typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::internal::MapField<
-      LabelMap_IndexToItemEntry_DoNotUse,
-      ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem,
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_INT64,
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::TYPE_MESSAGE> index_to_item_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_mediapipe_2futil_2flabel_5fmap_2eproto;
 };
 // ===================================================================
@@ -641,48 +456,9 @@ LabelMapItem::mutable_child_name() {
   return &child_name_;
 }
 
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
-// LabelMap
-
-// map<int64, .mediapipe.LabelMapItem> index_to_item = 1;
-inline int LabelMap::_internal_index_to_item_size() const {
-  return index_to_item_.size();
-}
-inline int LabelMap::index_to_item_size() const {
-  return _internal_index_to_item_size();
-}
-inline void LabelMap::clear_index_to_item() {
-  index_to_item_.Clear();
-}
-inline const ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >&
-LabelMap::_internal_index_to_item() const {
-  return index_to_item_.GetMap();
-}
-inline const ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >&
-LabelMap::index_to_item() const {
-  // @@protoc_insertion_point(field_map:mediapipe.LabelMap.index_to_item)
-  return _internal_index_to_item();
-}
-inline ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >*
-LabelMap::_internal_mutable_index_to_item() {
-  return index_to_item_.MutableMap();
-}
-inline ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >*
-LabelMap::mutable_index_to_item() {
-  // @@protoc_insertion_point(field_mutable_map:mediapipe.LabelMap.index_to_item)
-  return _internal_mutable_index_to_item();
-}
-
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
 
 // @@protoc_insertion_point(namespace_scope)
 

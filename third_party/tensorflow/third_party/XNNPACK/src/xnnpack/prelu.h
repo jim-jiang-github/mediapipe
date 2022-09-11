@@ -8,7 +8,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <xnnpack/params.h>
 #include <xnnpack/common.h>
 
 #ifdef __cplusplus
@@ -28,6 +27,10 @@ extern "C" {
 
 DECLARE_F16_PRELU_UKERNEL_FUNCTION(xnn_f16_prelu_ukernel__neonfp16arith_2x8)
 DECLARE_F16_PRELU_UKERNEL_FUNCTION(xnn_f16_prelu_ukernel__neonfp16arith_2x16)
+
+DECLARE_F16_PRELU_UKERNEL_FUNCTION(xnn_f16_prelu_ukernel__f16c_2x8)
+DECLARE_F16_PRELU_UKERNEL_FUNCTION(xnn_f16_prelu_ukernel__f16c_2x16)
+
 
 #define DECLARE_F32_PRELU_UKERNEL_FUNCTION(fn_name) \
   XNN_INTERNAL void fn_name(                        \

@@ -25,7 +25,7 @@ void xnn_qs8_gemm_minmax_rndnu_ukernel_1x16c4__neondot(
     int8_t* restrict c,
     size_t cm_stride,
     size_t cn_stride,
-    const union xnn_qs8_conv_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN XNN_DISABLE_MSAN
+    const union xnn_qs8_conv_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
   assert(mr != 0);
   assert(mr <= 1);
@@ -96,15 +96,14 @@ void xnn_qs8_gemm_minmax_rndnu_ukernel_1x16c4__neondot(
       vacc0xCDEF = vdotq_lane_s32(vacc0xCDEF, vb0123xCDEF, va0x01234567, 0);
     }
 
-    // Post-accumulation work
     const int32x4_t vright_pre_shift = vld1q_dup_s32(&params->rndnu_neon.right_pre_shift);
     const int32x4_t vmultiplier = vld1q_dup_s32(&params->rndnu_neon.multiplier);
     const int32x4_t vright_post_shift = vld1q_dup_s32(&params->rndnu_neon.right_post_shift);
 
-    vacc0x0123 = vshlq_s32(vacc0x0123, vright_pre_shift);
-    vacc0x4567 = vshlq_s32(vacc0x4567, vright_pre_shift);
-    vacc0x89AB = vshlq_s32(vacc0x89AB, vright_pre_shift);
-    vacc0xCDEF = vshlq_s32(vacc0xCDEF, vright_pre_shift);
+    vacc0x0123 = vqshlq_s32(vacc0x0123, vright_pre_shift);
+    vacc0x4567 = vqshlq_s32(vacc0x4567, vright_pre_shift);
+    vacc0x89AB = vqshlq_s32(vacc0x89AB, vright_pre_shift);
+    vacc0xCDEF = vqshlq_s32(vacc0xCDEF, vright_pre_shift);
 
     vacc0x0123 = vqdmulhq_s32(vacc0x0123, vmultiplier);
     vacc0x4567 = vqdmulhq_s32(vacc0x4567, vmultiplier);
@@ -153,11 +152,11 @@ void xnn_qs8_gemm_minmax_rndnu_ukernel_1x16c4__neondot(
         vout0x01234567 = vget_high_s8(vout0x0123456789ABCDEF);
       }
       if (nc & 4) {
-        vst1_lane_u32(__builtin_assume_aligned(c0, 1), vreinterpret_u32_s8(vout0x01234567), 0); c0 += 4;
+        vst1_lane_u32((void*) c0, vreinterpret_u32_s8(vout0x01234567), 0); c0 += 4;
         vout0x01234567 = vext_s8(vout0x01234567, vout0x01234567, 4);
       }
       if (nc & 2) {
-        vst1_lane_u16(__builtin_assume_aligned(c0, 1), vreinterpret_u16_s8(vout0x01234567), 0); c0 += 2;
+        vst1_lane_u16((void*) c0, vreinterpret_u16_s8(vout0x01234567), 0); c0 += 2;
         vout0x01234567 = vext_s8(vout0x01234567, vout0x01234567, 2);
       }
       if (nc & 1) {

@@ -1,5 +1,5 @@
 // Auto-generated file. Do not edit!
-//   Template: src/qs8-vadd/neon-ld64.c.in
+//   Template: src/qs8-vadd/neon.c.in
 //   Generator: tools/xngen
 //
 // Copyright 2020 Google LLC
@@ -19,7 +19,7 @@ void xnn_qs8_vadd_minmax_ukernel__neon_ld64_x16(
     const int8_t* input_a,
     const int8_t* input_b,
     int8_t* output,
-    const union xnn_qs8_add_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN XNN_DISABLE_MSAN
+    const union xnn_qs8_add_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
   const int8x8_t va_zero_point = vld1_dup_s8(&params->neon.a_zero_point);
   const int8x8_t vb_zero_point = vld1_dup_s8(&params->neon.b_zero_point);
@@ -95,11 +95,11 @@ void xnn_qs8_vadd_minmax_ukernel__neon_ld64_x16(
         n -= 8 * sizeof(int8_t);
       } else {
         if (n & (4 * sizeof(int8_t))) {
-          vst1_lane_u32(__builtin_assume_aligned(output, 1), vreinterpret_u32_s8(vout01234567), 0); output += 4;
+          vst1_lane_u32((void*) output, vreinterpret_u32_s8(vout01234567), 0); output += 4;
           vout01234567 = vext_s8(vout01234567, vout01234567, 4);
         }
         if (n & (2 * sizeof(int8_t))) {
-          vst1_lane_u16(__builtin_assume_aligned(output, 1), vreinterpret_u16_s8(vout01234567), 0); output += 2;
+          vst1_lane_u16((void*) output, vreinterpret_u16_s8(vout01234567), 0); output += 2;
           vout01234567 = vext_s8(vout01234567, vout01234567, 2);
         }
         if (n & (1 * sizeof(int8_t))) {

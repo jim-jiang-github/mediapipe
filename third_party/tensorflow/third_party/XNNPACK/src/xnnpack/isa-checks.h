@@ -48,6 +48,13 @@
     } \
   } while (0)
 
+#define TEST_REQUIRES_X86_F16C \
+  do { \
+    if (!cpuinfo_initialize() || !cpuinfo_has_x86_f16c()) { \
+      GTEST_SKIP(); \
+    } \
+  } while (0)
+
 #define TEST_REQUIRES_X86_XOP \
   do { \
     if (!cpuinfo_initialize() || !cpuinfo_has_x86_xop()) { \
@@ -83,9 +90,23 @@
     } \
   } while (0)
 
+#define TEST_REQUIRES_ARM_V6_SIMD \
+  do { \
+    if (!cpuinfo_initialize() || !cpuinfo_has_arm_v6()) { \
+      GTEST_SKIP(); \
+    } \
+  } while (0)
+
 #define TEST_REQUIRES_ARM_NEON \
   do { \
     if (!cpuinfo_initialize() || !cpuinfo_has_arm_neon()) { \
+      GTEST_SKIP(); \
+    } \
+  } while (0)
+
+#define TEST_REQUIRES_ARM_NEON_FP16 \
+  do { \
+    if (!cpuinfo_initialize() || !cpuinfo_has_arm_neon_fp16()) { \
       GTEST_SKIP(); \
     } \
   } while (0)

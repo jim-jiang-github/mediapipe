@@ -18,7 +18,7 @@
 #include <fp16.h>
 
 #include <xnnpack.h>
-#include <xnnpack/params-init.h>
+#include <xnnpack/microparams-init.h>
 #include <xnnpack/params.h>
 
 
@@ -34,11 +34,6 @@ class VBinaryCMicrokernelTester {
     SqrDiffC,
     SubC,
     RSubC,
-  };
-
-  enum class Variant {
-    Native,
-    Scalar,
   };
 
   inline VBinaryCMicrokernelTester& batch_size(size_t batch_size) {
@@ -90,19 +85,18 @@ class VBinaryCMicrokernelTester {
   void Test(xnn_f16_vbinary_ukernel_function vbinaryc, OpType op_type) const {
     std::random_device random_device;
     auto rng = std::mt19937(random_device());
-    auto f32rng = std::bind(std::uniform_real_distribution<float>(1.0e-3f, 1.0f), rng);
-    auto f16rng = std::bind(fp16_ieee_from_fp32_value, f32rng);
+    std::uniform_real_distribution<float> f32dist(0.01f, 1.0f);
 
     std::vector<uint16_t> a(batch_size() + XNN_EXTRA_BYTES / sizeof(uint16_t));
-    const uint16_t b = f16rng();
+    const uint16_t b = fp16_ieee_from_fp32_value(f32dist(rng));
     std::vector<uint16_t> y(batch_size() + (inplace() ? XNN_EXTRA_BYTES / sizeof(uint16_t) : 0));
     std::vector<float> y_ref(batch_size());
     for (size_t iteration = 0; iteration < iterations(); iteration++) {
-      std::generate(a.begin(), a.end(), std::ref(f16rng));
+      std::generate(a.begin(), a.end(), [&]() { return fp16_ieee_from_fp32_value(f32dist(rng)); });
       if (inplace()) {
-        std::generate(y.begin(), y.end(), std::ref(f16rng));
+        std::generate(y.begin(), y.end(), [&]() { return fp16_ieee_from_fp32_value(f32dist(rng)); });
       } else {
-        std::fill(y.begin(), y.end(), nanf(""));
+        std::fill(y.begin(), y.end(), UINT16_C(0x7E00) /* NaN */);
       }
       const uint16_t* a_data = inplace() ? y.data() : a.data();
 
@@ -152,22 +146,21 @@ class VBinaryCMicrokernelTester {
     }
   }
 
-  void Test(xnn_f16_vbinary_minmax_ukernel_function vbinaryc_minmax, OpType op_type) const {
+  void Test(xnn_f16_vbinary_minmax_ukernel_function vbinaryc_minmax, OpType op_type, xnn_init_f16_minmax_params_fn init_params) const {
     std::random_device random_device;
     auto rng = std::mt19937(random_device());
-    auto f32rng = std::bind(std::uniform_real_distribution<float>(1.0e-3f, 1.0f), rng);
-    auto f16rng = std::bind(fp16_ieee_from_fp32_value, f32rng);
+    std::uniform_real_distribution<float> f32dist(0.01f, 1.0f);
 
     std::vector<uint16_t> a(batch_size() + XNN_EXTRA_BYTES / sizeof(uint16_t));
-    const uint16_t b = f16rng();
+    const uint16_t b = fp16_ieee_from_fp32_value(f32dist(rng));
     std::vector<uint16_t> y(batch_size() + (inplace() ? XNN_EXTRA_BYTES / sizeof(uint16_t) : 0));
     std::vector<float> y_ref(batch_size());
     for (size_t iteration = 0; iteration < iterations(); iteration++) {
-      std::generate(a.begin(), a.end(), std::ref(f16rng));
+      std::generate(a.begin(), a.end(), [&]() { return fp16_ieee_from_fp32_value(f32dist(rng)); });
       if (inplace()) {
-        std::generate(y.begin(), y.end(), std::ref(f16rng));
+        std::generate(y.begin(), y.end(), [&]() { return fp16_ieee_from_fp32_value(f32dist(rng)); });
       } else {
-        std::fill(y.begin(), y.end(), nanf(""));
+        std::fill(y.begin(), y.end(), UINT16_C(0x7E00) /* NaN */);
       }
       const uint16_t* a_data = inplace() ? y.data() : a.data();
 
@@ -221,10 +214,8 @@ class VBinaryCMicrokernelTester {
 
       // Prepare parameters.
       xnn_f16_minmax_params params;
-      xnn_init_f16_minmax_params(
-        &params,
-        fp16_ieee_from_fp32_value(y_min),
-        fp16_ieee_from_fp32_value(y_max));
+      init_params(&params,
+        fp16_ieee_from_fp32_value(y_min), fp16_ieee_from_fp32_value(y_max));
 
       // Call optimized micro-kernel.
       vbinaryc_minmax(batch_size() * sizeof(uint16_t), a_data, &b, y.data(), &params);
@@ -237,19 +228,19 @@ class VBinaryCMicrokernelTester {
     }
   }
 
-  void Test(xnn_f32_vbinary_ukernel_function vbinaryc, OpType op_type, Variant variant = Variant::Native) const {
+  void Test(xnn_f32_vbinary_ukernel_function vbinaryc, OpType op_type, xnn_init_f32_default_params_fn init_params = nullptr) const {
     std::random_device random_device;
     auto rng = std::mt19937(random_device());
-    auto f32rng = std::bind(std::uniform_real_distribution<float>(0.0f, 1.0f), rng);
+    std::uniform_real_distribution<float> f32dist(0.01f, 1.0f);
 
     std::vector<float> a(batch_size() + XNN_EXTRA_BYTES / sizeof(float));
-    const float b = f32rng();
+    const float b = f32dist(rng);
     std::vector<float> y(batch_size() + (inplace() ? XNN_EXTRA_BYTES / sizeof(float) : 0));
     std::vector<float> y_ref(batch_size());
     for (size_t iteration = 0; iteration < iterations(); iteration++) {
-      std::generate(a.begin(), a.end(), std::ref(f32rng));
+      std::generate(a.begin(), a.end(), [&]() { return f32dist(rng); });
       if (inplace()) {
-        std::generate(y.begin(), y.end(), std::ref(f32rng));
+        std::generate(y.begin(), y.end(), [&]() { return f32dist(rng); });
       } else {
         std::fill(y.begin(), y.end(), nanf(""));
       }
@@ -290,8 +281,15 @@ class VBinaryCMicrokernelTester {
             break;
         }
       }
+
+      // Prepare parameters.
+      xnn_f32_default_params params;
+      if (init_params) {
+        init_params(&params);
+      }
+
       // Call optimized micro-kernel.
-      vbinaryc(batch_size() * sizeof(float), a_data, &b, y.data(), nullptr);
+      vbinaryc(batch_size() * sizeof(float), a_data, &b, y.data(), init_params != nullptr ? &params : nullptr);
 
       // Verify results.
       for (size_t i = 0; i < batch_size(); i++) {
@@ -301,19 +299,89 @@ class VBinaryCMicrokernelTester {
     }
   }
 
-  void Test(xnn_f32_vbinary_minmax_ukernel_function vbinaryc_minmax, OpType op_type, Variant variant = Variant::Native) const {
+  void Test(xnn_f32_vbinary_relu_ukernel_function vbinaryc_relu, OpType op_type) const {
     std::random_device random_device;
     auto rng = std::mt19937(random_device());
-    auto f32rng = std::bind(std::uniform_real_distribution<float>(0.0f, 1.0f), rng);
+    std::uniform_real_distribution<float> f32dist(-1.0f, 1.0f);
 
     std::vector<float> a(batch_size() + XNN_EXTRA_BYTES / sizeof(float));
-    const float b = f32rng();
+    const float b = f32dist(rng);
     std::vector<float> y(batch_size() + (inplace() ? XNN_EXTRA_BYTES / sizeof(float) : 0));
     std::vector<float> y_ref(batch_size());
     for (size_t iteration = 0; iteration < iterations(); iteration++) {
-      std::generate(a.begin(), a.end(), std::ref(f32rng));
+      std::generate(a.begin(), a.end(), [&]() { return f32dist(rng); });
       if (inplace()) {
-        std::generate(y.begin(), y.end(), std::ref(f32rng));
+        std::generate(y.begin(), y.end(), [&]() { return f32dist(rng); });
+      } else {
+        std::fill(y.begin(), y.end(), nanf(""));
+      }
+      const float* a_data = inplace() ? y.data() : a.data();
+
+      // Compute reference results.
+      for (size_t i = 0; i < batch_size(); i++) {
+        switch (op_type) {
+          case OpType::AddC:
+            y_ref[i] = a_data[i] + b;
+            break;
+          case OpType::DivC:
+            y_ref[i] = a_data[i] / b;
+            break;
+          case OpType::RDivC:
+            y_ref[i] = b / a_data[i];
+            break;
+          case OpType::MaxC:
+            y_ref[i] = std::max<float>(a_data[i], b);
+            break;
+          case OpType::MinC:
+            y_ref[i] = std::min<float>(a_data[i], b);
+            break;
+          case OpType::MulC:
+            y_ref[i] = a_data[i] * b;
+            break;
+          case OpType::SqrDiffC:
+          {
+            const float diff = a_data[i] - b;
+            y_ref[i] = diff * diff;
+            break;
+          }
+          case OpType::SubC:
+            y_ref[i] = a_data[i] - b;
+            break;
+          case OpType::RSubC:
+            y_ref[i] = b - a_data[i];
+            break;
+        }
+      }
+      for (size_t i = 0; i < batch_size(); i++) {
+        y_ref[i] = std::max(y_ref[i], 0.0f);
+      }
+
+      // Call optimized micro-kernel.
+      vbinaryc_relu(batch_size() * sizeof(float), a_data, &b, y.data(), nullptr);
+
+      // Verify results.
+      for (size_t i = 0; i < batch_size(); i++) {
+        ASSERT_GE(y[i], 0.0f)
+          << "at " << i << " / " << batch_size();
+        ASSERT_NEAR(y[i], y_ref[i], std::abs(y_ref[i]) * 1.0e-6f)
+          << "at " << i << " / " << batch_size();
+      }
+    }
+  }
+
+  void Test(xnn_f32_vbinary_minmax_ukernel_function vbinaryc_minmax, OpType op_type, xnn_init_f32_minmax_params_fn init_params) const {
+    std::random_device random_device;
+    auto rng = std::mt19937(random_device());
+    std::uniform_real_distribution<float> f32dist;
+
+    std::vector<float> a(batch_size() + XNN_EXTRA_BYTES / sizeof(float));
+    const float b = f32dist(rng);
+    std::vector<float> y(batch_size() + (inplace() ? XNN_EXTRA_BYTES / sizeof(float) : 0));
+    std::vector<float> y_ref(batch_size());
+    for (size_t iteration = 0; iteration < iterations(); iteration++) {
+      std::generate(a.begin(), a.end(), [&]() { return f32dist(rng); });
+      if (inplace()) {
+        std::generate(y.begin(), y.end(), [&]() { return f32dist(rng); });
       } else {
         std::fill(y.begin(), y.end(), nanf(""));
       }
@@ -369,93 +437,13 @@ class VBinaryCMicrokernelTester {
 
       // Prepare parameters.
       xnn_f32_minmax_params params;
-      switch (variant) {
-        case Variant::Native:
-          xnn_init_f32_minmax_params(&params, y_min, y_max);
-          break;
-        case Variant::Scalar:
-          xnn_init_f32_minmax_scalar_params(&params, y_min, y_max);
-          break;
-      }
+      init_params(&params, y_min, y_max);
 
       // Call optimized micro-kernel.
       vbinaryc_minmax(batch_size() * sizeof(float), a_data, &b, y.data(), &params);
 
       // Verify results.
       for (size_t i = 0; i < batch_size(); i++) {
-        ASSERT_NEAR(y[i], y_ref[i], std::abs(y_ref[i]) * 1.0e-6f)
-          << "at " << i << " / " << batch_size();
-      }
-    }
-  }
-
-  void Test(xnn_f32_vbinary_relu_ukernel_function vbinaryc_relu, OpType op_type, Variant variant = Variant::Native) const {
-    std::random_device random_device;
-    auto rng = std::mt19937(random_device());
-    auto f32rng = std::bind(std::uniform_real_distribution<float>(-1.0f, 1.0f), rng);
-
-    std::vector<float> a(batch_size() + XNN_EXTRA_BYTES / sizeof(float));
-    const float b = f32rng();
-    std::vector<float> y(batch_size() + (inplace() ? XNN_EXTRA_BYTES / sizeof(float) : 0));
-    std::vector<float> y_ref(batch_size());
-    for (size_t iteration = 0; iteration < iterations(); iteration++) {
-      std::generate(a.begin(), a.end(), std::ref(f32rng));
-      if (inplace()) {
-        std::generate(y.begin(), y.end(), std::ref(f32rng));
-      } else {
-        std::fill(y.begin(), y.end(), nanf(""));
-      }
-      const float* a_data = inplace() ? y.data() : a.data();
-
-      // Compute reference results.
-      for (size_t i = 0; i < batch_size(); i++) {
-        switch (op_type) {
-          case OpType::AddC:
-            y_ref[i] = a_data[i] + b;
-            break;
-          case OpType::DivC:
-            y_ref[i] = a_data[i] / b;
-            break;
-          case OpType::RDivC:
-            y_ref[i] = b / a_data[i];
-            break;
-          case OpType::MaxC:
-            y_ref[i] = std::max<float>(a_data[i], b);
-            break;
-          case OpType::MinC:
-            y_ref[i] = std::min<float>(a_data[i], b);
-            break;
-          case OpType::MulC:
-            y_ref[i] = a_data[i] * b;
-            break;
-          case OpType::SqrDiffC:
-          {
-            const float diff = a_data[i] - b;
-            y_ref[i] = diff * diff;
-            break;
-          }
-          case OpType::SubC:
-            y_ref[i] = a_data[i] - b;
-            break;
-          case OpType::RSubC:
-            y_ref[i] = b - a_data[i];
-            break;
-        }
-      }
-      for (size_t i = 0; i < batch_size(); i++) {
-        y_ref[i] = std::max(y_ref[i], 0.0f);
-      }
-
-      // Prepare parameters.
-      xnn_f32_relu_params params = { };
-
-      // Call optimized micro-kernel.
-      vbinaryc_relu(batch_size() * sizeof(float), a_data, &b, y.data(), &params);
-
-      // Verify results.
-      for (size_t i = 0; i < batch_size(); i++) {
-        ASSERT_GE(y[i], 0.0f)
-          << "at " << i << " / " << batch_size();
         ASSERT_NEAR(y[i], y_ref[i], std::abs(y_ref[i]) * 1.0e-6f)
           << "at " << i << " / " << batch_size();
       }

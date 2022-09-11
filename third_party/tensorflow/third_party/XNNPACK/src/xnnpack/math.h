@@ -8,9 +8,15 @@
 
 #pragma once
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <assert.h>
+
+#ifdef _MSC_VER
+  #include <intrin.h>
+  #include <stdlib.h> // For _rotl.
+#endif
 
 #include <xnnpack/common.h>
 
@@ -25,59 +31,87 @@
 #endif
 
 
-inline static size_t min(size_t a, size_t b) {
+XNN_INLINE static size_t min(size_t a, size_t b) {
   return XNN_UNPREDICTABLE(b < a) ? b : a;
 }
 
-inline static size_t max(size_t a, size_t b) {
+XNN_INLINE static size_t max(size_t a, size_t b) {
   return XNN_UNPREDICTABLE(b < a) ? a : b;
 }
 
-inline static size_t doz(size_t a, size_t b) {
+XNN_INLINE static size_t doz(size_t a, size_t b) {
   return XNN_UNPREDICTABLE(b < a) ? a - b : 0;
 }
 
-inline static size_t divide_round_up(size_t n, size_t q) {
+XNN_INLINE static size_t divide_round_up(size_t n, size_t q) {
   return XNN_UNPREDICTABLE(n % q == 0) ? n / q : n / q + 1;
 }
 
-inline static size_t round_up(size_t n, size_t q) {
+XNN_INLINE static size_t round_up(size_t n, size_t q) {
   return divide_round_up(n, q) * q;
 }
 
-inline static size_t round_down_po2(size_t n, size_t q) {
-  assert(q != 0);
-  assert((q & (q - 1)) == 0);
+XNN_INLINE static bool is_po2(size_t n) {
+  return (n != 0) && ((n & (n - 1)) == 0);
+}
+XNN_INLINE static size_t round_down_po2(size_t n, size_t q) {
+  assert(is_po2(q));
   return n & -q;
 }
 
-inline static size_t round_up_po2(size_t n, size_t q) {
+XNN_INLINE static size_t round_up_po2(size_t n, size_t q) {
   return round_down_po2(n + q - 1, q);
 }
 
-inline static size_t subtract_modulo(size_t a, size_t b, size_t m) {
+XNN_INLINE static size_t subtract_modulo(size_t a, size_t b, size_t m) {
   assert(a < m);
   assert(b < m);
   return XNN_UNPREDICTABLE(a >= b) ? a - b : a - b + m;
 }
 
-inline static int32_t math_min_s32(int32_t a, int32_t b) {
+XNN_INLINE static float uint32_as_float(uint32_t i) {
+  union {
+    uint32_t as_uint32;
+    float as_float;
+  } bits = { i };
+  return bits.as_float;
+}
+
+XNN_INLINE static uint32_t float_as_uint32(float f) {
+  union {
+    float as_float;
+    uint32_t as_uint32;
+  } bits = { f };
+  return bits.as_uint32;
+}
+
+XNN_INLINE static int32_t math_min_s32(int32_t a, int32_t b) {
   return XNN_UNPREDICTABLE(a < b) ? a : b;
 }
 
-inline static int32_t math_max_s32(int32_t a, int32_t b) {
+XNN_INLINE static int32_t math_max_s32(int32_t a, int32_t b) {
   return XNN_UNPREDICTABLE(a > b) ? a : b;
 }
 
-inline static uint32_t math_min_u32(uint32_t a, uint32_t b) {
+XNN_INLINE static uint32_t math_min_u32(uint32_t a, uint32_t b) {
   return XNN_UNPREDICTABLE(a < b) ? a : b;
 }
 
-inline static uint32_t math_max_u32(uint32_t a, uint32_t b) {
+XNN_INLINE static uint32_t math_max_u32(uint32_t a, uint32_t b) {
   return XNN_UNPREDICTABLE(a > b) ? a : b;
 }
 
-inline static float math_min_f32(float a, float b) {
+XNN_INLINE static float math_muladd_f32(float x, float y, float acc) {
+  #if defined(__GNUC__) && defined(__FP_FAST_FMAF)
+    return __builtin_fmaf(x, y, acc);
+  #elif defined(__clang__) && defined(__riscv)
+    return __builtin_fmaf(x, y, acc);
+  #else
+    return x * y + acc;
+  #endif
+}
+
+XNN_INLINE static float math_min_f32(float a, float b) {
   #if defined(__GNUC__) && defined(__ARM_ARCH) && (__ARM_ARCH >= 8)
     return __builtin_fminf(a, b);
   #elif defined(__clang__) && defined(__riscv)
@@ -87,7 +121,7 @@ inline static float math_min_f32(float a, float b) {
   #endif
 }
 
-inline static float math_max_f32(float a, float b) {
+XNN_INLINE static float math_max_f32(float a, float b) {
   #if defined(__GNUC__) && defined(__ARM_ARCH) && (__ARM_ARCH >= 8)
     return __builtin_fmaxf(a, b);
   #elif defined(__clang__) && defined(__riscv)
@@ -97,9 +131,9 @@ inline static float math_max_f32(float a, float b) {
   #endif
 }
 
-inline static float math_nonsign_mask_f32() {
+XNN_INLINE static float math_nonsign_mask_f32() {
   #if defined(__INTEL_COMPILER)
-    // Suprisingly, Intel compiler ignores __builtin_nanf payload
+    // Surprisingly, Intel compiler ignores __builtin_nanf payload
     return _castu32_f32(0x7FFFFFFF);
   #elif defined(__GNUC__)
     return __builtin_nanf("0x7FFFFF");
@@ -137,7 +171,7 @@ inline static float math_nonsign_mask_f32() {
 #endif
 
 XNN_IGNORE_SHIFT_BASE_UB
-inline static int32_t asr_s32(int32_t x, uint32_t n) {
+XNN_INLINE static int32_t math_asr_s32(int32_t x, uint32_t n) {
   #ifdef XNN_USE_SHIFT_BASE_UB_WORKAROUND
     #if XNN_ARCH_X86_64 || XNN_ARCH_ARM64
       return (int32_t) ((uint64_t) (int64_t) x >> n);
@@ -150,10 +184,57 @@ inline static int32_t asr_s32(int32_t x, uint32_t n) {
 }
 
 XNN_IGNORE_SHIFT_BASE_UB
-inline static int64_t asr_s64(int64_t x, uint32_t n) {
+XNN_INLINE static int64_t math_asr_s64(int64_t x, uint32_t n) {
   #ifdef XNN_USE_SHIFT_BASE_UB_WORKAROUND
     return x >= 0 ? x >> n : ~(~x >> n);
   #else
     return x >> n;
+  #endif
+}
+
+XNN_INLINE static uint32_t math_clz_u32(uint32_t x) {
+  #if defined(_MSC_VER) && !defined(__clang__)
+    unsigned long index;
+    if XNN_UNPREDICTABLE(_BitScanReverse(&index, (unsigned long) x) != 0) {
+      return (uint32_t) index ^ 31;
+    } else {
+      return 32;
+    }
+  #else
+    if XNN_UNPREDICTABLE(x == 0) {
+      return 32;
+    } else {
+      return (uint32_t) __builtin_clz((unsigned int) x);
+    }
+  #endif
+}
+
+XNN_INLINE static uint32_t math_clz_nonzero_u32(uint32_t x) {
+  assert(x != 0);
+  #if defined(_MSC_VER) && !defined(__clang__)
+    unsigned long index;
+    _BitScanReverse(&index, (unsigned long) x);
+    return (uint32_t) index ^ 31;
+  #else
+    return (uint32_t) __builtin_clz((unsigned int) x);
+  #endif
+}
+
+XNN_INLINE static uint32_t math_ctz_u32(uint32_t x) {
+  #if defined(_MSC_VER) && !defined(__clang__)
+    unsigned long index;
+    _BitScanForward(&index, (unsigned long) x);
+    return (uint32_t) index;
+  #else
+    return (uint32_t) __builtin_ctz((unsigned int) x);
+  #endif
+}
+
+XNN_INLINE static uint32_t math_rotl_u32(uint32_t x, int8_t r)
+{
+  #if XNN_COMPILER_MSVC
+    return _rotl((unsigned int) x, (int) r);
+  #else
+    return (x << r) | (x >> (32 - r));
   #endif
 }

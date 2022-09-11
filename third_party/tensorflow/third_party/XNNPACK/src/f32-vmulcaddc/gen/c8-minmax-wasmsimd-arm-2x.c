@@ -23,7 +23,7 @@ void xnn_f32_vmulcaddc_minmax_ukernel_c8__wasmsimd_arm_2x(
     const float*restrict weights,
     float*restrict output,
     size_t output_stride,
-    const union xnn_f32_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN
+    const union xnn_f32_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
   assert(rows != 0);
   assert(channels != 0);
@@ -33,17 +33,18 @@ void xnn_f32_vmulcaddc_minmax_ukernel_c8__wasmsimd_arm_2x(
   float* o0 = output;
   const float* i1 = (const float*) ((uintptr_t) i0 + input_stride);
   float* o1 = (float*) ((uintptr_t) o0 + output_stride);
-  if XNN_UNPREDICTABLE(rows < 2) {
-    i1 = i0;
-    o1 = o0;
-  }
 
   const size_t input_increment = input_stride * 2 - channels;
   const size_t output_increment = output_stride * 2 - channels;
 
-  const v128_t vmin = wasm_v128_load32_splat(&params->scalar.min);
-  const v128_t vmax = wasm_v128_load32_splat(&params->scalar.max);
+  const v128_t vmin = wasm_v128_load64_splat(params->wasmsimd.min);
+  const v128_t vmax = wasm_v128_load64_splat(params->wasmsimd.max);
   do {
+    if XNN_UNPREDICTABLE(rows < 2) {
+      i1 = i0;
+      o1 = o0;
+    }
+
     const float* w = weights;
     size_t c = channels;
     for (; c >= 8 * sizeof(float); c -= 8 * sizeof(float)) {
@@ -65,15 +66,15 @@ void xnn_f32_vmulcaddc_minmax_ukernel_c8__wasmsimd_arm_2x(
       vacc1x0123 = wasm_f32x4_add(vbias0123, wasm_f32x4_mul(vscale0123, vacc1x0123));
       vacc1x4567 = wasm_f32x4_add(vbias4567, wasm_f32x4_mul(vscale4567, vacc1x4567));
 
-      vacc0x0123 = wasm_f32x4_max(vacc0x0123, vmin);
-      vacc0x4567 = wasm_f32x4_max(vacc0x4567, vmin);
-      vacc1x0123 = wasm_f32x4_max(vacc1x0123, vmin);
-      vacc1x4567 = wasm_f32x4_max(vacc1x4567, vmin);
+      vacc0x0123 = wasm_f32x4_max(vmin, vacc0x0123);
+      vacc0x4567 = wasm_f32x4_max(vmin, vacc0x4567);
+      vacc1x0123 = wasm_f32x4_max(vmin, vacc1x0123);
+      vacc1x4567 = wasm_f32x4_max(vmin, vacc1x4567);
 
-      vacc0x0123 = wasm_f32x4_min(vacc0x0123, vmax);
-      vacc0x4567 = wasm_f32x4_min(vacc0x4567, vmax);
-      vacc1x0123 = wasm_f32x4_min(vacc1x0123, vmax);
-      vacc1x4567 = wasm_f32x4_min(vacc1x4567, vmax);
+      vacc0x0123 = wasm_f32x4_min(vmax, vacc0x0123);
+      vacc0x4567 = wasm_f32x4_min(vmax, vacc0x4567);
+      vacc1x0123 = wasm_f32x4_min(vmax, vacc1x0123);
+      vacc1x4567 = wasm_f32x4_min(vmax, vacc1x4567);
 
       wasm_v128_store(o0, vacc0x0123);
       wasm_v128_store(o0 + 4, vacc0x4567);
@@ -97,11 +98,11 @@ void xnn_f32_vmulcaddc_minmax_ukernel_c8__wasmsimd_arm_2x(
       vacc0 = wasm_f32x4_add(vbias, wasm_f32x4_mul(vscale, vacc0));
       vacc1 = wasm_f32x4_add(vbias, wasm_f32x4_mul(vscale, vacc1));
 
-      vacc0 = wasm_f32x4_max(vacc0, vmin);
-      vacc1 = wasm_f32x4_max(vacc1, vmin);
+      vacc0 = wasm_f32x4_max(vmin, vacc0);
+      vacc1 = wasm_f32x4_max(vmin, vacc1);
 
-      vacc0 = wasm_f32x4_min(vacc0, vmax);
-      vacc1 = wasm_f32x4_min(vacc1, vmax);
+      vacc0 = wasm_f32x4_min(vmax, vacc0);
+      vacc1 = wasm_f32x4_min(vmax, vacc1);
 
       wasm_v128_store(o0, vacc0);
       o0 += 4;
@@ -123,11 +124,11 @@ void xnn_f32_vmulcaddc_minmax_ukernel_c8__wasmsimd_arm_2x(
       vacc0 = wasm_f32x4_add(vbias, wasm_f32x4_mul(vscale, vacc0));
       vacc1 = wasm_f32x4_add(vbias, wasm_f32x4_mul(vscale, vacc1));
 
-      vacc0 = wasm_f32x4_max(vacc0, vmin);
-      vacc1 = wasm_f32x4_max(vacc1, vmin);
+      vacc0 = wasm_f32x4_max(vmin, vacc0);
+      vacc1 = wasm_f32x4_max(vmin, vacc1);
 
-      vacc0 = wasm_f32x4_min(vacc0, vmax);
-      vacc1 = wasm_f32x4_min(vacc1, vmax);
+      vacc0 = wasm_f32x4_min(vmax, vacc0);
+      vacc1 = wasm_f32x4_min(vmax, vacc1);
 
       if (c & (2 * sizeof(float))) {
         *((double*) o0) = wasm_f64x2_extract_lane(vacc0, 0);
@@ -148,10 +149,6 @@ void xnn_f32_vmulcaddc_minmax_ukernel_c8__wasmsimd_arm_2x(
     o0 = (float*) ((uintptr_t) o0 + output_increment);
     i1 = (const float*) ((uintptr_t) i1 + input_increment);
     o1 = (float*) ((uintptr_t) o1 + output_increment);
-    if XNN_UNPREDICTABLE(rows < 4) {
-      i1 = i0;
-      o1 = o0;
-    }
     rows = doz(rows, 2);
   } while (rows != 0);
 }

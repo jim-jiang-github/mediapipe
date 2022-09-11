@@ -59,11 +59,12 @@ const char descriptor_table_protodef_mediapipe_2fframework_2fdeps_2fproto_5fdesc
   "\n\014TYPE_MESSAGE\020\013\022\016\n\nTYPE_BYTES\020\014\022\017\n\013TYPE"
   "_UINT32\020\r\022\r\n\tTYPE_ENUM\020\016\022\021\n\rTYPE_SFIXED3"
   "2\020\017\022\021\n\rTYPE_SFIXED64\020\020\022\017\n\013TYPE_SINT32\020\021\022"
-  "\017\n\013TYPE_SINT64\020\022"
+  "\017\n\013TYPE_SINT64\020\022B7\n\032com.google.mediapipe"
+  ".protoB\031FieldDescriptorProtoProto"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fframework_2fdeps_2fproto_5fdescriptor_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fframework_2fdeps_2fproto_5fdescriptor_2eproto = {
-  false, false, 416, descriptor_table_protodef_mediapipe_2fframework_2fdeps_2fproto_5fdescriptor_2eproto, "mediapipe/framework/deps/proto_descriptor.proto", 
+  false, false, 473, descriptor_table_protodef_mediapipe_2fframework_2fdeps_2fproto_5fdescriptor_2eproto, "mediapipe/framework/deps/proto_descriptor.proto", 
   &descriptor_table_mediapipe_2fframework_2fdeps_2fproto_5fdescriptor_2eproto_once, nullptr, 0, 1,
   schemas, file_default_instances, TableStruct_mediapipe_2fframework_2fdeps_2fproto_5fdescriptor_2eproto::offsets,
   file_level_metadata_mediapipe_2fframework_2fdeps_2fproto_5fdescriptor_2eproto, file_level_enum_descriptors_mediapipe_2fframework_2fdeps_2fproto_5fdescriptor_2eproto, file_level_service_descriptors_mediapipe_2fframework_2fdeps_2fproto_5fdescriptor_2eproto,

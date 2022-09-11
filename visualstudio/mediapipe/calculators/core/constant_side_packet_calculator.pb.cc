@@ -97,7 +97,7 @@ const char descriptor_table_protodef_mediapipe_2fcalculators_2fcore_2fconstant_5
   "ble_value\030\t \001(\001H\000B\007\n\005value2]\n\003ext\022\034.medi"
   "apipe.CalculatorOptions\030\205\252\356\212\001 \001(\0132..medi"
   "apipe.ConstantSidePacketCalculatorOption"
-  "sB\014\242\002\tMediaPipe"
+  "s"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto_deps[3] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
@@ -106,7 +106,7 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto = {
-  false, false, 735, descriptor_table_protodef_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto, "mediapipe/calculators/core/constant_side_packet_calculator.proto", 
+  false, false, 721, descriptor_table_protodef_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto, "mediapipe/calculators/core/constant_side_packet_calculator.proto", 
   &descriptor_table_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto_deps, 3, 2,
   schemas, file_default_instances, TableStruct_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto::offsets,
   file_level_metadata_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto, file_level_enum_descriptors_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto, file_level_service_descriptors_mediapipe_2fcalculators_2fcore_2fconstant_5fside_5fpacket_5fcalculator_2eproto,

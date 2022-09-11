@@ -28,7 +28,7 @@ parser.set_defaults(defines=list())
 
 
 def split_ukernel_name(name):
-  match = re.match(r"^xnn_(f16|f32)_vmulcaddc(_(minmax))?_ukernel_c(\d+)__(.+)_(\d+)x$", name)
+  match = re.fullmatch(r"xnn_(f16|f32)_vmulcaddc(_(minmax))?_ukernel_c(\d+)__(.+)_(\d+)x", name)
   assert match is not None
   channel_tile = int(match.group(4))
   row_tile = int(match.group(6))
@@ -277,8 +277,14 @@ def main(args):
         name, channel_tile, row_tile, init_fn, isa)
       tests += "\n\n" + xnncommon.postprocess_test_case(test_case, arch, isa)
 
-    with codecs.open(options.output, "w", encoding="utf-8") as output_file:
-      output_file.write(tests)
+    txt_changed = True
+    if os.path.exists(options.output):
+      with codecs.open(options.output, "r", encoding="utf-8") as output_file:
+        txt_changed = output_file.read() != tests
+
+    if txt_changed:
+      with codecs.open(options.output, "w", encoding="utf-8") as output_file:
+        output_file.write(tests)
 
 
 if __name__ == "__main__":

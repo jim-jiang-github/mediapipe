@@ -7,6 +7,7 @@
 import argparse
 import codecs
 import io
+import os
 import re
 import sys
 from itertools import chain
@@ -74,6 +75,9 @@ def preprocess(input_text, input_globals, input_path="codegen"):
     if input_line == "":
       blank_lines += 1
       continue
+    # Skip lint markers.
+    if 'LINT' in input_line:
+      continue
 
     input_indent = extract_leading_whitespace(input_line)
     if python_block_start:
@@ -134,13 +138,16 @@ def main(args):
 
   input_text = codecs.open(options.input[0], "r", encoding="utf-8").read()
   python_globals = dict(chain(*options.defines))
-  output_text = preprocess(input_text, python_globals, options.input[0])
+  output_text = PREAMBLE.format(template=options.input[0], generator=sys.argv[0]) + preprocess(input_text, python_globals, options.input[0])
 
-  with codecs.open(options.output, "w", encoding="utf-8") as output_file:
-    output_file.write(PREAMBLE.format(
-      template=options.input[0], generator=sys.argv[0]))
-    output_file.write(output_text)
+  txt_changed = True
+  if os.path.exists(options.output):
+    with codecs.open(options.output, "r", encoding="utf-8") as output_file:
+      txt_changed = output_file.read() != output_text
 
+  if txt_changed:
+    with codecs.open(options.output, "w", encoding="utf-8") as output_file:
+      output_file.write(output_text)
 
 if __name__ == "__main__":
   main(sys.argv[1:])

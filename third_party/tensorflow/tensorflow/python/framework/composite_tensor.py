@@ -14,10 +14,6 @@
 # ==============================================================================
 """Tensor-like objects that are composed from tf.Tensors."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import abc
 
 import six
@@ -53,7 +49,7 @@ class CompositeTensor(object):
   @abc.abstractproperty
   def _type_spec(self):
     """A `TypeSpec` describing the type of this value."""
-    raise NotImplementedError("%s._type_spec()" % type(self).__name__)
+    raise NotImplementedError(f"{type(self).__name__}._type_spec()")
 
   def _shape_invariant_to_type_spec(self, shape):
     """Returns a TypeSpec given a shape invariant (used by `tf.while_loop`).
@@ -70,8 +66,8 @@ class CompositeTensor(object):
     # New TypeSpec subclasses generally do not need to implement this --
     # this method is used for backwards compatibility.  Users of tf.while_loop
     # can specify a type by passing in TypeSpec instead.
-    raise NotImplementedError("%s._shape_invariant_to_type_spec" %
-                              type(self).__name__)
+    raise NotImplementedError(
+        f"{type(self).__name__}._shape_invariant_to_type_spec")
 
   def _consumers(self):
     """Returns a list of `Operation`s that consume this `CompositeTensor`.
@@ -88,6 +84,22 @@ class CompositeTensor(object):
         if getattr(component, "graph", None) is not None
     ])
     return list(set(consumers))
+
+  def __tf_tracing_type__(self, context):
+    return self._type_spec.__tf_tracing_type__(context)
+
+  def _convert_variables_to_tensors(self):
+    """Converts ResourceVariable components to Tensors.
+
+    Override this method to explicitly convert ResourceVariables embedded in the
+    CompositeTensor to Tensors. By default, it returns the CompositeTensor
+    unchanged.
+
+    Returns:
+      A CompositeTensor with all its ResourceVariable components converted to
+      Tensors.
+    """
+    return self
 
 
 _pywrap_utils.RegisterType("CompositeTensor", CompositeTensor)
@@ -109,13 +121,27 @@ def replace_composites_with_components(structure):
   if isinstance(structure, CompositeTensor):
     return replace_composites_with_components(
         structure._type_spec._to_components(structure))  # pylint: disable=protected-access
-  elif not nest.is_sequence(structure):
+  elif not nest.is_nested(structure):
     return structure
   else:
     return nest.map_structure(
         replace_composites_with_components, structure, expand_composites=False)
 
 
+def convert_variables_to_tensors(composite_tensor):
+  return composite_tensor._convert_variables_to_tensors()  # pylint: disable=protected-access
+
+
 # @TODO(edloper): Can we replace convert_to_tensor_or_xyz with just
 # convert_to_tensor_or_composite?  Alternatively, should composite tensors
 # register a dispatch override for tf.convert_to_tensor?
+
+# Note about the internal encoding of composite tensors when they are "lowered"
+# from Python objects to tensors. The usual encoding is "component encoding"
+# which uses the dense tensors that represent a composite tensor.
+# A second encoding, "batchable tensor list encoding", is used by datasets
+# and map_fn which in addition to supporting batching also can use ops
+# for encoding and decoding, e.g. for encoding/decoding to/from a
+# single variant that represents a composite tensor. Some internal properties
+# for type specs for composite tensors use `flat` as a nickname for
+# "batchable tensor list encoding". (e.g. `flat_tensor_specs`).

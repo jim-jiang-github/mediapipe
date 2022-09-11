@@ -1,11 +1,16 @@
 #include "../calculator_graph_util.h"
 
+// resource root to locate tflite and other files
+// see also mediapipe/mediapipe/util/resource_util_default.cc
+constexpr char const* resource_root = "../";
+
 // name of file containing text format CalculatorGraphConfig proto
-constexpr char const* calculator_graph_config_file = "hair_segmentation_desktop_live.pbtxt";
+constexpr char const* calculator_graph_config_file = "../../mediapipe/graphs/hair_segmentation/hair_segmentation_desktop_live.pbtxt";
 
 absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
   mediapipe::CalculatorGraphConfig config;
   if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
+    download_mediapipe_asset_from_GCS("../mediapipe/models/hair_segmentation.tflite");
     return graph.Initialize(config);
   }
   return absl::NotFoundError(calculator_graph_config_file);

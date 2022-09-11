@@ -5,7 +5,8 @@
 
 #include <xnnpack/assembly.h>
 
-# void xnn_f32_igemm_minmax_ukernel_4x8__aarch64_neonfma_${"prfm_" if PREFETCH else ""}cortex_a75(
+# LINT.IfChange
+# void xnn_f32_igemm_minmax_ukernel_4x8__aarch64_neonfma${"_prfm" if PREFETCH else ""}_cortex_a75(
 #     size_t mr,                         (x0) - unused.  mr = 1
 #     size_t nc,                         x1
 #     size_t kc,                         x2 / x0
@@ -27,7 +28,7 @@
 # C pointer
 # x6  c0
 
-BEGIN_FUNCTION xnn_f32_igemm_minmax_ukernel_1x8__aarch64_neonfma_${"prfm_" if PREFETCH else ""}cortex_a75
+BEGIN_FUNCTION xnn_f32_igemm_minmax_ukernel_1x8__aarch64_neonfma${"_prfm" if PREFETCH else ""}_cortex_a75
 
         # Load cn_stride, a_offset
         LDP     x10, x11, [sp]
@@ -155,7 +156,7 @@ BEGIN_FUNCTION xnn_f32_igemm_minmax_ukernel_1x8__aarch64_neonfma_${"prfm_" if PR
         TBNZ    x0, 4, 6f
         # Is there a remainder?- 2 floats of A (8 bytes)
         TBNZ    x0, 3, 7f
-        # Is there a remainder?- 1 floats of A (4 bytes)
+        # Is there a remainder?- 1 float of A (4 bytes)
         TBNZ    x0, 2, 9f
 
 5:
@@ -239,7 +240,8 @@ BEGIN_FUNCTION xnn_f32_igemm_minmax_ukernel_1x8__aarch64_neonfma_${"prfm_" if PR
 13:
         RET
 
-END_FUNCTION xnn_f32_igemm_minmax_ukernel_1x8__aarch64_neonfma_${"prfm_" if PREFETCH else ""}cortex_a75
+END_FUNCTION xnn_f32_igemm_minmax_ukernel_1x8__aarch64_neonfma${"_prfm" if PREFETCH else ""}_cortex_a75
+# LINT.ThenChange(1x8-aarch64-neonfma-cortex-a75.cc)
 
 #ifdef __ELF__
 .section ".note.GNU-stack","",%progbits

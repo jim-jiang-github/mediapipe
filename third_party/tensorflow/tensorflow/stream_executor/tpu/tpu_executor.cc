@@ -15,8 +15,8 @@ limitations under the License.
 
 #include "tensorflow/stream_executor/tpu/tpu_executor.h"
 
+#include "absl/cleanup/cleanup.h"
 #include "tensorflow/c/tf_status.h"
-#include "tensorflow/core/lib/gtl/cleanup.h"
 #include "tensorflow/core/tpu/tpu_api.h"
 #include "tensorflow/stream_executor/tpu/status_helper.h"
 #include "tensorflow/stream_executor/tpu/tpu_event.h"
@@ -105,11 +105,11 @@ bool TpuExecutor::CreateStreamDependency(Stream* dependent, Stream* other) {
       get_stream(other->implementation()));
 }
 
-Status TpuExecutor::AllocateEvent(Event* event) { return Status::OK(); }
+Status TpuExecutor::AllocateEvent(Event* event) { return OkStatus(); }
 
 Status TpuExecutor::DeallocateEvent(Event* event) {
   tpu_platform().EraseEvent(event->implementation());
-  return Status::OK();
+  return OkStatus();
 }
 
 // AllocateTimer/DeallocateTimer have no specialization.
@@ -192,7 +192,7 @@ TpuExecutor::CreateEventImplementation() {
   return ptr;
 }
 
-DeviceMemoryBase TpuExecutor::Allocate(uint64 size, int64_t memory_space) {
+DeviceMemoryBase TpuExecutor::Allocate(uint64_t size, int64_t memory_space) {
   SE_DeviceMemoryBase se_base = tpu::ExecutorApiFn()->TpuExecutor_AllocateFn(
       executor_, size, memory_space);
   return ApiConverter::FromC(se_base);
@@ -208,7 +208,7 @@ void TpuExecutor::Deallocate(DeviceMemoryBase* memory) {
   tpu::ExecutorApiFn()->TpuExecutor_DeallocateFn(executor_, &se_base);
 }
 
-bool TpuExecutor::DeviceMemoryUsage(int64* free, int64* total) const {
+bool TpuExecutor::DeviceMemoryUsage(int64_t* free, int64_t* total) const {
   int64_t _free;
   int64_t _total;
   if (tpu::ExecutorApiFn()->TpuExecutor_DeviceMemoryUsageFn(executor_, &_free,
@@ -220,7 +220,7 @@ bool TpuExecutor::DeviceMemoryUsage(int64* free, int64* total) const {
   return false;
 }
 
-absl::optional<stream_executor::AllocatorStats>
+std::optional<stream_executor::AllocatorStats>
 TpuExecutor::GetAllocatorStats() {
   SE_AllocatorStats c_stats;
   if (tpu::ExecutorApiFn()->TpuExecutor_GetAllocatorStatsFn(executor_,
@@ -278,7 +278,7 @@ Status TpuExecutor::EnqueueInfeed(int32_t infeed_queue_index,
 
 bool TpuExecutor::Memcpy(Stream* stream, void* host_dst,
                          const ::stream_executor::DeviceMemoryBase& device_src,
-                         uint64 size) {
+                         uint64_t size) {
   SE_DeviceMemoryBase se_base = ApiConverter::ToC(device_src);
   return tpu::ExecutorApiFn()->TpuExecutor_MemcpyToHostFn(
       executor_, get_stream(stream->implementation()), host_dst, &se_base,
@@ -287,7 +287,7 @@ bool TpuExecutor::Memcpy(Stream* stream, void* host_dst,
 
 bool TpuExecutor::Memcpy(Stream* stream,
                          ::stream_executor::DeviceMemoryBase* device_dst,
-                         const void* host_src, uint64 size) {
+                         const void* host_src, uint64_t size) {
   SE_DeviceMemoryBase se_base = ApiConverter::ToC(*device_dst);
   return tpu::ExecutorApiFn()->TpuExecutor_MemcpyFromHostFn(
       executor_, get_stream(stream->implementation()), &se_base, host_src,
@@ -296,7 +296,7 @@ bool TpuExecutor::Memcpy(Stream* stream,
 
 Status TpuExecutor::SynchronousMemcpy(
     ::stream_executor::DeviceMemoryBase* device_dst, const void* host_src,
-    uint64 size) {
+    uint64_t size) {
   StatusHelper status;
   SE_DeviceMemoryBase se_base = ApiConverter::ToC(*device_dst);
   tpu::ExecutorApiFn()->TpuExecutor_SynchronousMemcpyFromHostFn(
@@ -306,7 +306,7 @@ Status TpuExecutor::SynchronousMemcpy(
 
 Status TpuExecutor::SynchronousMemcpy(
     void* host_dst, const ::stream_executor::DeviceMemoryBase& device_src,
-    uint64 size) {
+    uint64_t size) {
   StatusHelper status;
   SE_DeviceMemoryBase se_base = ApiConverter::ToC(device_src);
   tpu::ExecutorApiFn()->TpuExecutor_SynchronousMemcpyToHostFn(
@@ -316,14 +316,14 @@ Status TpuExecutor::SynchronousMemcpy(
 
 Status TpuExecutor::SynchronousMemcpyDeviceToDevice(
     ::stream_executor::DeviceMemoryBase* device_dst,
-    const ::stream_executor::DeviceMemoryBase& device_src, uint64 size) {
+    const ::stream_executor::DeviceMemoryBase& device_src, uint64_t size) {
   return ::stream_executor::port::UnimplementedError(
       "This operation not supported on TPU");
 }
 
 bool TpuExecutor::MemcpyDeviceToDevice(
     Stream* stream, ::stream_executor::DeviceMemoryBase* gpu_dst,
-    const ::stream_executor::DeviceMemoryBase& host_src, uint64 size) {
+    const ::stream_executor::DeviceMemoryBase& host_src, uint64_t size) {
   LOG(FATAL) << __func__ << " not supported on TpuExecutor";
 }
 
@@ -368,9 +368,9 @@ TpuExecutor::CreateDeviceDescription() const {
   StatusHelper status;
   SE_DeviceDescription* description =
       tpu::ExecutorApiFn()->TpuDeviceDescription_NewFn();
-  auto cleanup = tensorflow::gtl::MakeCleanup([description]() {
+  absl::Cleanup cleanup = [description]() {
     tpu::ExecutorApiFn()->TpuDeviceDescription_FreeFn(description);
-  });
+  };
   tpu::ExecutorApiFn()->TpuExecutor_CreateDeviceDescriptionFn(
       executor_, description, status.c_status);
   if (status.status().ok()) {

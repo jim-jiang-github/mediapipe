@@ -26,17 +26,16 @@ void xnn_${DATATYPE.lower()}_vaddc_minmax_ukernel__wasmsimd_x${BATCH_TILE}(
     const ${XINT8_T}* input_a,
     const ${XINT8_T}* input_b,
     ${XINT8_T}* output,
-    const union xnn_${DATATYPE.lower()}_add_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN XNN_DISABLE_MSAN
+    const union xnn_${DATATYPE.lower()}_add_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
-  const v128_t va_multiplier = wasm_v128_load(params->wasmsimd.a_multiplier);
-  const v128_t vrounding = wasm_v128_load(params->wasmsimd.rounding);
-  const int32_t vshift = params->wasmsimd.shift;
-  const v128_t voutput_zero_point = wasm_v128_load(params->wasmsimd.output_zero_point);
-  const v128_t voutput_min = wasm_v128_load(params->wasmsimd.output_min);
-  const v128_t voutput_max = wasm_v128_load(params->wasmsimd.output_max);
+  const v128_t va_multiplier = wasm_v128_load64_splat(params->wasmsimd.a_multiplier);
+  const uint32_t vshift = params->wasmsimd.shift;
+  const v128_t voutput_zero_point = wasm_v128_load64_splat(params->wasmsimd.output_zero_point);
+  const v128_t voutput_min = wasm_v128_load64_splat(params->wasmsimd.output_min);
+  const v128_t voutput_max = wasm_v128_load64_splat(params->wasmsimd.output_max);
 
   v128_t vbias = wasm_i32x4_splat((int32_t) *input_b * params->wasmsimd.b_multiplier[0]);
-  vbias = wasm_i32x4_add(vbias, wasm_v128_load(params->wasmsimd.bias));
+  vbias = wasm_i32x4_add(vbias, wasm_v128_load64_splat(params->wasmsimd.bias));
 
   for (; n >= ${BATCH_TILE} * sizeof(${XINT8_T}); n -= ${BATCH_TILE} * sizeof(${XINT8_T})) {
     const v128_t va${ABC[0:8]} = ${WASM_X16X8_LOAD8X8}(input_a);
@@ -49,7 +48,7 @@ void xnn_${DATATYPE.lower()}_vaddc_minmax_ukernel__wasmsimd_x${BATCH_TILE}(
       v128_t vacc${ABC[N+4:N+8]} = wasm_i32x4_add(vbias, wasm_i32x4_mul(${WASM_X32X4_EXTEND_HIGH_X16X8}(va${ABC[N:N+8]}), va_multiplier));
 
     $for N in range(0, BATCH_TILE, 4):
-      vacc${ABC[N:N+4]} = wasm_i32x4_shr(wasm_i32x4_add(vacc${ABC[N:N+4]}, vrounding), vshift);
+      vacc${ABC[N:N+4]} = wasm_i32x4_shr(vacc${ABC[N:N+4]}, vshift);
 
     $for N in range(0, BATCH_TILE, 8):
       v128_t vout${ABC[N:N+8]} = wasm_i16x8_add_sat(wasm_i16x8_narrow_i32x4(vacc${ABC[N:N+4]}, vacc${ABC[N+4:N+8]}), voutput_zero_point);
@@ -92,8 +91,8 @@ void xnn_${DATATYPE.lower()}_vaddc_minmax_ukernel__wasmsimd_x${BATCH_TILE}(
       v128_t vacc${ABC[0:4]} = wasm_i32x4_add(vbias, wasm_i32x4_mul(${WASM_X32X4_EXTEND_LOW_X16X8}(va${ABC[0:8]}), va_multiplier));
       v128_t vacc${ABC[4:8]} = wasm_i32x4_add(vbias, wasm_i32x4_mul(${WASM_X32X4_EXTEND_HIGH_X16X8}(va${ABC[0:8]}), va_multiplier));
 
-      vacc${ABC[0:4]} = wasm_i32x4_shr(wasm_i32x4_add(vacc${ABC[0:4]}, vrounding), vshift);
-      vacc${ABC[4:8]} = wasm_i32x4_shr(wasm_i32x4_add(vacc${ABC[4:8]}, vrounding), vshift);
+      vacc${ABC[0:4]} = wasm_i32x4_shr(vacc${ABC[0:4]}, vshift);
+      vacc${ABC[4:8]} = wasm_i32x4_shr(vacc${ABC[4:8]}, vshift);
 
       v128_t vout${ABC[0:8]} = wasm_i16x8_add_sat(wasm_i16x8_narrow_i32x4(vacc${ABC[0:4]}, vacc${ABC[4:8]}), voutput_zero_point);
 
@@ -108,33 +107,35 @@ void xnn_${DATATYPE.lower()}_vaddc_minmax_ukernel__wasmsimd_x${BATCH_TILE}(
           n -= 8 * sizeof(${XINT8_T});
         } else {
           if (n & (4 * sizeof(${XINT8_T}))) {
-            *((uint32_t*) output) = (uint32_t) wasm_i32x4_extract_lane(vout${ABC[0:8]}${ABC[0:8]}, 0);
+            *((float*) output) = (float) wasm_f32x4_extract_lane(vout${ABC[0:8]}${ABC[0:8]}, 0);
             vout${ABC[0:8]}${ABC[0:8]} = wasm_u64x2_shr(vout${ABC[0:8]}${ABC[0:8]}, 32);
             output += 4;
           }
+          uint32_t vout${ABC[0:4]} = wasm_i32x4_extract_lane(vout${ABC[0:8]}${ABC[0:8]}, 0);
           if (n & (2 * sizeof(${XINT8_T}))) {
-            *((uint16_t*) output) = (uint16_t) wasm_i16x8_extract_lane(vout${ABC[0:8]}${ABC[0:8]}, 0);
-            vout${ABC[0:8]}${ABC[0:8]} = wasm_u32x4_shr(vout${ABC[0:8]}${ABC[0:8]}, 16);
+            *((uint16_t*) output) = (uint16_t) vout${ABC[0:4]};
+            vout${ABC[0:4]} >>= 16;
             output += 2;
           }
           if (n & (1 * sizeof(${XINT8_T}))) {
-            *output = (${XINT8_T}) wasm_i8x16_extract_lane(vout${ABC[0:8]}${ABC[0:8]}, 0);
+            *output = (${XINT8_T}) vout${ABC[0:4]};
           }
           n = 0;
         }
       $else:
         if (n & (4 * sizeof(${XINT8_T}))) {
-          *((uint32_t*) output) = (uint32_t) wasm_i32x4_extract_lane(vout${ABC[0:8]}${ABC[0:8]}, 0);
+          *((float*) output) = (float) wasm_f32x4_extract_lane(vout${ABC[0:8]}${ABC[0:8]}, 0);
           vout${ABC[0:8]}${ABC[0:8]} = wasm_u64x2_shr(vout${ABC[0:8]}${ABC[0:8]}, 32);
           output += 4;
         }
+        uint32_t vout${ABC[0:4]} = wasm_i32x4_extract_lane(vout${ABC[0:8]}${ABC[0:8]}, 0);
         if (n & (2 * sizeof(${XINT8_T}))) {
-          *((uint16_t*) output) = (uint16_t) wasm_i16x8_extract_lane(vout${ABC[0:8]}${ABC[0:8]}, 0);
-          vout${ABC[0:8]}${ABC[0:8]} = wasm_u32x4_shr(vout${ABC[0:8]}${ABC[0:8]}, 16);
+          *((uint16_t*) output) = (uint16_t) vout${ABC[0:4]};
+          vout${ABC[0:4]} >>= 16;
           output += 2;
         }
         if (n & (1 * sizeof(${XINT8_T}))) {
-          *output = (${XINT8_T}) wasm_i8x16_extract_lane(vout${ABC[0:8]}${ABC[0:8]}, 0);
+          *output = (${XINT8_T}) vout${ABC[0:4]};
         }
     }${" while (n != 0);" if BATCH_TILE > 8 else ""}
   }

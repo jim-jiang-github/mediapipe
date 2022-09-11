@@ -73,7 +73,7 @@ class TpuExecutableInterface : public Executable {
       const ServiceExecutableRunOptions& run_options,
       absl::Span<const stream_executor::DeviceMemoryBase> arguments,
       stream_executor::DeviceMemoryBase result,
-      absl::optional<stream_executor::DeviceMemoryBase>
+      std::optional<stream_executor::DeviceMemoryBase>
           cross_program_prefetch_addr) = 0;
 
   virtual absl::string_view fingerprint() const = 0;
@@ -81,7 +81,7 @@ class TpuExecutableInterface : public Executable {
  protected:
   virtual Shape HostShapeToDeviceShape(const Shape& host_shape) = 0;
 
-  virtual int64 ShapeSize(const Shape& shape) = 0;
+  virtual int64_t ShapeSize(const Shape& shape) = 0;
 };
 
 }  // namespace xla

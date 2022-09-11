@@ -29,9 +29,8 @@ void xnn_f32_spmm_minmax_ukernel_4x1__wasmsimd_x86_x4(
   assert(mc % sizeof(float) == 0);
   assert(nc != 0);
 
-  const v128_t vmin = wasm_v128_load32_splat(&params->scalar.min);
-  const v128_t vmax = wasm_v128_load32_splat(&params->scalar.max);
-  const v128_t vzero = wasm_f64x2_splat(0.0);
+  const v128_t vmin = wasm_v128_load64_splat(params->wasmsimd.min);
+  const v128_t vmax = wasm_v128_load64_splat(params->wasmsimd.max);
   size_t output_decrement = output_stride * nc - 4 * sizeof(float);
   while XNN_LIKELY(mc >= 4 * sizeof(float)) {
     const float*restrict w = weights;
@@ -42,9 +41,9 @@ void xnn_f32_spmm_minmax_ukernel_4x1__wasmsimd_x86_x4(
       uint32_t nnz = *nnzmap++;
       v128_t vacc0123x0 = wasm_v128_load32_splat(w);
       w += 1;
-      v128_t vacc0123x1 = vzero;
-      v128_t vacc0123x2 = vzero;
-      v128_t vacc0123x3 = vzero;
+      v128_t vacc0123x1 = wasm_f32x4_const_splat(0.0f);
+      v128_t vacc0123x2 = wasm_f32x4_const_splat(0.0f);
+      v128_t vacc0123x3 = wasm_f32x4_const_splat(0.0f);
       for (; nnz >= 4; nnz -= 4) {
         const intptr_t diff0 = dmap[0];
         const intptr_t diff1 = dmap[1];
@@ -85,8 +84,8 @@ void xnn_f32_spmm_minmax_ukernel_4x1__wasmsimd_x86_x4(
           vacc0123 = wasm_f32x4_add(vacc0123, wasm_f32x4_mul(vi0123, vw));
         } while (--nnz != 0);
       }
-      v128_t vout0123 = wasm_v128_bitselect(vacc0123, vmax, wasm_f32x4_le(vacc0123, vmax));
-      vout0123 = wasm_v128_bitselect(vmin, vout0123, wasm_f32x4_lt(vout0123, vmin));
+      v128_t vout0123 = wasm_f32x4_pmin(vmax, vacc0123);
+      vout0123 = wasm_f32x4_pmax(vmin, vout0123);
       wasm_v128_store(output, vout0123);
       output = (float*restrict) ((uintptr_t) output + output_stride);
     } while (--n != 0);
@@ -113,8 +112,8 @@ void xnn_f32_spmm_minmax_ukernel_4x1__wasmsimd_x86_x4(
             vacc01 = wasm_f32x4_add(vacc01, wasm_f32x4_mul(vi01, vw));
           } while (--nnz != 0);
         }
-        v128_t vout01 = wasm_v128_bitselect(vacc01, vmax, wasm_f32x4_le(vacc01, vmax));
-        vout01 = wasm_v128_bitselect(vmin, vout01, wasm_f32x4_lt(vout01, vmin));
+        v128_t vout01 = wasm_f32x4_pmin(vmax, vacc01);
+        vout01 = wasm_f32x4_pmax(vmin, vout01);
         *((double*) output) = wasm_f64x2_extract_lane(vout01, 0);
 
         output = (float*restrict) ((uintptr_t) output + output_stride);
@@ -140,8 +139,8 @@ void xnn_f32_spmm_minmax_ukernel_4x1__wasmsimd_x86_x4(
             vacc0 = wasm_f32x4_add(vacc0, wasm_f32x4_mul(vi0, vw));
           } while (--nnz != 0);
         }
-        v128_t vout0 = wasm_v128_bitselect(vacc0, vmax, wasm_f32x4_le(vacc0, vmax));
-        vout0 = wasm_v128_bitselect(vmin, vout0, wasm_f32x4_lt(vout0, vmin));
+        v128_t vout0 = wasm_f32x4_pmin(vmax, vacc0);
+        vout0 = wasm_f32x4_pmax(vmin, vout0);
         *output = wasm_f32x4_extract_lane(vout0, 0);
 
         output = (float*restrict) ((uintptr_t) output + output_stride);

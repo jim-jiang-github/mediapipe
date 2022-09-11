@@ -87,6 +87,7 @@ limitations under the License.
 #include "tensorflow/compiler/xla/status.h"
 #include "tensorflow/compiler/xla/util.h"
 #include "tensorflow/core/platform/logging.h"
+#include "tensorflow/core/profiler/lib/traceme.h"
 
 namespace xla {
 
@@ -459,8 +460,6 @@ void TransposePlan::Execute(
 
   const char* ac = static_cast<const char*>(a);
   char* bc = static_cast<char*>(b);
-  DCHECK((ac + elem_size_in_bytes_ * num_elems_ <= b ||
-          bc + elem_size_in_bytes_ * num_elems_ <= a));
 
   auto execute_by_type = [&](absl::Span<Node const> nodes) {
     switch (elem_size_in_bytes_) {
@@ -497,6 +496,8 @@ void TransposePlan::Execute(
     absl::BlockingCounter counter(nodes_.size());
     for (absl::Span<Node const> nodes : nodes_) {
       schedule_work([&, nodes]() {
+        tensorflow::profiler::TraceMe traceme("Transpose::Execute",
+                                              /*level=*/2);
         execute_by_type(nodes);
         counter.DecrementCount();
       });
@@ -650,7 +651,7 @@ void TransposePlan::CoalesceDimensions(
 int64_t TransposePlan::InputNumElems() const {
   int64_t size = 1;
   for (size_t i = 0; i < a_dims_.size(); ++i) {
-    size *= RoundUpToNearest(a_dims_[i], a_tiling_[i]);
+    size *= RoundUpTo(a_dims_[i], a_tiling_[i]);
   }
   return size;
 }
@@ -658,15 +659,15 @@ int64_t TransposePlan::InputNumElems() const {
 int64_t TransposePlan::OutputNumElems() const {
   int64_t size = 1;
   for (size_t i = 0; i < a_dims_.size(); ++i) {
-    size *= RoundUpToNearest(a_dims_[permutation_[i]], b_tiling_[i]);
+    size *= RoundUpTo(a_dims_[permutation_[i]], b_tiling_[i]);
   }
   return size;
 }
 
 // Parses and validates a tiling specification, and populates `tiling`.
-static Status ParseTilingSpecification(int ndim,
-                                       absl::Span<int64_t const> tiling_spec,
-                                       absl::InlinedVector<int64, 4>& tiling) {
+static Status ParseTilingSpecification(
+    int ndim, absl::Span<int64_t const> tiling_spec,
+    absl::InlinedVector<int64_t, 4>& tiling) {
   tiling.resize(ndim, 1);
   if (tiling_spec.size() > ndim) {
     return InvalidArgument(
@@ -681,7 +682,7 @@ static Status ParseTilingSpecification(int ndim,
   int offset = ndim;
   offset -= tiling_spec.size();
   absl::c_copy(tiling_spec, tiling.begin() + offset);
-  return Status::OK();
+  return OkStatus();
 }
 
 // Helper function that builds a plan.
@@ -790,21 +791,15 @@ void TransposePlan::BuildPlanNodes(
       } else if (node.is_inner_dim_in_b) {
         node.inc = inner_block_elems_ * outer_block_elems_b_;
       }
+
       int task_id = task_id_at_loop / num_tasks_at_loop;
-      if (partial) {
-        // Only the last task handles the trailing tile.
-        // DCHECK_EQ(task_id, loop_parallelism_[agendum.loop_id] - 1);
-        node.start = 0;
-        node.end = a_dims_[a_dim] % tile_size;
-      } else {
-        int64_t num_iterations = CeilOfRatio(tile_size, node.inc);
-        int64_t num_iterations_per_task = CeilOfRatio<int64_t>(
-            num_iterations, loop_parallelism_[agendum.loop_id]);
-        node.start =
-            std::min(tile_size, task_id * num_iterations_per_task * node.inc);
-        node.end = std::min(tile_size,
-                            (task_id + 1) * num_iterations_per_task * node.inc);
-      }
+      int64_t size = partial ? a_dims_[a_dim] % tile_size : tile_size;
+      int64_t num_iterations = CeilOfRatio(size, node.inc);
+      int64_t num_iterations_per_task = CeilOfRatio<int64_t>(
+          num_iterations, loop_parallelism_[agendum.loop_id]);
+      node.start = std::min(size, task_id * num_iterations_per_task * node.inc);
+      node.end =
+          std::min(size, (task_id + 1) * num_iterations_per_task * node.inc);
       if (!loop_has_trivial_iteration_space(node) ||
           (inner_kernel_is_memcpy_ && node.is_inner_dim_in_a)) {
         nodes.push_back(node);
@@ -885,7 +880,7 @@ void TransposePlan::BuildPlanNodes(
 StatusOr<std::unique_ptr<TransposePlan>> TransposePlan::Create(
     size_t elem_size_in_bytes, absl::Span<int64_t const> dims,
     absl::Span<int64_t const> permutation,
-    absl::variant<Tiling, Striding> input_layout, Tiling output_tiling,
+    std::variant<Tiling, Striding> input_layout, Tiling output_tiling,
     Transformation transformation, int num_threads) {
   auto is_negative = [](int d) { return d < 0; };
   if (absl::c_find_if(dims, is_negative) != dims.end()) {
@@ -932,20 +927,14 @@ StatusOr<std::unique_ptr<TransposePlan>> TransposePlan::Create(
       ParseTilingSpecification(ndim, output_tiling.tiling, plan->b_tiling_));
 
   // Handles strides.
-  if (absl::holds_alternative<Striding>(input_layout)) {
+  if (std::holds_alternative<Striding>(input_layout)) {
     absl::Span<int64_t const> input_strides_in_bytes =
-        absl::get<Striding>(input_layout).strides_in_bytes;
+        std::get<Striding>(input_layout).strides_in_bytes;
     if (input_strides_in_bytes.size() != dims.size()) {
       return InvalidArgument(
           "dims and input_strides_in_bytes must have equal sizes, got %d "
           "and %d",
           dims.size(), input_strides_in_bytes.size());
-    }
-    if (absl::c_find_if(input_strides_in_bytes, is_negative) !=
-        input_strides_in_bytes.end()) {
-      return InvalidArgument(
-          "input_strides_in_bytes must be non-negative, got %s",
-          absl::StrJoin(dims, ","));
     }
     plan->original_a_strides_.resize(ndim);
     absl::c_copy(input_strides_in_bytes, plan->original_a_strides_.begin());
@@ -970,7 +959,7 @@ StatusOr<std::unique_ptr<TransposePlan>> TransposePlan::Create(
           (is_stride1 && transformation == Transformation::kF64ToEf57 &&
            dims[k] == 2);
 
-      return std::make_tuple(is_stride1, -stride, ef57_even,
+      return std::make_tuple(is_stride1, -std::abs(stride), ef57_even,
                              is_trailing_dim_in_b, dims[k]);
     };
     absl::c_stable_sort(dim_order,
@@ -990,7 +979,7 @@ StatusOr<std::unique_ptr<TransposePlan>> TransposePlan::Create(
     plan->a_tiling_.resize(ndim, 1);
   } else {
     TF_RETURN_IF_ERROR(ParseTilingSpecification(
-        ndim, absl::get<Tiling>(input_layout).tiling, plan->a_tiling_));
+        ndim, std::get<Tiling>(input_layout).tiling, plan->a_tiling_));
 
     plan->a_dims_ = plan->original_a_dims_;
     plan->permutation_.resize(ndim);
@@ -1154,14 +1143,10 @@ void TransposePlan::Initialize() {
   }
 
   // Loop order heuristic: try to make loops with small strides innermost.
-  auto cost = [&](const Loop& l) -> double {
-    // If the inner kernel is a memcpy make sure the innermost dimension is the
-    // stride 1 dimensions. This is a requirement of the kernel.
-    if (inner_kernel_is_memcpy_ && l.dim_in_a == pos_stride1a) {
-      return l.tile_interior ? -2 : -1;
-    }
-    int64_t a_stride = (l.tile_interior && a_is_tiled_) ? lda_tile_[l.dim_in_a]
-                                                        : lda_[l.dim_in_a];
+  auto cost = [&](const Loop& l) {
+    int64_t a_stride =
+        std::abs((l.tile_interior && a_is_tiled_) ? lda_tile_[l.dim_in_a]
+                                                  : lda_[l.dim_in_a]);
     bool is_inner_dim_in_a =
         (!a_is_tiled_ || l.tile_interior) && (l.dim_in_a == pos_stride1a);
 
@@ -1180,13 +1165,19 @@ void TransposePlan::Initialize() {
     // consecutive writes and consecutive reads, we would prefer consecutive
     // writes.
     double penalty = 1.01;
-    return std::min<double>(a_stride * penalty, b_stride);
+
+    // If the inner kernel is a memcpy make sure the innermost loop is the
+    // stride-1 dimension. This is a requirement of the memcpy kernel.
+    bool dim_must_go_last =
+        inner_kernel_is_memcpy_ && l.dim_in_a == pos_stride1a &&
+        (l.tile_interior ||
+         (a_tiling_[l.dim_in_a] == 1 && b_tiling_[b_dim] == 1));
+    return std::make_tuple(dim_must_go_last,
+                           inner_kernel_is_memcpy_ && l.tile_interior,
+                           -std::min<double>(a_stride * penalty, b_stride));
   };
   absl::c_stable_sort(loop_order_, [&](const Loop& a, const Loop& b) {
-    return std::make_tuple(inner_kernel_is_memcpy_ && a.tile_interior,
-                           -cost(a)) <
-           std::make_tuple(inner_kernel_is_memcpy_ && b.tile_interior,
-                           -cost(b));
+    return cost(a) < cost(b);
   });
   // It is a required invariant of the loop order that tile interiors always
   // appear after the corresponding tile exterior. This is a consequence of the
@@ -1194,7 +1185,8 @@ void TransposePlan::Initialize() {
   // both input and output.
 
   // The stride-1 loop must be innermost for a memcpy loop.
-  CHECK(!inner_kernel_is_memcpy_ || loop_order_.back().dim_in_a == ndim - 1);
+  DCHECK(!inner_kernel_is_memcpy_ || loop_order_.back().dim_in_a == ndim - 1)
+      << ToString();
 
   loop_parallelism_ = ChooseParallelizationStrategy(inverse_permutation);
   int num_threads =
@@ -1266,7 +1258,7 @@ std::vector<int> TransposePlan::ChooseParallelizationStrategy(
     const Loop& loop = loop_order_[i];
     CHECK_GE(available_parallelism, 1);
     int64_t iterations = loop_iterations(loop);
-    int kMinBytesPerThread = inner_kernel_is_memcpy_ ? (1 << 20) : (1 << 17);
+    int kMinBytesPerThread = inner_kernel_is_memcpy_ ? (1 << 20) : (1 << 26);
     int64_t min_iterations_per_thread =
         CeilOfRatio<int64_t>(kMinBytesPerThread, work_in_bytes[i]);
     int64_t parallel_work = CeilOfRatio(iterations, min_iterations_per_thread);
@@ -1359,17 +1351,10 @@ bool TransposePlanCacheKey::operator==(
 
 template <typename H>
 H AbslHashValue(H h, const TransposePlanCacheKey& key) {
-  h = H::combine(std::move(h), key.elem_size_in_bytes,
-                 key.input_layout_is_tiling, key.num_threads,
-                 static_cast<int>(key.transformation));
-  h = H::combine_contiguous(std::move(h), key.dims.data(), key.dims.size());
-  h = H::combine_contiguous(std::move(h), key.permutation.data(),
-                            key.permutation.size());
-  h = H::combine_contiguous(std::move(h), key.input_layout.data(),
-                            key.input_layout.size());
-  h = H::combine_contiguous(std::move(h), key.output_tiling.data(),
-                            key.output_tiling.size());
-  return h;
+  return H::combine(std::move(h), key.elem_size_in_bytes,
+                    key.input_layout_is_tiling, key.num_threads,
+                    key.transformation, key.dims, key.permutation,
+                    key.input_layout, key.output_tiling);
 }
 
 TransposePlanCache::TransposePlanCache(int capacity)
@@ -1380,7 +1365,7 @@ TransposePlanCache::~TransposePlanCache() = default;
 StatusOr<std::shared_ptr<TransposePlan>> TransposePlanCache::GetOrCreate(
     size_t elem_size_in_bytes, absl::Span<int64_t const> dims,
     absl::Span<int64_t const> permutation,
-    absl::variant<TransposePlan::Tiling, TransposePlan::Striding> input_layout,
+    std::variant<TransposePlan::Tiling, TransposePlan::Striding> input_layout,
     TransposePlan::Tiling output_tiling,
     TransposePlan::Transformation transformation, int num_threads) {
   TransposePlanCacheKey key;
@@ -1389,15 +1374,15 @@ StatusOr<std::shared_ptr<TransposePlan>> TransposePlanCache::GetOrCreate(
   absl::c_copy(dims, key.dims.begin());
   key.permutation.resize(permutation.size());
   absl::c_copy(permutation, key.permutation.begin());
-  if (absl::holds_alternative<TransposePlan::Striding>(input_layout)) {
+  if (std::holds_alternative<TransposePlan::Striding>(input_layout)) {
     absl::Span<int64_t const> input_strides_in_bytes =
-        absl::get<TransposePlan::Striding>(input_layout).strides_in_bytes;
+        std::get<TransposePlan::Striding>(input_layout).strides_in_bytes;
     key.input_layout = absl::InlinedVector<int64_t, 4>(
         input_strides_in_bytes.begin(), input_strides_in_bytes.end());
     key.input_layout_is_tiling = false;
   } else {
     absl::Span<int64_t const> input_tiling =
-        absl::get<TransposePlan::Tiling>(input_layout).tiling;
+        std::get<TransposePlan::Tiling>(input_layout).tiling;
     key.input_layout = absl::InlinedVector<int64_t, 4>(input_tiling.begin(),
                                                        input_tiling.end());
     key.input_layout_is_tiling = true;

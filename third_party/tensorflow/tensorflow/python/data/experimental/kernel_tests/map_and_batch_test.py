@@ -13,15 +13,14 @@
 # limitations under the License.
 # ==============================================================================
 """Tests for `tf.data.experimental.map_and_batch()`."""
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import math
 
 from absl.testing import parameterized
 import numpy as np
 
+from tensorflow.python import pywrap_sanitizers
+from tensorflow.python.checkpoint import checkpoint as trackable_utils
+from tensorflow.python.checkpoint import checkpoint_management
 from tensorflow.python.data.experimental.ops import batching
 from tensorflow.python.data.kernel_tests import checkpoint_test_base
 from tensorflow.python.data.kernel_tests import test_base
@@ -398,6 +397,22 @@ class MapAndBatchTest(test_base.DatasetTestBase, parameterized.TestCase):
             self.evaluate(get_next()))
     with self.assertRaises(errors.OutOfRangeError):
       self.evaluate(get_next())
+
+  @combinations.generate(test_base.eager_only_combinations())
+  def testCheckpointLargeBatches(self):
+    if pywrap_sanitizers.is_tsan_enabled():
+      self.skipTest("Creating a large buffer causes OOM when using tsan.")
+    # Batches of size 512M
+    dataset = dataset_ops.Dataset.from_tensors(
+        array_ops.ones((64, 1024, 1024), dtype=dtypes.float32)).repeat()
+    dataset = dataset.map(lambda x: x+1, num_parallel_calls=5)
+    dataset = dataset.batch(2)
+    iterator = iter(dataset)
+    next(iterator)  # request an element to fill the buffer
+    ckpt = trackable_utils.Checkpoint(iterator=iterator)
+    manager = checkpoint_management.CheckpointManager(
+        ckpt, self.get_temp_dir(), max_to_keep=1)
+    manager.save()
 
 
 class MapAndBatchCheckpointTest(checkpoint_test_base.CheckpointTestBase,

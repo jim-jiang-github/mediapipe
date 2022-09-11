@@ -102,7 +102,7 @@ node {
   output_stream: "MULTI_FACE_GEOMETRY:multi_face_geometry"
   options: {
     [mediapipe.FaceGeometryPipelineCalculatorOptions.ext] {
-      metadata_path: "../../mediapipe/modules/face_geometry/data/geometry_pipeline_metadata_landmarks.pbtxt"
+      metadata_path: "../mediapipe/modules/face_geometry/data/geometry_pipeline_metadata_landmarks.pbtxt"
     }
   }
 }
@@ -118,7 +118,7 @@ node {
   
   options: {
     [mediapipe.FaceGeometryPipelineCalculatorOptions.ext] {
-      metadata_path: "../../mediapipe/modules/face_geometry/data/geometry_pipeline_metadata_landmarks.pbtxt"
+      metadata_path: "../mediapipe/modules/face_geometry/data/geometry_pipeline_metadata_landmarks.pbtxt"
     }
   }
 }

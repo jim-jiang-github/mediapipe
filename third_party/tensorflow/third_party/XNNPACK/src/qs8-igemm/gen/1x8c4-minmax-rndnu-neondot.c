@@ -27,7 +27,7 @@ void xnn_qs8_igemm_minmax_rndnu_ukernel_1x8c4__neondot(
     size_t cn_stride,
     size_t a_offset,
     const int8_t* zero,
-    const union xnn_qs8_conv_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN XNN_DISABLE_MSAN
+    const union xnn_qs8_conv_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
   assert(mr != 0);
   assert(mr <= 1);
@@ -132,11 +132,11 @@ void xnn_qs8_igemm_minmax_rndnu_ukernel_1x8c4__neondot(
       nc -= 8;
     } else {
       if (nc & 4) {
-        vst1_lane_u32(__builtin_assume_aligned(c0, 1), vreinterpret_u32_s8(vout0x01234567), 0); c0 += 4;
+        vst1_lane_u32((void*) c0, vreinterpret_u32_s8(vout0x01234567), 0); c0 += 4;
         vout0x01234567 = vext_s8(vout0x01234567, vout0x01234567, 4);
       }
       if (nc & 2) {
-        vst1_lane_u16(__builtin_assume_aligned(c0, 1), vreinterpret_u16_s8(vout0x01234567), 0); c0 += 2;
+        vst1_lane_u16((void*) c0, vreinterpret_u16_s8(vout0x01234567), 0); c0 += 2;
         vout0x01234567 = vext_s8(vout0x01234567, vout0x01234567, 2);
       }
       if (nc & 1) {

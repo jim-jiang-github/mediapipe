@@ -54,6 +54,8 @@ namespace tensorflow {
   REGISTER_KERNEL_BUILDER(Name("XlaDynamicUpdateSlice").Device(DEVICE),        \
                           XlaCompileOnDemandOp);                               \
   REGISTER_KERNEL_BUILDER(Name("XlaIf").Device(DEVICE), XlaCompileOnDemandOp); \
+  REGISTER_KERNEL_BUILDER(Name("XlaOptimizationBarrier").Device(DEVICE),       \
+                          XlaCompileOnDemandOp);                               \
   REGISTER_KERNEL_BUILDER(Name("XlaPad")                                       \
                               .HostMemory("padding_low")                       \
                               .HostMemory("padding_high")                      \
@@ -97,6 +99,11 @@ namespace tensorflow {
                           XlaCompileOnDemandOp);                               \
   REGISTER_KERNEL_BUILDER(Name("XlaEinsum").Device(DEVICE),                    \
                           XlaCompileOnDemandOp);                               \
+  REGISTER_KERNEL_BUILDER(Name("XlaRngBitGenerator")                           \
+                              .HostMemory("algorithm")                         \
+                              .HostMemory("shape")                             \
+                              .Device(DEVICE),                                 \
+                          XlaCompileOnDemandOp);                               \
   REGISTER_KERNEL_BUILDER(Name("XlaSpmdShardToFullShape").Device(DEVICE),      \
                           XlaCompileOnDemandOp);                               \
   REGISTER_KERNEL_BUILDER(Name("XlaSharding").Device(DEVICE),                  \
@@ -107,8 +114,9 @@ namespace tensorflow {
       Name("XlaGather").HostMemory("slice_sizes").Device(DEVICE),              \
       XlaCompileOnDemandOp);                                                   \
   REGISTER_KERNEL_BUILDER(Name("XlaScatter").Device(DEVICE),                   \
+                          XlaCompileOnDemandOp);                               \
+  REGISTER_KERNEL_BUILDER(Name("XlaCallModule").Device(DEVICE),                \
                           XlaCompileOnDemandOp);
-
 REGISTER_XLA_OPS_ON_DEVICE(DEVICE_CPU);
 REGISTER_XLA_OPS_ON_DEVICE(DEVICE_GPU);
 

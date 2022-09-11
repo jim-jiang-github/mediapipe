@@ -77,7 +77,6 @@
     <ClCompile Include=".\src\f32-prelu\gen\avx512f-2x16.c" />
     <ClCompile Include=".\src\f32-prelu\gen\sse2-2x8.c" />
     <ClCompile Include=".\src\f32-prelu\gen\sse41-2x8.c" />
-    <ClCompile Include=".\src\f32-raddstoreexpminusmax\gen\sse2-p5-x20-acc2.c" />
     <ClCompile Include=".\src\f32-rmax\sse.c" />
     <ClCompile Include=".\src\f32-spmm\gen\32x1-minmax-sse.c" />
     <ClCompile Include=".\src\f32-vbinary\gen\vadd-minmax-avx-x16.c" />
@@ -189,12 +188,6 @@
     <ClCompile Include=".\src\operators\unary-elementwise-nc.c" />
     <ClCompile Include=".\src\operators\unpooling-nhwc.c" />
     <ClCompile Include=".\src\packing.c" />
-    <ClCompile Include=".\src\qs8-gavgpool\gen\7p7x-minmax-sse2-c8-acc2.c" />
-    <ClCompile Include=".\src\qs8-gavgpool\gen\7p7x-minmax-sse41-c8-acc2.c" />
-    <ClCompile Include=".\src\qs8-gavgpool\gen\7p7x-minmax-ssse3-c8-acc2.c" />
-    <ClCompile Include=".\src\qs8-gavgpool\gen\7x-minmax-sse2-c8-acc2.c" />
-    <ClCompile Include=".\src\qs8-gavgpool\gen\7x-minmax-sse41-c8-acc2.c" />
-    <ClCompile Include=".\src\qs8-gavgpool\gen\7x-minmax-ssse3-c8-acc2.c" />
     <ClCompile Include=".\src\qs8-vaddc\gen\minmax-avx-mul32-ld32-x8.c" />
     <ClCompile Include=".\src\qs8-vaddc\gen\minmax-sse2-mul16-ld64-x8.c" />
     <ClCompile Include=".\src\qs8-vaddc\gen\minmax-sse41-mul16-ld64-x8.c" />
@@ -205,8 +198,6 @@
     <ClCompile Include=".\src\qs8-vadd\gen\minmax-xop-mul32-ld32-x8.c" />
     <ClCompile Include=".\src\qu8-avgpool\9p8x-minmax-sse2-c8.c" />
     <ClCompile Include=".\src\qu8-avgpool\9x-minmax-sse2-c8.c" />
-    <ClCompile Include=".\src\qu8-gavgpool\7p7x-minmax-sse2-c8.c" />
-    <ClCompile Include=".\src\qu8-gavgpool\7x-minmax-sse2-c8.c" />
     <ClCompile Include=".\src\runtime.c" />
     <ClCompile Include=".\src\subgraph.c" />
     <ClCompile Include=".\src\subgraph\abs.c" />
@@ -224,7 +215,6 @@
     <ClCompile Include=".\src\subgraph\elu.c" />
     <ClCompile Include=".\src\subgraph\floor.c" />
     <ClCompile Include=".\src\subgraph\fully-connected.c" />
-    <ClCompile Include=".\src\subgraph\global-average-pooling-2d.c" />
     <ClCompile Include=".\src\subgraph\hardswish.c" />
     <ClCompile Include=".\src\subgraph\leaky-relu.c" />
     <ClCompile Include=".\src\subgraph\max-pooling-2d.c" />
@@ -250,19 +240,91 @@
     <ClCompile Include=".\src\u8-maxpool\9p8x-minmax-sse2-c16.c" />
     <ClCompile Include=".\src\u8-rmax\sse2.c" />
     <ClCompile Include=".\src\x32-depthtospace2d-chw2hwc\scalar.c" />
-    <ClCompile Include=".\src\x32-fill\sse.c" />
-    <ClCompile Include=".\src\x32-pad\sse.c" />
     <ClCompile Include=".\src\x32-unpool\sse2.c" />
     <ClCompile Include=".\src\x32-zip\x2-sse2.c" />
     <ClCompile Include=".\src\x32-zip\x3-sse2.c" />
     <ClCompile Include=".\src\x32-zip\x4-sse2.c" />
     <ClCompile Include=".\src\x32-zip\xm-sse2.c" />
-    <ClCompile Include=".\src\x8-lut\scalar.c" />
     <ClCompile Include=".\src\x8-zip\x2-sse2.c" />
     <ClCompile Include=".\src\x8-zip\x3-sse2.c" />
     <ClCompile Include=".\src\x8-zip\x4-sse2.c" />
     <ClCompile Include=".\src\x8-zip\xm-sse2.c" />
     <ClCompile Include=".\src\xx-copy\memcpy.c" />
+    <ClCompile Include="src\cache.c" />
+    <ClCompile Include="src\f16-avgpool\9p8x-minmax-f16c-c8.c" />
+    <ClCompile Include="src\f16-avgpool\9x-minmax-f16c-c8.c" />
+    <ClCompile Include="src\f16-dwconv\gen\up16x3-minmax-fma3.c" />
+    <ClCompile Include="src\f16-dwconv\gen\up16x4-minmax-fma3.c" />
+    <ClCompile Include="src\f16-dwconv\gen\up16x9-minmax-fma3.c" />
+    <ClCompile Include="src\f16-dwconv\gen\up8x25-minmax-fma3-acc2.c" />
+    <ClCompile Include="src\f16-f32-vcvt\gen\vcvt-avx-int16-x16.c" />
+    <ClCompile Include="src\f16-f32-vcvt\gen\vcvt-avx512skx-x16.c" />
+    <ClCompile Include="src\f16-f32-vcvt\gen\vcvt-f16c-x16.c" />
+    <ClCompile Include="src\f16-f32-vcvt\gen\vcvt-sse2-int16-x32.c" />
+    <ClCompile Include="src\f16-f32-vcvt\gen\vcvt-sse41-int16-x16.c" />
+    <ClCompile Include="src\f16-gavgpool\gen\7p7x-minmax-f16c-c8.c" />
+    <ClCompile Include="src\f16-gavgpool\gen\7x-minmax-f16c-c8.c" />
+    <ClCompile Include="src\f16-gemm\gen\1x16-minmax-avx2-broadcast.c" />
+    <ClCompile Include="src\f16-gemm\gen\4x16-minmax-avx2-broadcast.c" />
+    <ClCompile Include="src\f16-ibilinear\gen\fma3-c8.c" />
+    <ClCompile Include="src\f16-igemm\gen\1x16-minmax-avx2-broadcast.c" />
+    <ClCompile Include="src\f16-igemm\gen\4x16-minmax-avx2-broadcast.c" />
+    <ClCompile Include="src\f16-maxpool\9p8x-minmax-f16c-c8.c" />
+    <ClCompile Include="src\f16-pavgpool\9p8x-minmax-avx2-c8.c" />
+    <ClCompile Include="src\f16-pavgpool\9x-minmax-avx2-c8.c" />
+    <ClCompile Include="src\f16-prelu\gen\f16c-2x16.c" />
+    <ClCompile Include="src\f16-raddstoreexpminusmax\gen\avx2-rr1-p2-x40.c" />
+    <ClCompile Include="src\f16-rmax\f16c.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vadd-minmax-f16c-x16.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vaddc-minmax-f16c-x16.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vdiv-minmax-f16c-x8.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vdivc-minmax-f16c-x8.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vmax-f16c-x16.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vmaxc-f16c-x16.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vmin-f16c-x16.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vminc-f16c-x16.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vmul-minmax-f16c-x16.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vmulc-minmax-f16c-x16.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vrdivc-minmax-f16c-x8.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vrsubc-minmax-f16c-x16.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vsqrdiff-f16c-x16.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vsqrdiffc-f16c-x16.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vsub-minmax-f16c-x16.c" />
+    <ClCompile Include="src\f16-vbinary\gen\vsubc-minmax-f16c-x16.c" />
+    <ClCompile Include="src\f16-vclamp\gen\vclamp-f16c-x16.c" />
+    <ClCompile Include="src\f16-velu\gen\velu-avx2-rr1-p3-x16.c" />
+    <ClCompile Include="src\f16-vhswish\gen\vhswish-f16c-x16.c" />
+    <ClCompile Include="src\f16-vlrelu\gen\vlrelu-f16c-x16.c" />
+    <ClCompile Include="src\f16-vmulcaddc\gen\c8-minmax-fma3-2x.c" />
+    <ClCompile Include="src\f16-vrnd\gen\vrndd-f16c-x16.c" />
+    <ClCompile Include="src\f16-vrnd\gen\vrndne-f16c-x16.c" />
+    <ClCompile Include="src\f16-vrnd\gen\vrndu-f16c-x16.c" />
+    <ClCompile Include="src\f16-vrnd\gen\vrndz-f16c-x16.c" />
+    <ClCompile Include="src\f16-vsigmoid\gen\vsigmoid-avx2-rr1-p2-rcp-x32.c" />
+    <ClCompile Include="src\f16-vsqrt\gen\f16c-sqrt-x8.c" />
+    <ClCompile Include="src\f16-vunary\gen\vabs-sse2-x16.c" />
+    <ClCompile Include="src\f16-vunary\gen\vneg-sse2-x16.c" />
+    <ClCompile Include="src\f16-vunary\gen\vsqr-f16c-x16.c" />
+    <ClCompile Include="src\f32-dwconv\gen\up16x3-minmax-avx.c" />
+    <ClCompile Include="src\f32-dwconv\gen\up16x3-minmax-avx512f.c" />
+    <ClCompile Include="src\f32-dwconv\gen\up16x3-minmax-fma3.c" />
+    <ClCompile Include="src\f32-dwconv\gen\up8x3-minmax-sse.c" />
+    <ClCompile Include="src\f32-f16-vcvt\gen\vcvt-avx-x24.c" />
+    <ClCompile Include="src\f32-f16-vcvt\gen\vcvt-avx512skx-x16.c" />
+    <ClCompile Include="src\f32-f16-vcvt\gen\vcvt-f16c-x16.c" />
+    <ClCompile Include="src\f32-f16-vcvt\gen\vcvt-sse2-x16.c" />
+    <ClCompile Include="src\f32-f16-vcvt\gen\vcvt-sse41-x8.c" />
+    <ClCompile Include="src\f32-qs8-vcvt\gen\vcvt-avx-x32.c" />
+    <ClCompile Include="src\f32-qs8-vcvt\gen\vcvt-avx2-x64.c" />
+    <ClCompile Include="src\f32-qs8-vcvt\gen\vcvt-avx512skx-x128.c" />
+    <ClCompile Include="src\f32-qs8-vcvt\gen\vcvt-sse2-x32.c" />
+    <ClCompile Include="src\f32-qs8-vcvt\gen\vcvt-sse41-x32.c" />
+    <ClCompile Include="src\f32-qu8-vcvt\gen\vcvt-avx-x32.c" />
+    <ClCompile Include="src\f32-qu8-vcvt\gen\vcvt-avx2-x32.c" />
+    <ClCompile Include="src\f32-qu8-vcvt\gen\vcvt-avx2-x64.c" />
+    <ClCompile Include="src\f32-qu8-vcvt\gen\vcvt-avx512skx-x128.c" />
+    <ClCompile Include="src\f32-qu8-vcvt\gen\vcvt-sse2-x32.c" />
+    <ClCompile Include="src\f32-raddstoreexpminusmax\gen\sse2-rr2-p5-x20-acc2.c" />
     <ClCompile Include="src\f32-vclamp\gen\vclamp-avx-x16.c" />
     <ClCompile Include="src\f32-vclamp\gen\vclamp-avx512f-x16.c" />
     <ClCompile Include="src\f32-vclamp\gen\vclamp-sse-x8.c" />
@@ -273,19 +335,37 @@
     <ClCompile Include="src\f32-vsigmoid\gen\vsigmoid-avx-rr2-p5-nr2-x40.c" />
     <ClCompile Include="src\f32-vsigmoid\gen\vsigmoid-avx2-rr1-p5-div-x40.c" />
     <ClCompile Include="src\f32-vsigmoid\gen\vsigmoid-avx512f-rr2-lut32-p2-perm2-scalef-div-x64.c" />
-    <ClCompile Include="src\f32-vsigmoid\gen\vsigmoid-sse2-lut64-p2-div-x8.c" />
-    <ClCompile Include="src\f32-vsigmoid\gen\vsigmoid-sse41-lut64-p2-div-x8.c" />
-    <ClCompile Include="src\params-init.c" />
+    <ClCompile Include="src\f32-vsigmoid\gen\vsigmoid-sse2-rr2-lut64-p2-div-x8.c" />
+    <ClCompile Include="src\f32-vsigmoid\gen\vsigmoid-sse41-rr2-lut64-p2-div-x8.c" />
+    <ClCompile Include="src\memory.c" />
+    <ClCompile Include="src\microparams-init.c" />
+    <ClCompile Include="src\mutex.c" />
+    <ClCompile Include="src\normalization.c" />
+    <ClCompile Include="src\operator-strings.c" />
+    <ClCompile Include="src\operator-utils.c" />
+    <ClCompile Include="src\operators\lut-elementwise-nc.c" />
+    <ClCompile Include="src\operators\transpose-nd.c" />
+    <ClCompile Include="src\params.c" />
+    <ClCompile Include="src\qc8-dwconv\gen\up16x25-minmax-fp32-avx-mul16-add16.c" />
     <ClCompile Include="src\qc8-dwconv\gen\up16x25-minmax-fp32-avx-mul32.c" />
     <ClCompile Include="src\qc8-dwconv\gen\up16x25-minmax-fp32-avx2-mul32.c" />
+    <ClCompile Include="src\qc8-dwconv\gen\up16x25-minmax-fp32-xop-mul16-add16.c" />
     <ClCompile Include="src\qc8-dwconv\gen\up16x25-minmax-fp32-xop-mul32.c" />
+    <ClCompile Include="src\qc8-dwconv\gen\up16x3-minmax-fp32-avx-mul16-add16.c" />
+    <ClCompile Include="src\qc8-dwconv\gen\up16x3-minmax-fp32-avx2-mul32.c" />
+    <ClCompile Include="src\qc8-dwconv\gen\up16x3-minmax-fp32-xop-mul16-add16.c" />
+    <ClCompile Include="src\qc8-dwconv\gen\up16x9-minmax-fp32-avx-mul16-add16.c" />
     <ClCompile Include="src\qc8-dwconv\gen\up16x9-minmax-fp32-avx-mul32.c" />
     <ClCompile Include="src\qc8-dwconv\gen\up16x9-minmax-fp32-avx2-mul32.c" />
+    <ClCompile Include="src\qc8-dwconv\gen\up16x9-minmax-fp32-xop-mul16-add16.c" />
     <ClCompile Include="src\qc8-dwconv\gen\up16x9-minmax-fp32-xop-mul32.c" />
     <ClCompile Include="src\qc8-dwconv\gen\up32x25-minmax-fp32-avx512skx-mul32.c" />
+    <ClCompile Include="src\qc8-dwconv\gen\up32x3-minmax-fp32-avx512skx-mul32.c" />
     <ClCompile Include="src\qc8-dwconv\gen\up32x9-minmax-fp32-avx512skx-mul32.c" />
     <ClCompile Include="src\qc8-dwconv\gen\up8x25-minmax-fp32-sse2-mul16.c" />
     <ClCompile Include="src\qc8-dwconv\gen\up8x25-minmax-fp32-sse41-mul16.c" />
+    <ClCompile Include="src\qc8-dwconv\gen\up8x3-minmax-fp32-sse2-mul16.c" />
+    <ClCompile Include="src\qc8-dwconv\gen\up8x3-minmax-fp32-sse41-mul16.c" />
     <ClCompile Include="src\qc8-dwconv\gen\up8x9-minmax-fp32-sse2-mul16.c" />
     <ClCompile Include="src\qc8-dwconv\gen\up8x9-minmax-fp32-sse41-mul16.c" />
     <ClCompile Include="src\qc8-gemm\gen\1x16c8-minmax-fp32-avx512skx.c" />
@@ -312,20 +392,35 @@
     <ClCompile Include="src\qc8-igemm\gen\3x4c8-minmax-fp32-sse41-ld64.c" />
     <ClCompile Include="src\qc8-igemm\gen\3x8c8-minmax-fp32-avx2.c" />
     <ClCompile Include="src\qc8-igemm\gen\4x16c8-minmax-fp32-avx512skx.c" />
+    <ClCompile Include="src\qs8-dwconv\gen\up16x25-minmax-fp32-avx-mul16-add16.c" />
     <ClCompile Include="src\qs8-dwconv\gen\up16x25-minmax-fp32-avx-mul32.c" />
     <ClCompile Include="src\qs8-dwconv\gen\up16x25-minmax-fp32-avx2-mul32.c" />
+    <ClCompile Include="src\qs8-dwconv\gen\up16x25-minmax-fp32-xop-mul16-add16.c" />
     <ClCompile Include="src\qs8-dwconv\gen\up16x25-minmax-fp32-xop-mul32.c" />
+    <ClCompile Include="src\qs8-dwconv\gen\up16x9-minmax-fp32-avx-mul16-add16.c" />
     <ClCompile Include="src\qs8-dwconv\gen\up16x9-minmax-fp32-avx-mul32.c" />
     <ClCompile Include="src\qs8-dwconv\gen\up16x9-minmax-fp32-avx2-mul32.c" />
+    <ClCompile Include="src\qs8-dwconv\gen\up16x9-minmax-fp32-xop-mul16-add16.c" />
     <ClCompile Include="src\qs8-dwconv\gen\up16x9-minmax-fp32-xop-mul32.c" />
     <ClCompile Include="src\qs8-dwconv\gen\up32x25-minmax-fp32-avx512skx-mul32.c" />
     <ClCompile Include="src\qs8-dwconv\gen\up32x9-minmax-fp32-avx512skx-mul32.c" />
+    <ClCompile Include="src\qs8-dwconv\gen\up8x25-minmax-fp32-sse2-mul16-add16.c" />
     <ClCompile Include="src\qs8-dwconv\gen\up8x25-minmax-fp32-sse2-mul16.c" />
+    <ClCompile Include="src\qs8-dwconv\gen\up8x25-minmax-fp32-sse41-mul16-add16.c" />
     <ClCompile Include="src\qs8-dwconv\gen\up8x25-minmax-fp32-sse41-mul16.c" />
-    <ClCompile Include="src\qs8-dwconv\gen\up8x25-minmax-gemmlowp-sse2-mul16.c" />
-    <ClCompile Include="src\qs8-dwconv\gen\up8x25-minmax-gemmlowp-sse41-mul16.c" />
+    <ClCompile Include="src\qs8-dwconv\gen\up8x9-minmax-fp32-sse2-mul16-add16.c" />
     <ClCompile Include="src\qs8-dwconv\gen\up8x9-minmax-fp32-sse2-mul16.c" />
+    <ClCompile Include="src\qs8-dwconv\gen\up8x9-minmax-fp32-sse41-mul16-add16.c" />
     <ClCompile Include="src\qs8-dwconv\gen\up8x9-minmax-fp32-sse41-mul16.c" />
+    <ClCompile Include="src\qs8-f32-vcvt\gen\vcvt-avx-x32.c" />
+    <ClCompile Include="src\qs8-f32-vcvt\gen\vcvt-avx2-x16.c" />
+    <ClCompile Include="src\qs8-f32-vcvt\gen\vcvt-avx512skx-x32.c" />
+    <ClCompile Include="src\qs8-f32-vcvt\gen\vcvt-sse2-x32.c" />
+    <ClCompile Include="src\qs8-f32-vcvt\gen\vcvt-sse41-x16.c" />
+    <ClCompile Include="src\qs8-gavgpool\gen\7p7x-minmax-fp32-sse2-c8.c" />
+    <ClCompile Include="src\qs8-gavgpool\gen\7p7x-minmax-fp32-sse41-c8.c" />
+    <ClCompile Include="src\qs8-gavgpool\gen\7x-minmax-fp32-sse2-c8.c" />
+    <ClCompile Include="src\qs8-gavgpool\gen\7x-minmax-fp32-sse41-c8.c" />
     <ClCompile Include="src\qs8-gemm\gen\1x16c8-minmax-fp32-avx512skx.c" />
     <ClCompile Include="src\qs8-gemm\gen\1x4c8-minmax-fp32-avx-ld128.c" />
     <ClCompile Include="src\qs8-gemm\gen\1x4c8-minmax-fp32-sse2-ld64.c" />
@@ -356,9 +451,28 @@
     <ClCompile Include="src\qs8-vadd\gen\minmax-avx2-mul32-ld64-x16.c" />
     <ClCompile Include="src\qs8-vadd\gen\minmax-avx512skx-mul32-ld128-x16.c" />
     <ClCompile Include="src\qs8-vadd\gen\minmax-avx512skx-mul32-ld128-x32.c" />
+    <ClCompile Include="src\qs8-vcvt\gen\vcvt-avx-x32.c" />
+    <ClCompile Include="src\qs8-vcvt\gen\vcvt-avx2-x32.c" />
+    <ClCompile Include="src\qs8-vcvt\gen\vcvt-sse2-x32.c" />
+    <ClCompile Include="src\qs8-vcvt\gen\vcvt-sse41-x32.c" />
+    <ClCompile Include="src\qs8-vcvt\gen\vcvt-ssse3-x32.c" />
+    <ClCompile Include="src\qs8-vlrelu\gen\vlrelu-avx-x32.c" />
+    <ClCompile Include="src\qs8-vlrelu\gen\vlrelu-avx2-x32.c" />
+    <ClCompile Include="src\qs8-vlrelu\gen\vlrelu-sse2-x32.c" />
+    <ClCompile Include="src\qs8-vlrelu\gen\vlrelu-sse41-x32.c" />
+    <ClCompile Include="src\qs8-vlrelu\gen\vlrelu-ssse3-x32.c" />
+    <ClCompile Include="src\qs8-vmulc\gen\minmax-fp32-avx-mul16-ld64-x16.c" />
+    <ClCompile Include="src\qs8-vmulc\gen\minmax-fp32-sse2-mul16-ld64-x16.c" />
+    <ClCompile Include="src\qs8-vmulc\gen\minmax-fp32-sse2-mul16-ld64-x8.c" />
+    <ClCompile Include="src\qs8-vmulc\gen\minmax-fp32-sse41-mul16-ld64-x16.c" />
+    <ClCompile Include="src\qs8-vmul\gen\minmax-fp32-avx-mul16-ld64-x16.c" />
+    <ClCompile Include="src\qs8-vmul\gen\minmax-fp32-sse2-mul16-ld64-x8.c" />
+    <ClCompile Include="src\qs8-vmul\gen\minmax-fp32-sse41-mul16-ld64-x16.c" />
+    <ClCompile Include="src\qu8-dwconv\gen\up16x25-minmax-fp32-avx-mul16.c" />
     <ClCompile Include="src\qu8-dwconv\gen\up16x25-minmax-fp32-avx-mul32.c" />
     <ClCompile Include="src\qu8-dwconv\gen\up16x25-minmax-fp32-avx2-mul32.c" />
     <ClCompile Include="src\qu8-dwconv\gen\up16x25-minmax-fp32-xop-mul32.c" />
+    <ClCompile Include="src\qu8-dwconv\gen\up16x9-minmax-fp32-avx-mul16.c" />
     <ClCompile Include="src\qu8-dwconv\gen\up16x9-minmax-fp32-avx-mul32.c" />
     <ClCompile Include="src\qu8-dwconv\gen\up16x9-minmax-fp32-avx2-mul32.c" />
     <ClCompile Include="src\qu8-dwconv\gen\up16x9-minmax-fp32-xop-mul32.c" />
@@ -368,6 +482,16 @@
     <ClCompile Include="src\qu8-dwconv\gen\up8x25-minmax-fp32-sse41-mul16.c" />
     <ClCompile Include="src\qu8-dwconv\gen\up8x9-minmax-fp32-sse2-mul16.c" />
     <ClCompile Include="src\qu8-dwconv\gen\up8x9-minmax-fp32-sse41-mul16.c" />
+    <ClCompile Include="src\qu8-f32-vcvt\gen\vcvt-avx-x32.c" />
+    <ClCompile Include="src\qu8-f32-vcvt\gen\vcvt-avx2-x16.c" />
+    <ClCompile Include="src\qu8-f32-vcvt\gen\vcvt-avx512skx-x32.c" />
+    <ClCompile Include="src\qu8-f32-vcvt\gen\vcvt-sse2-x16.c" />
+    <ClCompile Include="src\qu8-f32-vcvt\gen\vcvt-sse2-x32.c" />
+    <ClCompile Include="src\qu8-f32-vcvt\gen\vcvt-sse41-x16.c" />
+    <ClCompile Include="src\qu8-gavgpool\gen\7p7x-minmax-fp32-sse2-c8.c" />
+    <ClCompile Include="src\qu8-gavgpool\gen\7p7x-minmax-fp32-sse41-c8.c" />
+    <ClCompile Include="src\qu8-gavgpool\gen\7x-minmax-fp32-sse2-c8.c" />
+    <ClCompile Include="src\qu8-gavgpool\gen\7x-minmax-fp32-sse41-c8.c" />
     <ClCompile Include="src\qu8-gemm\gen\1x16c8-minmax-fp32-avx512skx.c" />
     <ClCompile Include="src\qu8-gemm\gen\1x4c8-minmax-fp32-avx-ld128.c" />
     <ClCompile Include="src\qu8-gemm\gen\1x4c8-minmax-fp32-sse2-ld64.c" />
@@ -404,7 +528,51 @@
     <ClCompile Include="src\qu8-vadd\gen\minmax-sse2-mul16-ld64-x8.c" />
     <ClCompile Include="src\qu8-vadd\gen\minmax-sse41-mul16-ld64-x8.c" />
     <ClCompile Include="src\qu8-vadd\gen\minmax-xop-mul32-ld32-x8.c" />
+    <ClCompile Include="src\qu8-vcvt\gen\vcvt-avx-x32.c" />
+    <ClCompile Include="src\qu8-vcvt\gen\vcvt-avx2-x16.c" />
+    <ClCompile Include="src\qu8-vcvt\gen\vcvt-avx2-x32.c" />
+    <ClCompile Include="src\qu8-vcvt\gen\vcvt-avx2-x64.c" />
+    <ClCompile Include="src\qu8-vcvt\gen\vcvt-sse2-x32.c" />
+    <ClCompile Include="src\qu8-vcvt\gen\vcvt-sse41-x32.c" />
+    <ClCompile Include="src\qu8-vcvt\gen\vcvt-ssse3-x32.c" />
+    <ClCompile Include="src\qu8-vlrelu\gen\vlrelu-avx-x32.c" />
+    <ClCompile Include="src\qu8-vlrelu\gen\vlrelu-avx2-x32.c" />
+    <ClCompile Include="src\qu8-vlrelu\gen\vlrelu-sse2-x32.c" />
+    <ClCompile Include="src\qu8-vlrelu\gen\vlrelu-sse41-x32.c" />
+    <ClCompile Include="src\qu8-vlrelu\gen\vlrelu-ssse3-x32.c" />
+    <ClCompile Include="src\qu8-vmulc\gen\minmax-fp32-avx-mul16-ld64-x16.c" />
+    <ClCompile Include="src\qu8-vmulc\gen\minmax-fp32-sse2-mul16-ld64-x8.c" />
+    <ClCompile Include="src\qu8-vmulc\gen\minmax-fp32-sse41-mul16-ld64-x16.c" />
+    <ClCompile Include="src\qu8-vmul\gen\minmax-fp32-avx-mul16-ld64-x16.c" />
+    <ClCompile Include="src\qu8-vmul\gen\minmax-fp32-sse2-mul16-ld64-x8.c" />
+    <ClCompile Include="src\qu8-vmul\gen\minmax-fp32-sse41-mul16-ld64-x16.c" />
+    <ClCompile Include="src\s8-ibilinear\gen\sse2-c8.c" />
+    <ClCompile Include="src\s8-ibilinear\gen\sse41-c16.c" />
+    <ClCompile Include="src\s8-maxpool\9p8x-minmax-sse2-c16.c" />
+    <ClCompile Include="src\s8-maxpool\9p8x-minmax-sse41-c16.c" />
+    <ClCompile Include="src\s8-vclamp\sse2-x64.c" />
+    <ClCompile Include="src\s8-vclamp\sse41-x64.c" />
+    <ClCompile Include="src\subgraph\concatenate.c" />
+    <ClCompile Include="src\subgraph\convert.c" />
+    <ClCompile Include="src\subgraph\even-split.c" />
+    <ClCompile Include="src\subgraph\global-average-pooling.c" />
+    <ClCompile Include="src\subgraph\static-transpose.c" />
+    <ClCompile Include="src\subgraph\validation.c" />
+    <ClCompile Include="src\u8-ibilinear\gen\sse2-c8.c" />
+    <ClCompile Include="src\u8-ibilinear\gen\sse41-c16.c" />
     <ClCompile Include="src\u8-vclamp\sse2-x64.c" />
+    <ClCompile Include="src\ukernel-strings.c" />
+    <ClCompile Include="src\x16-transposec\gen\8x8-reuse-multi-sse2.c" />
+    <ClCompile Include="src\x32-packx\x4-sse.c" />
+    <ClCompile Include="src\x32-transposec\4x4-sse.c" />
+    <ClCompile Include="src\x8-lut\gen\lut-avx-x64.c" />
+    <ClCompile Include="src\x8-lut\gen\lut-avx2-x128.c" />
+    <ClCompile Include="src\x8-lut\gen\lut-avx512skx-vpshufb-x64.c" />
+    <ClCompile Include="src\x8-lut\gen\lut-scalar-x4.c" />
+    <ClCompile Include="src\x8-transposec\gen\16x16-reuse-mov-sse2.c" />
+    <ClCompile Include="src\xx-fill\sse2-x64.c" />
+    <ClCompile Include="src\xx-pad\sse2.c" />
+    <ClCompile Include="src\xx-transpose\1x1-memcpy.c" />
     <ClCompile Include="third_party\clog\src\clog.c" />
     <ClCompile Include="third_party\cpuinfo\src\api.c" />
     <ClCompile Include="third_party\cpuinfo\src\cache.c" />
@@ -501,7 +669,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>XNN_LOG_LEVEL=0;restrict=;_CRT_SECURE_NO_WARNINGS;_WIN32;_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>XNN_ENABLE_GEMM_M_SPECIALIZATION=1;XNN_ENABLE_MEMOPT=1;XNN_ENABLE_SPARSE=1;XNN_ENABLE_JIT=0;XNN_LOG_LEVEL=0;restrict=;_CRT_SECURE_NO_WARNINGS;_WIN32;_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -521,7 +689,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>XNN_LOG_LEVEL=0;restrict=;_CRT_SECURE_NO_WARNINGS;_WIN32;_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>XNN_ENABLE_GEMM_M_SPECIALIZATION=1;XNN_ENABLE_MEMOPT=1;XNN_ENABLE_SPARSE=1;XNN_ENABLE_JIT=0;XNN_LOG_LEVEL=0;restrict=;_CRT_SECURE_NO_WARNINGS;_WIN32;_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -541,7 +709,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>XNN_LOG_LEVEL=0;restrict=;_CRT_SECURE_NO_WARNINGS;_WIN32;_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>XNN_ENABLE_GEMM_M_SPECIALIZATION=1;XNN_ENABLE_MEMOPT=1;XNN_ENABLE_SPARSE=1;XNN_ENABLE_JIT=0;XNN_LOG_LEVEL=0;restrict=;_CRT_SECURE_NO_WARNINGS;_WIN32;_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -562,7 +730,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>XNN_LOG_LEVEL=0;restrict=;_CRT_SECURE_NO_WARNINGS;_WIN32;_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>XNN_ENABLE_GEMM_M_SPECIALIZATION=1;XNN_ENABLE_MEMOPT=1;XNN_ENABLE_SPARSE=1;XNN_ENABLE_JIT=0;XNN_LOG_LEVEL=0;restrict=;_CRT_SECURE_NO_WARNINGS;_WIN32;_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>

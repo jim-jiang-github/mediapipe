@@ -22,6 +22,7 @@ limitations under the License.
 #include "tensorflow/compiler/tf2xla/xla_context.h"
 #include "tensorflow/compiler/tf2xla/xla_op_kernel.h"
 #include "tensorflow/compiler/tf2xla/xla_op_registry.h"
+#include "tensorflow/compiler/xla/client/lib/dynamic_shaped_ops.h"
 #include "tensorflow/compiler/xla/client/xla_builder.h"
 #include "tensorflow/core/framework/tensor_shape.h"
 
@@ -115,13 +116,13 @@ static Status ValidateShapes(XlaOpKernelContext* ctx,
   }
 
   // Check that both branches have identical output shapes.
-  if (!xla::ShapeUtil::Compatible(then_result.xla_output_shape,
-                                  else_result.xla_output_shape)) {
+  if (!xla::ShapeUtil::DynamicShapeIsCompatible(then_result.xla_output_shape,
+                                                else_result.xla_output_shape) &&
+      !xla::ShapeUtil::DynamicShapeIsCompatible(else_result.xla_output_shape,
+                                                then_result.xla_output_shape)) {
     // Check if it is a currently unsupported case to report a different error
     // message.
     for (const PartialTensorShape& shape : output_shapes) {
-      // TODO(yunxing): To be removed once set-dimension-size is used to handle
-      // asymmetric branches.
       if (!shape.IsFullyDefined()) {
         return errors::InvalidArgument(
             "Output shapes of then and else branches do not match: ",
@@ -178,7 +179,7 @@ static Status ValidateShapes(XlaOpKernelContext* ctx,
           "Mismatch in resource of then and else branch for resource ", i);
     }
   }
-  return Status::OK();
+  return OkStatus();
 }
 
 // TODO(b/35949885): There is duplication here with the handling of the
@@ -265,9 +266,15 @@ void XlaIfOp::Compile(XlaOpKernelContext* ctx) {
   XlaCompiler::CompilationResult then_result;
   OP_REQUIRES_OK(ctx, compiler->CompileFunction(options, then_branch_,
                                                 arguments, &then_result));
+  OP_REQUIRES_OK(
+      ctx, ctx->xla_context()->RecordCollectiveInfoFromNestedCompilationResult(
+               then_result));
   XlaCompiler::CompilationResult else_result;
   OP_REQUIRES_OK(ctx, compiler->CompileFunction(options, else_branch_,
                                                 arguments, &else_result));
+  OP_REQUIRES_OK(
+      ctx, ctx->xla_context()->RecordCollectiveInfoFromNestedCompilationResult(
+               else_result));
 
   StatusOr<bool> has_tensor_array_gradients = PopulateTensorArrayGradients(
       ctx, b, absl::MakeSpan(arguments), &then_result, &else_result);
@@ -309,9 +316,9 @@ void XlaIfOp::Compile(XlaOpKernelContext* ctx) {
   }
 
   xla::XlaOp input_tuple = xla::Tuple(b, inputs);
-  xla::XlaOp outputs =
-      xla::Conditional(ctx->Input(0), input_tuple, *then_result.computation,
-                       input_tuple, *else_result.computation);
+  xla::XlaOp outputs = xla::DynamicConditional(
+      ctx->builder(), ctx->Input(0), input_tuple, *then_result.computation,
+      input_tuple, *else_result.computation);
 
   // Sets non-variable outputs.
   for (int i = 0; i < output_types_.size(); ++i) {

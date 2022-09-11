@@ -41,7 +41,7 @@ Status DetermineArgumentLayoutsFromCompileOptions(
     const XlaComputation& computation,
     std::function<StatusOr<Shape>(Shape)>
         choose_compact_layout_for_shape_function,
-    absl::optional<std::vector<Shape>>& argument_layouts,
+    std::optional<std::vector<Shape>>& argument_layouts,
     ExecutableBuildOptions* build_options,
     std::vector<const Shape*>* argument_layout_pointers);
 
@@ -54,6 +54,11 @@ StatusOr<std::vector<int>> ComputeParametersThatMustBeDonated(
 
 // Return max parallelism level.
 int DefaultThreadPoolSize();
+
+// Returns true if the striding of an array corresponds to a major-to-minor
+// layout.
+bool HasMajorToMinorLayout(PrimitiveType type, absl::Span<int64_t const> dims,
+                           absl::Span<int64_t const> byte_strides);
 
 }  // namespace xla
 

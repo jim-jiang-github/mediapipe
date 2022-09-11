@@ -58,9 +58,9 @@ struct MarkOpsForOutsideCompilation
 // TODO(b/161726307): Move or import the relevant patterns to LowerTF pass and
 // remove this.
 void AddCanonicalizationPatterns(MLIRContext* context,
-                                 OwningRewritePatternList* patterns) {
-  for (auto* op : context->getRegisteredOperations())
-    op->getCanonicalizationPatterns(*patterns, context);
+                                 RewritePatternSet* patterns) {
+  for (auto op : context->getRegisteredOperations())
+    op.getCanonicalizationPatterns(*patterns, context);
 }
 
 // Adds the list of ops that are supported on TPU through constant folding which
@@ -120,6 +120,8 @@ void AddSupportedFunctionalOps(MLIRContext* context,
       OperationName(TF::XlaReduceOp::getOperationName(), context));
   supported_ops->insert(
       OperationName(TF::XlaReduceWindowOp::getOperationName(), context));
+  supported_ops->insert(
+      OperationName(TF::XlaRngBitGeneratorOp::getOperationName(), context));
   supported_ops->insert(
       OperationName(TF::XlaScatterOp::getOperationName(), context));
   supported_ops->insert(
@@ -391,7 +393,7 @@ void MarkOpsForOutsideCompilation::runOnOperation() {
     getOperation().emitError() << "'tf' dialect is not registered";
     return signalPassFailure();
   }
-  OwningRewritePatternList patterns(&getContext());
+  RewritePatternSet patterns(&getContext());
   mhlo::PopulateLegalizeTfPatterns(module.getContext(), &patterns);
   TF::PopulateTFLoweringBeforeHLOPatterns(module.getContext(), &patterns);
   TF::PopulateLoweringQuantizedPatterns(module.getContext(), &patterns);
@@ -405,7 +407,7 @@ void MarkOpsForOutsideCompilation::runOnOperation() {
   PatternApplicator(std::move(patterns))
       .walkAllPatterns([&](const Pattern& pattern) {
         Optional<OperationName> root_kind = pattern.getRootKind();
-        if (root_kind.hasValue()) supported_ops.insert(root_kind.getValue());
+        if (root_kind.has_value()) supported_ops.insert(root_kind.getValue());
       });
   AddSupportedFunctionalOps(module.getContext(), &supported_ops);
   AddSupportedOpsUsingFolding(module.getContext(), &supported_ops);

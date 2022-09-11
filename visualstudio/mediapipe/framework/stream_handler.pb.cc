@@ -91,16 +91,16 @@ const char descriptor_table_protodef_mediapipe_2fframework_2fstream_5fhandler_2e
   "tStreamHandlerConfig\0229\n\025output_stream_ha"
   "ndler\030\001 \001(\t:\032InOrderOutputStreamHandler\022"
   "\031\n\021input_side_packet\030\002 \003(\t\022,\n\007options\030\003 "
-  "\001(\0132\033.mediapipe.MediaPipeOptionsB<\n\032com."
+  "\001(\0132\033.mediapipe.MediaPipeOptionsB0\n\032com."
   "google.mediapipe.protoB\022StreamHandlerPro"
-  "to\242\002\tMediaPipe"
+  "to"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fframework_2fstream_5fhandler_2eproto_deps[1] = {
   &::descriptor_table_mediapipe_2fframework_2fmediapipe_5foptions_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fframework_2fstream_5fhandler_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fframework_2fstream_5fhandler_2eproto = {
-  false, false, 454, descriptor_table_protodef_mediapipe_2fframework_2fstream_5fhandler_2eproto, "mediapipe/framework/stream_handler.proto", 
+  false, false, 442, descriptor_table_protodef_mediapipe_2fframework_2fstream_5fhandler_2eproto, "mediapipe/framework/stream_handler.proto", 
   &descriptor_table_mediapipe_2fframework_2fstream_5fhandler_2eproto_once, descriptor_table_mediapipe_2fframework_2fstream_5fhandler_2eproto_deps, 1, 2,
   schemas, file_default_instances, TableStruct_mediapipe_2fframework_2fstream_5fhandler_2eproto::offsets,
   file_level_metadata_mediapipe_2fframework_2fstream_5fhandler_2eproto, file_level_enum_descriptors_mediapipe_2fframework_2fstream_5fhandler_2eproto, file_level_service_descriptors_mediapipe_2fframework_2fstream_5fhandler_2eproto,

@@ -5,7 +5,7 @@
 
 #include <xnnpack/assembly.h>
 
-# void xnn_f32_gemm${"inc" if INC else ""}_minmax_ukernel_5x8__aarch64_neonfma_${"prfm_" if PREFETCH else ""}cortex_a75(
+# void xnn_f32_gemm${"inc" if INC else ""}_minmax_ukernel_5x8__aarch64_neonfma${"_prfm" if PREFETCH else ""}_cortex_a75(
 #     size_t mr,                x0
 #     size_t nc,                x1
 #     size_t kc,                x2 / x0
@@ -58,7 +58,7 @@ $else:
 # C   v28 v29
 # Clamp v30 v31
 
-BEGIN_FUNCTION xnn_f32_gemm${"inc" if INC else ""}_minmax_ukernel_5x8__aarch64_neonfma_${"prfm_" if PREFETCH else ""}cortex_a75
+BEGIN_FUNCTION xnn_f32_gemm${"inc" if INC else ""}_minmax_ukernel_5x8__aarch64_neonfma${"_prfm" if PREFETCH else ""}_cortex_a75
 
         $if INC:
           # Load cn_stride, acc
@@ -614,23 +614,23 @@ BEGIN_FUNCTION xnn_f32_gemm${"inc" if INC else ""}_minmax_ukernel_5x8__aarch64_n
         TBZ     x1, 1, 9f
         $if INC:
           STR     d28, [x7], 8
-          DUP     d28, v28.d[1]
           STR     d26, [x13], 8
+          DUP     d28, v28.d[1]
           DUP     d26, v26.d[1]
           STR     d24, [x17], 8
-          DUP     d24, v24.d[1]
           STR     d22, [x16], 8
+          DUP     d24, v24.d[1]
           DUP     d22, v22.d[1]
           STR     d20,  [x6], 8
           DUP     d20, v20.d[1]
         $else:
           STR     d20,  [x6], 8
-          DUP     d20, v20.d[1]
           STR     d22, [x16], 8
+          DUP     d20, v20.d[1]
           DUP     d22, v22.d[1]
           STR     d24, [x17], 8
-          DUP     d24, v24.d[1]
           STR     d26, [x13], 8
+          DUP     d24, v24.d[1]
           DUP     d26, v26.d[1]
           STR     d28, [x7], 8
           DUP     d28, v28.d[1]
@@ -656,7 +656,7 @@ BEGIN_FUNCTION xnn_f32_gemm${"inc" if INC else ""}_minmax_ukernel_5x8__aarch64_n
         LDP     d8,  d9, [sp], 48
         RET
 
-END_FUNCTION xnn_f32_gemm${"inc" if INC else ""}_minmax_ukernel_5x8__aarch64_neonfma_${"prfm_" if PREFETCH else ""}cortex_a75
+END_FUNCTION xnn_f32_gemm${"inc" if INC else ""}_minmax_ukernel_5x8__aarch64_neonfma${"_prfm" if PREFETCH else ""}_cortex_a75
 
 #ifdef __ELF__
 .section ".note.GNU-stack","",%progbits

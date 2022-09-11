@@ -27,10 +27,20 @@ _ARCH_TO_MACRO_MAP = {
   "x86-64": "XNN_ARCH_X86_64",
   "wasm": "XNN_ARCH_WASM",
   "wasmsimd": "XNN_ARCH_WASMSIMD",
+  "wasmrelaxedsimd": "XNN_ARCH_WASMRELAXEDSIMD",
+}
+
+# Mapping from ISA extension to macro guarding build-time enabled/disabled
+# status for the ISA. Only ISAs that can be enabled/disabled have an entry.
+_ISA_TO_MACRO_MAP = {
+  "neonfp16arith": "XNN_ENABLE_ARM_FP16",
+  "neondot": "XNN_ENABLE_ARM_DOTPROD",
 }
 
 _ISA_TO_ARCH_MAP = {
+  "armv6simd": ["aarch32"],
   "neon": ["aarch32", "aarch64"],
+  "neonfp16": ["aarch32", "aarch64"],
   "neonfma": ["aarch32", "aarch64"],
   "neonv8": ["aarch32", "aarch64"],
   "neonfp16arith": ["aarch32", "aarch64"],
@@ -40,18 +50,22 @@ _ISA_TO_ARCH_MAP = {
   "ssse3": ["x86-32", "x86-64"],
   "sse41": ["x86-32", "x86-64"],
   "avx": ["x86-32", "x86-64"],
+  "f16c": ["x86-32", "x86-64"],
   "xop": ["x86-32", "x86-64"],
   "fma3": ["x86-32", "x86-64"],
   "avx2": ["x86-32", "x86-64"],
   "avx512f": ["x86-32", "x86-64"],
   "avx512skx": ["x86-32", "x86-64"],
   "wasm32": ["wasm", "wasmsimd"],
-  "wasm": ["wasm", "wasmsimd"],
-  "wasmsimd": ["wasmsimd"],
+  "wasm": ["wasm", "wasmsimd", "wasmrelaxedsimd"],
+  "wasmsimd": ["wasmsimd", "wasmrelaxedsimd"],
+  "wasmrelaxedsimd": ["wasmrelaxedsimd"],
 }
 
 _ISA_TO_CHECK_MAP = {
+  "armv6simd": "TEST_REQUIRES_ARM_V6_SIMD",
   "neon": "TEST_REQUIRES_ARM_NEON",
+  "neonfp16": "TEST_REQUIRES_ARM_NEON_FP16",
   "neonfma": "TEST_REQUIRES_ARM_NEON_FMA",
   "neonv8": "TEST_REQUIRES_ARM_NEON_V8",
   "neonfp16arith": "TEST_REQUIRES_ARM_NEON_FP16_ARITH",
@@ -61,6 +75,7 @@ _ISA_TO_CHECK_MAP = {
   "ssse3": "TEST_REQUIRES_X86_SSSE3",
   "sse41": "TEST_REQUIRES_X86_SSE41",
   "avx": "TEST_REQUIRES_X86_AVX",
+  "f16c": "TEST_REQUIRES_X86_F16C",
   "xop": "TEST_REQUIRES_X86_XOP",
   "avx2": "TEST_REQUIRES_X86_AVX2",
   "fma3": "TEST_REQUIRES_X86_FMA3",
@@ -98,12 +113,19 @@ def arch_to_macro(arch, isa):
     return _ARCH_TO_MACRO_MAP[arch]
 
 
-def postprocess_test_case(test_case, arch, isa, assembly=False):
+def postprocess_test_case(test_case, arch, isa, assembly=False, jit=False):
   test_case = _remove_duplicate_newlines(test_case)
   if arch:
     guard = " || ".join(arch_to_macro(a, isa) for a in arch)
+    if isa in _ISA_TO_MACRO_MAP:
+      if len(arch) > 1:
+        guard = "%s && (%s)" % (_ISA_TO_MACRO_MAP[isa], guard)
+      else:
+        guard = "%s && %s" % (_ISA_TO_MACRO_MAP[isa], guard)
     if assembly:
       guard += " && XNN_ENABLE_ASSEMBLY"
+    if jit:
+      guard += " && XNN_PLATFORM_JIT"
     return "#if %s\n" % guard + _indent(test_case) + "\n" + \
       "#endif  // %s\n" % guard
   else:

@@ -1,6 +1,10 @@
 #include "../calculator_graph_util.h"
 #include "../register_options.h"
 
+// resource root to locate tflite and other files
+// see also mediapipe/mediapipe/util/resource_util_default.cc
+constexpr char const* resource_root = "../";
+
 // name of file containing text format CalculatorGraphConfig proto
 constexpr char const* calculator_graph_config_file =
     "../../mediapipe/graphs/face_detection/face_detection_desktop_live.pbtxt";
@@ -8,7 +12,7 @@ constexpr char const* calculator_graph_config_file =
 // subgraphs
 namespace mediapipe {
 DEFINE_SUBGRAPH(FaceDetectionShortRangeCpu, "../../mediapipe/modules/face_detection/face_detection_short_range_cpu.pbtxt");
-  DEFINE_SUBGRAPH(FaceDetectionShortRange, "./face_detection_short_range.pbtxt"); // ../../mediapipe/modules/face_detection/face_detection_short_range.pbtxt
+  DEFINE_SUBGRAPH(FaceDetectionShortRange, "../../mediapipe/modules/face_detection/face_detection_short_range.pbtxt");
     DEFINE_SUBGRAPH(FaceDetection, "../../mediapipe/modules/face_detection/face_detection.pbtxt");
 }
 
@@ -22,7 +26,7 @@ absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
     {
       // ref /mediapipe/mediapipe/modules/face_detection/face_detection_test.cc
       mediapipe::CalculatorGraphConfig face_detectioni_short_range_config;
-      if (read_config_from_pbtxt(face_detectioni_short_range_config, "./face_detection_short_range.pbtxt")) {
+      if (read_config_from_pbtxt(face_detectioni_short_range_config, "../../mediapipe/modules/face_detection/face_detection_short_range.pbtxt")) {
         mediapipe::tool::OptionsMap map;
         map.Initialize(face_detectioni_short_range_config.node(0));
         mediapipe::FaceDetectionOptions face_options = map.Get<mediapipe::FaceDetectionOptions>();
@@ -36,6 +40,9 @@ absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
       }
     }
 #endif
+
+    // TO-DO: get model_file from config!? with respace to resource_root above
+    download_mediapipe_asset_from_GCS("../mediapipe/modules/face_detection/face_detection_short_range.tflite");
 
     return graph.Initialize(config);
   }

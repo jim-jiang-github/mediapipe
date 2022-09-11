@@ -14,15 +14,10 @@
 # ==============================================================================
 """Tests for XLA JIT compiler."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import unittest
 
 import numpy as np
 import six
-from six.moves import xrange  # pylint: disable=redefined-builtin
 
 from tensorflow.compiler.tests import xla_test
 from tensorflow.python.framework import dtypes
@@ -83,7 +78,7 @@ class UnaryOpsTest(xla_test.XLATestCase):
   def ListsAreClose(self, result, expected, rtol, atol):
     """Tests closeness of two lists of floats."""
     self.assertEqual(len(result), len(expected))
-    for i in xrange(len(result)):
+    for i in range(len(result)):
       self.assertAllClose(result[i], expected[i], rtol, atol)
 
   def AssertCloseAndSorted(self, result, expected, rtol, atol):
@@ -955,6 +950,16 @@ class UnaryOpsTest(xla_test.XLATestCase):
           lambda x: array_ops.bitcast(x, dtypes.uint64),
           np.array([1, 0x100000003f800000], np.int64),
           expected=np.array([1, 0x100000003f800000], np.uint64))
+
+  def testBitcastInt8ToFloat(self):
+    self._assertOpOutputMatchesExpected(
+        lambda x: array_ops.bitcast(x, dtypes.float32),
+        np.array([[1, 0, 0, 0], [0xd0, 0x0f, 0x49, 0x40]], np.int8),
+        expected=np.array([1e-45, 3.14159], np.float32))
+    self._assertOpOutputMatchesExpected(
+        lambda x: array_ops.bitcast(x, dtypes.np.int8),
+        np.array([1e-45, 3.14159], np.float32),
+        expected=np.array([[1, 0, 0, 0], [0xd0, 0x0f, 0x49, 0x40]], np.int8))
 
   def testInvertPermutation(self):
     for np_dtype in [np.int32, np.int64]:

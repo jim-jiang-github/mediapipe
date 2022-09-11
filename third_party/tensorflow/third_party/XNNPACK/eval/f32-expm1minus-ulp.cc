@@ -19,8 +19,9 @@
 #include <fp16/fp16.h>
 
 #include "bench/utils.h"
-#include <xnnpack/AlignedAllocator.h>
+#include <xnnpack/aligned-allocator.h>
 #include <xnnpack/common.h>
+#include <xnnpack/math.h>
 #include <xnnpack/math-stubs.h>
 
 
@@ -42,7 +43,7 @@ static void ComputeError(
     const double output_ref = std::expm1(double(input[i]));
     const double abs_error = std::abs(output_ref - double(output[i]));
     const float output_abs = std::abs(output_ref);
-    const float output_ulp = fp32_from_bits(fp32_to_bits(output_abs) + 1) - output_abs;
+    const float output_ulp = uint32_as_float(float_as_uint32(output_abs) + 1) - output_abs;
     error[i] = float(abs_error / output_ulp);
   }
 }
@@ -90,7 +91,7 @@ static void ExpM1Error(benchmark::State& state,
   for (auto _ : state) {
     for (uint32_t n = min_input; int32_t(n) < 0; n -= block_size) {
       for (uint32_t i = 0; i < block_size; i++) {
-        x[i] = fp32_from_bits(std::max<uint32_t>(n - i, 0x80000000));
+        x[i] = uint32_as_float(std::max<uint32_t>(n - i, 0x80000000));
       }
       std::fill(y.begin(), y.end(), std::nanf(""));
 
@@ -193,7 +194,7 @@ static void ExpM1Error(benchmark::State& state,
     ->Iterations(1);
 #endif  // XNN_ARCH_X86 || XNN_ARCH_X86_64
 
-#if XNN_ARCH_WASMSIMD
+#if XNN_ARCH_WASMSIMD || XNN_ARCH_WASMRELAXEDSIMD
   BENCHMARK_CAPTURE(ExpM1Error, wasmsimd_rr2_lut16_p3_andnot,
                     xnn_math_f32_expm1minus__wasmsimd_rr2_lut16_p3_andnot)
     ->Unit(benchmark::kMillisecond)
@@ -210,7 +211,7 @@ static void ExpM1Error(benchmark::State& state,
                     xnn_math_f32_expm1minus__wasmsimd_rr2_p6_max)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(1);
-#endif  // XNN_ARCH_WASMSIMD
+#endif  // XNN_ARCH_WASMSIMD || XNN_ARCH_WASMRELAXEDSIMD
 
 BENCHMARK_CAPTURE(ExpM1Error, scalar_rr2_lut4_p4,
                   xnn_math_f32_expm1minus__scalar_rr2_lut4_p4)

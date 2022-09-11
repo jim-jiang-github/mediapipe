@@ -16,6 +16,8 @@ limitations under the License.
 #ifndef TENSORFLOW_COMPILER_MLIR_TFRT_BENCHMARKS_BENCHMARK_MLIR_FUNCTION_H_
 #define TENSORFLOW_COMPILER_MLIR_TFRT_BENCHMARKS_BENCHMARK_MLIR_FUNCTION_H_
 
+#include <functional>
+
 #include "tensorflow/compiler/mlir/tfrt/benchmarks/benchmark.h"
 
 namespace tensorflow {
@@ -28,18 +30,54 @@ struct InputTensorSpec {
   llvm::SmallVector<ssize_t> dims;
 };
 
-// Benchmark arbitrary MLIR function using inputs of given type and shape. The
-// number of results is required to prepare placeholders for returned values.
-void RunMlirBenchmark(::testing::benchmark::State& state,
-                      llvm::StringRef mlir_input, llvm::StringRef function_name,
-                      llvm::ArrayRef<InputTensorSpec> input_specs,
-                      int num_results);
+// Benchmark arbitrary Tensorflow dialect MLIR function using inputs of given
+// type and shape by compiling it using TF JitRt pipeline and the TFRT runtime.
+void RunJitRtBenchmark(::testing::benchmark::State& state,
+                       llvm::StringRef mlir_input,
+                       llvm::StringRef function_name,
+                       llvm::ArrayRef<InputTensorSpec> input_specs,
+                       bool vectorize = false, bool codegen_transpose = false);
 
-#define BM_TFMlir(NAME, MLIR_INPUT, FN, INPUT_SPEC, NUM_RESULTS)      \
-  static void BM_mlir_##NAME(::testing::benchmark::State& state) {    \
-    RunMlirBenchmark(state, MLIR_INPUT, FN, INPUT_SPEC, NUM_RESULTS); \
+// Benchmark arbitrary Tensorflow dialect MLIR function using inputs of given
+// type and shape by compiling it to BEF with fallback kernels.
+void RunTfrtBenchmark(::testing::benchmark::State& state,
+                      llvm::StringRef mlir_input, llvm::StringRef function_name,
+                      llvm::ArrayRef<InputTensorSpec> input_specs);
+
+// Benchmark arbitrary compute function written as Eigen expression(s).
+void RunEigenBenchmark(
+    ::testing::benchmark::State& state,
+    std::function<void(llvm::ArrayRef<Tensor>,
+                       llvm::Optional<Eigen::ThreadPoolDevice>)>
+        compute,
+    llvm::ArrayRef<InputTensorSpec> input_specs);
+
+// TODO(ezhulenev): Benchmarking macro should generate unit tests to verify
+// that benchmarks at least do not crash with the specified inputs.
+
+#define BM_Jitrt(NAME, MLIR_INPUT, FN, INPUT_SPEC)                  \
+  static void BM_Jitrt_##NAME(::testing::benchmark::State& state) { \
+    RunJitRtBenchmark(state, MLIR_INPUT, FN, INPUT_SPEC);           \
+  }                                                                 \
+  BENCHMARK(BM_Jitrt_##NAME)->MeasureProcessCPUTime()
+
+#define BM_JitrtV(NAME, MLIR_INPUT, FN, INPUT_SPEC)                   \
+  static void BM_Jitrtv_##NAME(::testing::benchmark::State& state) {  \
+    RunJitRtBenchmark(state, MLIR_INPUT, FN, INPUT_SPEC, true, true); \
   }                                                                   \
-  BENCHMARK(BM_mlir_##NAME)
+  BENCHMARK(BM_Jitrtv_##NAME)->MeasureProcessCPUTime()
+
+#define BM_Tfrt(NAME, MLIR_INPUT, FN, INPUT_SPEC)                  \
+  static void BM_tfrt_##NAME(::testing::benchmark::State& state) { \
+    RunTfrtBenchmark(state, MLIR_INPUT, FN, INPUT_SPEC);           \
+  }                                                                \
+  BENCHMARK(BM_tfrt_##NAME)->MeasureProcessCPUTime()
+
+#define BM_Eigen(NAME, FN, INPUT_SPEC)                              \
+  static void BM_eigen_##NAME(::testing::benchmark::State& state) { \
+    RunEigenBenchmark(state, FN, INPUT_SPEC);                       \
+  }                                                                 \
+  BENCHMARK(BM_eigen_##NAME)->MeasureProcessCPUTime()
 
 }  // namespace tensorflow
 

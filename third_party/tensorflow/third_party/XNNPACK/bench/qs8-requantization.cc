@@ -17,7 +17,7 @@
 
 #include <benchmark/benchmark.h>
 #include "bench/utils.h"
-#include <xnnpack/AlignedAllocator.h>
+#include <xnnpack/aligned-allocator.h>
 #include <xnnpack/common.h>
 #include <xnnpack/requantization-stubs.h>
 
@@ -73,7 +73,7 @@ class Requantization : public benchmark::Fixture {
   }
 
  protected:
-  std::vector<int32_t, AlignedAllocator<int32_t, 32>> input_;
+  std::vector<int32_t, AlignedAllocator<int32_t, 64>> input_;
   std::vector<int8_t> output_;
   size_t n_;
 };
@@ -190,7 +190,7 @@ class Requantization : public benchmark::Fixture {
 #endif  // XNN_ARCH_X86 || XNN_ARCH_X86_64
 
 
-#if XNN_ARCH_WASMSIMD
+#if XNN_ARCH_WASMSIMD || XNN_ARCH_WASMRELAXEDSIMD
   BENCHMARK_F(Requantization, fp32__wasmsimd)(benchmark::State& state) {
     for (auto _ : state) {
       xnn_qs8_requantize_fp32__wasmsimd(
@@ -204,7 +204,7 @@ class Requantization : public benchmark::Fixture {
           n(), input(), 0x1.0p-12f /* scale */, -1 /* zero point */, -127 /* qmin */, 126 /* qmax */, output());
     }
   }
-#endif  // XNN_ARCH_WASMSIMD
+#endif  // XNN_ARCH_WASMSIMD || XNN_ARCH_WASMRELAXEDSIMD
 
 
 BENCHMARK_F(Requantization, fp32__scalar_lrintf)(benchmark::State& state) {
@@ -214,9 +214,9 @@ BENCHMARK_F(Requantization, fp32__scalar_lrintf)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_F(Requantization, fp32__scalar_magic)(benchmark::State& state) {
+BENCHMARK_F(Requantization, fp32__scalar_fmagic)(benchmark::State& state) {
   for (auto _ : state) {
-    xnn_qs8_requantize_fp32__scalar_magic(
+    xnn_qs8_requantize_fp32__scalar_fmagic(
         n(), input(), 0x1.0p-12f /* scale */, -1 /* zero point */, -127 /* qmin */, 126 /* qmax */, output());
   }
 }

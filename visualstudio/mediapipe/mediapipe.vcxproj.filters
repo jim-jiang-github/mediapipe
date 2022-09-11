@@ -1296,6 +1296,9 @@
     <ClCompile Include="..\..\mediapipe\calculators\tensor\inference_calculator_xnnpack.cc">
       <Filter>calculators\tensor</Filter>
     </ClCompile>
+    <ClCompile Include="gpu\gl_animation_overlay_calculator.pb.cc">
+      <Filter>gpu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\mediapipe\framework\tool\options_util.h">
@@ -1999,6 +2002,9 @@
     </ClInclude>
     <ClInclude Include="..\..\mediapipe\calculators\tensor\inference_runner.h">
       <Filter>calculators\tensor</Filter>
+    </ClInclude>
+    <ClInclude Include="gpu\gl_animation_overlay_calculator.pb.h">
+      <Filter>gpu</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

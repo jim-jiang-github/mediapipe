@@ -65,15 +65,16 @@ const char descriptor_table_protodef_mediapipe_2fcalculators_2fcore_2fflow_5flim
   "\001(\005:\0011\022\027\n\014max_in_queue\030\002 \001(\005:\0010\022\"\n\021in_fl"
   "ight_timeout\030\003 \001(\003:\00710000002V\n\003ext\022\034.med"
   "iapipe.CalculatorOptions\030\370\240\364\233\001 \001(\0132\'.med"
-  "iapipe.FlowLimiterCalculatorOptionsB\014\242\002\t"
-  "MediaPipe"
+  "iapipe.FlowLimiterCalculatorOptionsBC\n%c"
+  "om.google.mediapipe.calculator.protoB\032Fl"
+  "owLimiterCalculatorProto"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fcalculators_2fcore_2fflow_5flimiter_5fcalculator_2eproto_deps[1] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fcalculators_2fcore_2fflow_5flimiter_5fcalculator_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fcalculators_2fcore_2fflow_5flimiter_5fcalculator_2eproto = {
-  false, false, 329, descriptor_table_protodef_mediapipe_2fcalculators_2fcore_2fflow_5flimiter_5fcalculator_2eproto, "mediapipe/calculators/core/flow_limiter_calculator.proto", 
+  false, false, 384, descriptor_table_protodef_mediapipe_2fcalculators_2fcore_2fflow_5flimiter_5fcalculator_2eproto, "mediapipe/calculators/core/flow_limiter_calculator.proto", 
   &descriptor_table_mediapipe_2fcalculators_2fcore_2fflow_5flimiter_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2fcore_2fflow_5flimiter_5fcalculator_2eproto_deps, 1, 1,
   schemas, file_default_instances, TableStruct_mediapipe_2fcalculators_2fcore_2fflow_5flimiter_5fcalculator_2eproto::offsets,
   file_level_metadata_mediapipe_2fcalculators_2fcore_2fflow_5flimiter_5fcalculator_2eproto, file_level_enum_descriptors_mediapipe_2fcalculators_2fcore_2fflow_5flimiter_5fcalculator_2eproto, file_level_service_descriptors_mediapipe_2fcalculators_2fcore_2fflow_5flimiter_5fcalculator_2eproto,

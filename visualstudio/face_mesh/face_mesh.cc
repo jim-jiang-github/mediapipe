@@ -14,6 +14,10 @@
 #include "../calculator_graph_util.h"
 #include "../register_options.h"
 
+// resource root to locate tflite and other files
+// see also mediapipe/mediapipe/util/resource_util_default.cc
+constexpr char const* resource_root = "../";
+
 // name of file containing text format CalculatorGraphConfig proto
 constexpr char const* calculator_graph_config_file =
 #ifdef NDEBUG
@@ -25,11 +29,11 @@ constexpr char const* calculator_graph_config_file =
 namespace mediapipe {
 DEFINE_SUBGRAPH(FaceLandmarkFrontCpu, "../../mediapipe/modules/face_landmark/face_landmark_front_cpu.pbtxt");
   DEFINE_SUBGRAPH(FaceDetectionShortRangeCpu, "../../mediapipe/modules/face_detection/face_detection_short_range_cpu.pbtxt");
-    DEFINE_SUBGRAPH(FaceDetectionShortRange, "../face_detection/face_detection_short_range.pbtxt");
+    DEFINE_SUBGRAPH(FaceDetectionShortRange, "../../mediapipe/modules/face_detection/face_detection_short_range.pbtxt");
       DEFINE_SUBGRAPH(FaceDetection, "../../mediapipe/modules/face_detection/face_detection.pbtxt");
   DEFINE_SUBGRAPH(FaceDetectionFrontDetectionToRoi, "../../mediapipe/modules/face_landmark/face_detection_front_detection_to_roi.pbtxt");
   DEFINE_SUBGRAPH(FaceLandmarkCpu, "../../mediapipe/modules/face_landmark/face_landmark_cpu.pbtxt");
-    DEFINE_SUBGRAPH(FaceLandmarksModelLoader, "face_landmarks_model_loader.pbtxt"); // ../../mediapipe/modules/face_landmark
+    DEFINE_SUBGRAPH(FaceLandmarksModelLoader, "../../mediapipe/modules/face_landmark/face_landmarks_model_loader.pbtxt");
     DEFINE_SUBGRAPH(TensorsToFaceLandmarks, "../../mediapipe/modules/face_landmark/tensors_to_face_landmarks.pbtxt");
     DEFINE_SUBGRAPH(TensorsToFaceLandmarksWithAttention, "../../mediapipe/modules/face_landmark/tensors_to_face_landmarks_with_attention.pbtxt");
   DEFINE_SUBGRAPH(FaceLandmarkLandmarksToRoi, "../../mediapipe/modules/face_landmark/face_landmark_landmarks_to_roi.pbtxt");
@@ -44,6 +48,8 @@ absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
   // config
   mediapipe::CalculatorGraphConfig config;
   if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
+    download_mediapipe_asset_from_GCS("../mediapipe/modules/face_detection/face_detection_short_range.tflite");
+    download_mediapipe_asset_from_GCS("../mediapipe/modules/face_landmark/face_landmark_with_attention.tflite");
     return graph.Initialize(config);
   }
   return absl::NotFoundError(calculator_graph_config_file);

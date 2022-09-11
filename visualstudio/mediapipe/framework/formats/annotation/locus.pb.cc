@@ -117,14 +117,15 @@ const char descriptor_table_protodef_mediapipe_2fframework_2fformats_2fannotatio
   ".Locus\"E\n\tLocusType\022\n\n\006GLOBAL\020\001\022\020\n\014BOUND"
   "ING_BOX\020\002\022\n\n\006REGION\020\003\022\016\n\nVIDEO_TUBE\020\004\"P\n"
   "\013BoundingBox\022\016\n\006left_x\030\001 \001(\005\022\017\n\007upper_y\030"
-  "\002 \001(\005\022\017\n\007right_x\030\003 \001(\005\022\017\n\007lower_y\030\004 \001(\005"
+  "\002 \001(\005\022\017\n\007right_x\030\003 \001(\005\022\017\n\007lower_y\030\004 \001(\005B"
+  "\003\370\001\001"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fframework_2fformats_2fannotation_2flocus_2eproto_deps[1] = {
   &::descriptor_table_mediapipe_2fframework_2fformats_2fannotation_2frasterization_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fframework_2fformats_2fannotation_2flocus_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fframework_2fformats_2fannotation_2flocus_2eproto = {
-  false, false, 559, descriptor_table_protodef_mediapipe_2fframework_2fformats_2fannotation_2flocus_2eproto, "mediapipe/framework/formats/annotation/locus.proto", 
+  false, false, 564, descriptor_table_protodef_mediapipe_2fframework_2fformats_2fannotation_2flocus_2eproto, "mediapipe/framework/formats/annotation/locus.proto", 
   &descriptor_table_mediapipe_2fframework_2fformats_2fannotation_2flocus_2eproto_once, descriptor_table_mediapipe_2fframework_2fformats_2fannotation_2flocus_2eproto_deps, 1, 2,
   schemas, file_default_instances, TableStruct_mediapipe_2fframework_2fformats_2fannotation_2flocus_2eproto::offsets,
   file_level_metadata_mediapipe_2fframework_2fformats_2fannotation_2flocus_2eproto, file_level_enum_descriptors_mediapipe_2fframework_2fformats_2fannotation_2flocus_2eproto, file_level_service_descriptors_mediapipe_2fframework_2fformats_2fannotation_2flocus_2eproto,

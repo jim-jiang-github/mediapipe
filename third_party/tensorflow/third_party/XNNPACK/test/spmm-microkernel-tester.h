@@ -12,15 +12,14 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
-#include <functional>
 #include <random>
 #include <vector>
 
 #include <fp16.h>
 
 #include <xnnpack.h>
-#include <xnnpack/AlignedAllocator.h>
-#include <xnnpack/params-init.h>
+#include <xnnpack/aligned-allocator.h>
+#include <xnnpack/microparams-init.h>
 #include <xnnpack/params.h>
 
 
@@ -31,11 +30,6 @@ static inline bool is_fp16_zero(uint16_t x) {
 
 class SpMMMicrokernelTester {
  public:
-  enum class Variant {
-    Native,
-    Scalar,
-  };
-
   inline SpMMMicrokernelTester& mr(size_t mr) {
     this->mr_ = mr;
     return *this;
@@ -132,15 +126,15 @@ class SpMMMicrokernelTester {
     return this->iterations_;
   }
 
-  void Test(xnn_f32_spmm_minmax_ukernel_function spmm, Variant variant = Variant::Native) const {
+  void Test(xnn_f32_spmm_minmax_ukernel_function spmm, xnn_init_f32_minmax_params_fn init_params) const {
     ASSERT_GE(m(), 1);
     ASSERT_GE(n(), 1);
     ASSERT_GE(k(), 1);
 
     std::random_device random_device;
     auto rng = std::mt19937(random_device());
-    auto f32rng = std::bind(std::uniform_real_distribution<float>(), rng);
-    auto prng = std::bind(std::uniform_real_distribution<float>(), rng);
+    std::uniform_real_distribution<float> f32dist;
+    std::uniform_real_distribution<float> pdist;
 
     std::vector<float, AlignedAllocator<float, 64>> input(k() * m());
     // Think of b as (n/nr + n % nr) x k, expansion happens later.
@@ -156,9 +150,9 @@ class SpMMMicrokernelTester {
     std::vector<float> output_ref(n() * m());
 
     for (size_t iteration = 0; iteration < iterations(); iteration++) {
-      std::generate(input.begin(), input.end(), std::ref(f32rng));
-      std::generate(b.begin(), b.end(), std::ref(f32rng));
-      std::generate(bias.begin(), bias.end(), std::ref(f32rng));
+      std::generate(input.begin(), input.end(), [&]() { return f32dist(rng); });
+      std::generate(b.begin(), b.end(), [&]() { return f32dist(rng); });
+      std::generate(bias.begin(), bias.end(), [&]() { return f32dist(rng); });
       std::fill(output.begin(), output.end(), nanf(""));
       std::fill(output_ref.begin(), output_ref.end(), 0.0f);
       std::fill(nmap.begin(), nmap.end(), 0);
@@ -166,7 +160,7 @@ class SpMMMicrokernelTester {
       std::fill(w.begin(), w.end(), 0.0f);
 
       for (float& b_value : b) {
-        if (prng() <= sparsity()) {
+        if (pdist(rng) <= sparsity()) {
           b_value = 0.0f;
         }
       }
@@ -274,14 +268,7 @@ class SpMMMicrokernelTester {
 
       // Prepare parameters.
       xnn_f32_minmax_params params;
-      switch (variant) {
-        case Variant::Native:
-          xnn_init_f32_minmax_params(&params, output_min, output_max);
-          break;
-        case Variant::Scalar:
-          xnn_init_f32_minmax_scalar_params(&params, output_min, output_max);
-          break;
-      }
+      init_params(&params, output_min, output_max);
 
       spmm(m() * sizeof(float), n(),
         input.data() + first_kk * m(),
@@ -304,16 +291,15 @@ class SpMMMicrokernelTester {
     }
   }
 
-  void Test(xnn_f16_spmm_minmax_ukernel_function spmm) const {
+  void Test(xnn_f16_spmm_minmax_ukernel_function spmm, xnn_init_f16_minmax_params_fn init_params) const {
     ASSERT_GE(m(), 1);
     ASSERT_GE(n(), 1);
     ASSERT_GE(k(), 1);
 
     std::random_device random_device;
     auto rng = std::mt19937(random_device());
-    auto f32rng = std::bind(std::uniform_real_distribution<float>(), rng);
-    auto f16rng = std::bind(fp16_ieee_from_fp32_value, f32rng);
-    auto prng = std::bind(std::uniform_real_distribution<float>(), rng);
+    std::uniform_real_distribution<float> f32dist;
+    std::uniform_real_distribution<float> pdist;
 
     std::vector<uint16_t, AlignedAllocator<uint16_t, 64>> input(k() * m());
     // Think of b as (n/nr + n % nr) x k, expansion happens later.
@@ -329,9 +315,9 @@ class SpMMMicrokernelTester {
     std::vector<float> output_ref(n() * m());
 
     for (size_t iteration = 0; iteration < iterations(); iteration++) {
-      std::generate(input.begin(), input.end(), std::ref(f16rng));
-      std::generate(b.begin(), b.end(), std::ref(f16rng));
-      std::generate(bias.begin(), bias.end(), std::ref(f16rng));
+      std::generate(input.begin(), input.end(), [&]() { return fp16_ieee_from_fp32_value(f32dist(rng)); });
+      std::generate(b.begin(), b.end(), [&]() { return fp16_ieee_from_fp32_value(f32dist(rng)); });
+      std::generate(bias.begin(), bias.end(), [&]() { return fp16_ieee_from_fp32_value(f32dist(rng)); });
       std::fill(output.begin(), output.end(), 0xC000);
       std::fill(output_ref.begin(), output_ref.end(), 0.0f);
       std::fill(nmap.begin(), nmap.end(), 0);
@@ -339,7 +325,7 @@ class SpMMMicrokernelTester {
       std::fill(w.begin(), w.end(), 0);
 
       for (uint16_t& b_value : b) {
-        if (prng() <= sparsity()) {
+        if (pdist(rng) <= sparsity()) {
           b_value = 0;
         }
       }
@@ -447,10 +433,9 @@ class SpMMMicrokernelTester {
       }
 
       // Prepare parameters.
-      xnn_f16_scaleminmax_params params;
-      params.scale = UINT16_C(0x3C00) /* 1.0 */;
-      params.max = fp16_ieee_from_fp32_value(output_max);
-      params.min = fp16_ieee_from_fp32_value(output_min);
+      xnn_f16_minmax_params params;
+      init_params(&params,
+        fp16_ieee_from_fp32_value(output_min), fp16_ieee_from_fp32_value(output_max));
 
       spmm(m() * sizeof(uint16_t), n(),
         input.data() + first_kk * m(),

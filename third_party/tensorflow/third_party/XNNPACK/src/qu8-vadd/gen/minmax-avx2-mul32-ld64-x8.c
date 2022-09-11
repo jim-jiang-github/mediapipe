@@ -20,13 +20,12 @@ void xnn_qu8_vadd_minmax_ukernel__avx2_mul32_ld64_x8(
     const uint8_t* input_a,
     const uint8_t* input_b,
     uint8_t* output,
-    const union xnn_qu8_add_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN XNN_DISABLE_MSAN
+    const union xnn_qu8_add_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
   const __m256i vbias = _mm256_load_si256((const __m256i*) params->avx2.bias);
   const __m256i va_multiplier = _mm256_load_si256((const __m256i*) params->avx2.a_multiplier);
   const __m256i vb_multiplier = _mm256_load_si256((const __m256i*) params->avx2.b_multiplier);
-  const __m256i vrounding = _mm256_load_si256((const __m256i*) params->avx2.rounding);
-  const __m128i vshift = _mm_loadu_si32(params->avx2.shift);
+  const __m128i vshift = _mm_load_si128((const __m128i*) params->avx2.shift);
   const __m128i voutput_zero_point = _mm_load_si128((const __m128i*) params->avx2.output_zero_point);
   const __m128i voutput_min = _mm_load_si128((const __m128i*) params->avx2.output_min);
   const __m128i voutput_max = _mm_load_si128((const __m128i*) params->avx2.output_max);
@@ -41,7 +40,7 @@ void xnn_qu8_vadd_minmax_ukernel__avx2_mul32_ld64_x8(
 
     vacc01234567 = _mm256_add_epi32(vacc01234567, _mm256_mullo_epi32(vb01234567, vb_multiplier));
 
-    vacc01234567 = _mm256_sra_epi32(_mm256_add_epi32(vacc01234567, vrounding), vshift);
+    vacc01234567 = _mm256_sra_epi32(vacc01234567, vshift);
 
     __m128i vout01234567 = _mm_adds_epi16(_mm_packs_epi32(_mm256_castsi256_si128(vacc01234567), _mm256_extracti128_si256(vacc01234567, 1)), voutput_zero_point);
 
@@ -63,7 +62,7 @@ void xnn_qu8_vadd_minmax_ukernel__avx2_mul32_ld64_x8(
 
       vacc01234567 = _mm256_add_epi32(vacc01234567, _mm256_mullo_epi32(vb01234567, vb_multiplier));
 
-      vacc01234567 = _mm256_sra_epi32(_mm256_add_epi32(vacc01234567, vrounding), vshift);
+      vacc01234567 = _mm256_sra_epi32(vacc01234567, vshift);
 
       __m128i vout01234567 = _mm_adds_epi16(_mm_packs_epi32(_mm256_castsi256_si128(vacc01234567), _mm256_extracti128_si256(vacc01234567, 1)), voutput_zero_point);
       __m128i vout0123456701234567 = _mm_packus_epi16(vout01234567, vout01234567);
@@ -71,12 +70,12 @@ void xnn_qu8_vadd_minmax_ukernel__avx2_mul32_ld64_x8(
       vout0123456701234567 = _mm_min_epu8(vout0123456701234567, voutput_max);
 
       if (n & (4 * sizeof(uint8_t))) {
-        *((uint32_t*) output) = (uint32_t) _mm_cvtsi128_si32(vout0123456701234567);
+        _mm_storeu_si32(output, vout0123456701234567);
         vout0123456701234567 = _mm_srli_epi64(vout0123456701234567, 32);
         output += 4;
       }
       if (n & (2 * sizeof(uint8_t))) {
-        *((uint16_t*) output) = (uint16_t) _mm_extract_epi16(vout0123456701234567, 0);
+        _mm_storeu_si16(output, vout0123456701234567);
         vout0123456701234567 = _mm_srli_epi32(vout0123456701234567, 16);
         output += 2;
       }

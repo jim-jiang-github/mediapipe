@@ -68,8 +68,6 @@
 // }
 //
 
-#include "../calculator_graph_util.h"
-
 #include "mediapipe/framework/calculator_framework.h"
 #include "mediapipe/framework/formats/landmark.pb.h"
 #include "mediapipe/modules/face_geometry/protos/environment.pb.h"
@@ -77,6 +75,8 @@
 #include "mediapipe/modules/face_geometry/geometry_pipeline_calculator.pb.h"
 #include "mediapipe/modules/face_geometry/protos/geometry_pipeline_metadata.pb.h"
 #include "mediapipe/util/resource_util.h"
+
+#include "../calculator_graph_util.h"
 
 namespace mediapipe {
 
@@ -118,7 +118,12 @@ public:
       face_geometry::GeometryPipelineMetadata metadata;
       auto const& metadata_path = cc->Options<FaceGeometryPipelineCalculatorOptions>().metadata_path();
       std::string metadata_blob; // 140 KB
-      MP_RETURN_IF_ERROR(mediapipe::GetResourceContents(metadata_path, &metadata_blob)) << "Failed to read content blob! Resolved path = " << metadata_path;
+
+      ASSIGN_OR_RETURN(std::string resolved_path,
+                     mediapipe::PathToResourceAsFile(metadata_path),
+                     _ << "Failed to resolve path! Path = " << metadata_path);
+
+      MP_RETURN_IF_ERROR(mediapipe::GetResourceContents(resolved_path, &metadata_blob)) << "Failed to read content blob! Resolved path = " << metadata_path;
       RET_CHECK(google::protobuf::TextFormat::ParseFromString(metadata_blob, &metadata)) << "Failed to parse a metadata proto from a text blob!";
 
       auto const& procrustes_landmark_basis = metadata.procrustes_landmark_basis();

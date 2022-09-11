@@ -1,17 +1,23 @@
 #include "../calculator_graph_util.h"
 
+// resource root to locate tflite and other files
+// see also mediapipe/mediapipe/util/resource_util_default.cc
+constexpr char const* resource_root = "../";
+
 // name of file containing text format CalculatorGraphConfig proto
 constexpr char const* calculator_graph_config_file = "../../mediapipe/graphs/selfie_segmentation/selfie_segmentation_cpu.pbtxt";
 
 // subgraphs
 namespace mediapipe {
 DEFINE_SUBGRAPH(SelfieSegmentationCpu, "../../mediapipe/modules/selfie_segmentation/selfie_segmentation_cpu.pbtxt");
-  DEFINE_SUBGRAPH(SelfieSegmentationModelLoader, "selfie_segmentation_model_loader.pbtxt");
+  DEFINE_SUBGRAPH(SelfieSegmentationModelLoader, "../../mediapipe/modules/selfie_segmentation/selfie_segmentation_model_loader.pbtxt");
 }
 
 absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
   mediapipe::CalculatorGraphConfig config;
   if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
+    download_mediapipe_asset_from_GCS("../mediapipe/modules/selfie_segmentation/selfie_segmentation.tflite");
+    download_mediapipe_asset_from_GCS("../mediapipe/modules/selfie_segmentation/selfie_segmentation_landscape.tflite");
     return graph.Initialize(config);
   }
   return absl::NotFoundError(calculator_graph_config_file);

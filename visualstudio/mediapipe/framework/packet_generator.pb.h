@@ -182,6 +182,22 @@ class PacketGeneratorOptions PROTOBUF_FINAL :
 
   // accessors -------------------------------------------------------
 
+  enum : int {
+    kMergeFieldsFieldNumber = 1,
+  };
+  // optional bool merge_fields = 1 [default = true];
+  bool has_merge_fields() const;
+  private:
+  bool _internal_has_merge_fields() const;
+  public:
+  void clear_merge_fields();
+  bool merge_fields() const;
+  void set_merge_fields(bool value);
+  private:
+  bool _internal_merge_fields() const;
+  void _internal_set_merge_fields(bool value);
+  public:
+
   GOOGLE_PROTOBUF_EXTENSION_ACCESSORS(PacketGeneratorOptions)
   // @@protoc_insertion_point(class_scope:mediapipe.PacketGeneratorOptions)
  private:
@@ -192,7 +208,9 @@ class PacketGeneratorOptions PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  bool merge_fields_;
   friend struct ::TableStruct_mediapipe_2fframework_2fpacket_5fgenerator_2eproto;
 };
 // -------------------------------------------------------------------
@@ -477,6 +495,34 @@ class PacketGeneratorConfig PROTOBUF_FINAL :
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
 // PacketGeneratorOptions
+
+// optional bool merge_fields = 1 [default = true];
+inline bool PacketGeneratorOptions::_internal_has_merge_fields() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool PacketGeneratorOptions::has_merge_fields() const {
+  return _internal_has_merge_fields();
+}
+inline void PacketGeneratorOptions::clear_merge_fields() {
+  merge_fields_ = true;
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline bool PacketGeneratorOptions::_internal_merge_fields() const {
+  return merge_fields_;
+}
+inline bool PacketGeneratorOptions::merge_fields() const {
+  // @@protoc_insertion_point(field_get:mediapipe.PacketGeneratorOptions.merge_fields)
+  return _internal_merge_fields();
+}
+inline void PacketGeneratorOptions::_internal_set_merge_fields(bool value) {
+  _has_bits_[0] |= 0x00000001u;
+  merge_fields_ = value;
+}
+inline void PacketGeneratorOptions::set_merge_fields(bool value) {
+  _internal_set_merge_fields(value);
+  // @@protoc_insertion_point(field_set:mediapipe.PacketGeneratorOptions.merge_fields)
+}
 
 // -------------------------------------------------------------------
 

@@ -385,6 +385,7 @@
     <ClCompile Include="framework\tool\field_data.pb.cc" />
     <ClCompile Include="framework\tool\packet_generator_wrapper_calculator.pb.cc" />
     <ClCompile Include="framework\tool\switch_container.pb.cc" />
+    <ClCompile Include="gpu\gl_animation_overlay_calculator.pb.cc" />
     <ClCompile Include="gpu\gpu_origin.pb.cc" />
     <ClCompile Include="gpu\scale_mode.pb.cc" />
     <ClCompile Include="graphs\iris_tracking\calculators\iris_to_depth_calculator.pb.cc" />
@@ -619,6 +620,7 @@
     <ClInclude Include="framework\tool\field_data.pb.h" />
     <ClInclude Include="framework\tool\packet_generator_wrapper_calculator.pb.h" />
     <ClInclude Include="framework\tool\switch_container.pb.h" />
+    <ClInclude Include="gpu\gl_animation_overlay_calculator.pb.h" />
     <ClInclude Include="gpu\gpu_origin.pb.h" />
     <ClInclude Include="gpu\scale_mode.pb.h" />
     <ClInclude Include="graphs\iris_tracking\calculators\iris_to_depth_calculator.pb.h" />

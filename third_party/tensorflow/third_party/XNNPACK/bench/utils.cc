@@ -20,8 +20,10 @@
 
 #include <cpuinfo.h>
 
-#include "bench/utils.h"
+#include <xnnpack.h>
+#include <xnnpack/allocator.h>
 
+#include "bench/utils.h"
 
 static void* wipe_buffer = nullptr;
 static size_t wipe_buffer_size = 0;
@@ -173,9 +175,9 @@ bool CheckVFP(benchmark::State& state) {
   return true;
 }
 
-bool CheckNEONFP16ARITH(benchmark::State& state) {
-  if (!cpuinfo_initialize() || !cpuinfo_has_arm_neon_fp16_arith()) {
-    state.SkipWithError("no NEON-FP16-ARITH extension");
+bool CheckARMV6(benchmark::State& state) {
+  if (!cpuinfo_initialize() || !cpuinfo_has_arm_v6()) {
+    state.SkipWithError("no ARMv6 extension");
     return false;
   }
   return true;
@@ -189,9 +191,33 @@ bool CheckNEON(benchmark::State& state) {
   return true;
 }
 
+bool CheckNEONFP16(benchmark::State& state) {
+  if (!cpuinfo_initialize() || !cpuinfo_has_arm_neon_fp16()) {
+    state.SkipWithError("no NEON-FP16 extension");
+    return false;
+  }
+  return true;
+}
+
 bool CheckNEONFMA(benchmark::State& state) {
   if (!cpuinfo_initialize() || !cpuinfo_has_arm_neon_fma()) {
     state.SkipWithError("no NEON-FMA extension");
+    return false;
+  }
+  return true;
+}
+
+bool CheckNEONV8(benchmark::State& state) {
+  if (!cpuinfo_initialize() || !cpuinfo_has_arm_neon_v8()) {
+    state.SkipWithError("no NEON-V8 extension");
+    return false;
+  }
+  return true;
+}
+
+bool CheckNEONFP16ARITH(benchmark::State& state) {
+  if (!cpuinfo_initialize() || !cpuinfo_has_arm_neon_fp16_arith()) {
+    state.SkipWithError("no NEON-FP16-ARITH extension");
     return false;
   }
   return true;
@@ -224,6 +250,14 @@ bool CheckSSE41(benchmark::State& state) {
 bool CheckAVX(benchmark::State& state) {
   if (!cpuinfo_initialize() || !cpuinfo_has_x86_avx()) {
     state.SkipWithError("no AVX extension");
+    return false;
+  }
+  return true;
+}
+
+bool CheckF16C(benchmark::State& state) {
+  if (!cpuinfo_initialize() || !cpuinfo_has_x86_f16c()) {
+    state.SkipWithError("no F16C extension");
     return false;
   }
   return true;
@@ -270,6 +304,16 @@ bool CheckAVX512SKX(benchmark::State& state) {
     return false;
   }
   return true;
+}
+
+CodeMemoryHelper::CodeMemoryHelper() {
+  status = xnn_allocate_code_memory(&buffer, XNN_DEFAULT_CODE_BUFFER_SIZE);
+}
+
+CodeMemoryHelper::~CodeMemoryHelper() {
+  if (status == xnn_status_success) {
+    xnn_release_code_memory(&buffer);
+  }
 }
 
 }  // namespace utils

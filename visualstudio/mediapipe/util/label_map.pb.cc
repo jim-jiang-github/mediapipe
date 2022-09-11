@@ -31,31 +31,8 @@ struct LabelMapItemDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT LabelMapItemDefaultTypeInternal _LabelMapItem_default_instance_;
-constexpr LabelMap_IndexToItemEntry_DoNotUse::LabelMap_IndexToItemEntry_DoNotUse(
-  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized){}
-struct LabelMap_IndexToItemEntry_DoNotUseDefaultTypeInternal {
-  constexpr LabelMap_IndexToItemEntry_DoNotUseDefaultTypeInternal()
-    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
-  ~LabelMap_IndexToItemEntry_DoNotUseDefaultTypeInternal() {}
-  union {
-    LabelMap_IndexToItemEntry_DoNotUse _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT LabelMap_IndexToItemEntry_DoNotUseDefaultTypeInternal _LabelMap_IndexToItemEntry_DoNotUse_default_instance_;
-constexpr LabelMap::LabelMap(
-  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : index_to_item_(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}){}
-struct LabelMapDefaultTypeInternal {
-  constexpr LabelMapDefaultTypeInternal()
-    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
-  ~LabelMapDefaultTypeInternal() {}
-  union {
-    LabelMap _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT LabelMapDefaultTypeInternal _LabelMap_default_instance_;
 }  // namespace mediapipe
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_mediapipe_2futil_2flabel_5fmap_2eproto[3];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_mediapipe_2futil_2flabel_5fmap_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_mediapipe_2futil_2flabel_5fmap_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_mediapipe_2futil_2flabel_5fmap_2eproto = nullptr;
 
@@ -71,47 +48,24 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2futil_2flabel_5fmap
   0,
   1,
   ~0u,
-  PROTOBUF_FIELD_OFFSET(::mediapipe::LabelMap_IndexToItemEntry_DoNotUse, _has_bits_),
-  PROTOBUF_FIELD_OFFSET(::mediapipe::LabelMap_IndexToItemEntry_DoNotUse, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::mediapipe::LabelMap_IndexToItemEntry_DoNotUse, key_),
-  PROTOBUF_FIELD_OFFSET(::mediapipe::LabelMap_IndexToItemEntry_DoNotUse, value_),
-  0,
-  1,
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::mediapipe::LabelMap, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::mediapipe::LabelMap, index_to_item_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, 8, sizeof(::mediapipe::LabelMapItem)},
-  { 11, 18, sizeof(::mediapipe::LabelMap_IndexToItemEntry_DoNotUse)},
-  { 20, -1, sizeof(::mediapipe::LabelMap)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::mediapipe::_LabelMapItem_default_instance_),
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::mediapipe::_LabelMap_IndexToItemEntry_DoNotUse_default_instance_),
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::mediapipe::_LabelMap_default_instance_),
 };
 
 const char descriptor_table_protodef_mediapipe_2futil_2flabel_5fmap_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\036mediapipe/util/label_map.proto\022\tmediap"
   "ipe\"F\n\014LabelMapItem\022\014\n\004name\030\001 \001(\t\022\024\n\014dis"
-  "play_name\030\002 \001(\t\022\022\n\nchild_name\030\003 \003(\t\"\224\001\n\010"
-  "LabelMap\022;\n\rindex_to_item\030\001 \003(\0132$.mediap"
-  "ipe.LabelMap.IndexToItemEntry\032K\n\020IndexTo"
-  "ItemEntry\022\013\n\003key\030\001 \001(\003\022&\n\005value\030\002 \001(\0132\027."
-  "mediapipe.LabelMapItem:\0028\001"
+  "play_name\030\002 \001(\t\022\022\n\nchild_name\030\003 \003(\t"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2futil_2flabel_5fmap_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2futil_2flabel_5fmap_2eproto = {
-  false, false, 266, descriptor_table_protodef_mediapipe_2futil_2flabel_5fmap_2eproto, "mediapipe/util/label_map.proto", 
-  &descriptor_table_mediapipe_2futil_2flabel_5fmap_2eproto_once, nullptr, 0, 3,
+  false, false, 115, descriptor_table_protodef_mediapipe_2futil_2flabel_5fmap_2eproto, "mediapipe/util/label_map.proto", 
+  &descriptor_table_mediapipe_2futil_2flabel_5fmap_2eproto_once, nullptr, 0, 1,
   schemas, file_default_instances, TableStruct_mediapipe_2futil_2flabel_5fmap_2eproto::offsets,
   file_level_metadata_mediapipe_2futil_2flabel_5fmap_2eproto, file_level_enum_descriptors_mediapipe_2futil_2flabel_5fmap_2eproto, file_level_service_descriptors_mediapipe_2futil_2flabel_5fmap_2eproto,
 };
@@ -431,256 +385,11 @@ void LabelMapItem::InternalSwap(LabelMapItem* other) {
       file_level_metadata_mediapipe_2futil_2flabel_5fmap_2eproto[0]);
 }
 
-// ===================================================================
-
-LabelMap_IndexToItemEntry_DoNotUse::LabelMap_IndexToItemEntry_DoNotUse() {}
-LabelMap_IndexToItemEntry_DoNotUse::LabelMap_IndexToItemEntry_DoNotUse(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-    : SuperType(arena) {}
-void LabelMap_IndexToItemEntry_DoNotUse::MergeFrom(const LabelMap_IndexToItemEntry_DoNotUse& other) {
-  MergeFromInternal(other);
-}
-::PROTOBUF_NAMESPACE_ID::Metadata LabelMap_IndexToItemEntry_DoNotUse::GetMetadata() const {
-  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
-      &descriptor_table_mediapipe_2futil_2flabel_5fmap_2eproto_getter, &descriptor_table_mediapipe_2futil_2flabel_5fmap_2eproto_once,
-      file_level_metadata_mediapipe_2futil_2flabel_5fmap_2eproto[1]);
-}
-void LabelMap_IndexToItemEntry_DoNotUse::MergeFrom(
-    const ::PROTOBUF_NAMESPACE_ID::Message& other) {
-  ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom(other);
-}
-
-
-// ===================================================================
-
-class LabelMap::_Internal {
- public:
-};
-
-LabelMap::LabelMap(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
-  index_to_item_(arena) {
-  SharedCtor();
-  RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:mediapipe.LabelMap)
-}
-LabelMap::LabelMap(const LabelMap& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  index_to_item_.MergeFrom(from.index_to_item_);
-  // @@protoc_insertion_point(copy_constructor:mediapipe.LabelMap)
-}
-
-void LabelMap::SharedCtor() {
-}
-
-LabelMap::~LabelMap() {
-  // @@protoc_insertion_point(destructor:mediapipe.LabelMap)
-  SharedDtor();
-  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
-}
-
-void LabelMap::SharedDtor() {
-  GOOGLE_DCHECK(GetArena() == nullptr);
-}
-
-void LabelMap::ArenaDtor(void* object) {
-  LabelMap* _this = reinterpret_cast< LabelMap* >(object);
-  (void)_this;
-}
-void LabelMap::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
-}
-void LabelMap::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-
-void LabelMap::Clear() {
-// @@protoc_insertion_point(message_clear_start:mediapipe.LabelMap)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  index_to_item_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
-}
-
-const char* LabelMap::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
-    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // map<int64, .mediapipe.LabelMapItem> index_to_item = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            ptr = ctx->ParseMessage(&index_to_item_, ptr);
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
-        } else goto handle_unusual;
-        continue;
-      default: {
-      handle_unusual:
-        if ((tag == 0) || ((tag & 7) == 4)) {
-          CHK_(ptr);
-          ctx->SetLastTag(tag);
-          goto success;
-        }
-        ptr = UnknownFieldParse(tag,
-            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-            ptr, ctx);
-        CHK_(ptr != nullptr);
-        continue;
-      }
-    }  // switch
-  }  // while
-success:
-  return ptr;
-failure:
-  ptr = nullptr;
-  goto success;
-#undef CHK_
-}
-
-::PROTOBUF_NAMESPACE_ID::uint8* LabelMap::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:mediapipe.LabelMap)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // map<int64, .mediapipe.LabelMapItem> index_to_item = 1;
-  if (!this->_internal_index_to_item().empty()) {
-    typedef ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >::const_pointer
-        ConstPtr;
-    typedef ::PROTOBUF_NAMESPACE_ID::internal::SortItem< ::PROTOBUF_NAMESPACE_ID::int64, ConstPtr > SortItem;
-    typedef ::PROTOBUF_NAMESPACE_ID::internal::CompareByFirstField<SortItem> Less;
-
-    if (stream->IsSerializationDeterministic() &&
-        this->_internal_index_to_item().size() > 1) {
-      ::std::unique_ptr<SortItem[]> items(
-          new SortItem[this->_internal_index_to_item().size()]);
-      typedef ::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >::size_type size_type;
-      size_type n = 0;
-      for (::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >::const_iterator
-          it = this->_internal_index_to_item().begin();
-          it != this->_internal_index_to_item().end(); ++it, ++n) {
-        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
-      }
-      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
-      for (size_type i = 0; i < n; i++) {
-        target = LabelMap_IndexToItemEntry_DoNotUse::Funcs::InternalSerialize(1, items[static_cast<ptrdiff_t>(i)].second->first, items[static_cast<ptrdiff_t>(i)].second->second, target, stream);
-      }
-    } else {
-      for (::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >::const_iterator
-          it = this->_internal_index_to_item().begin();
-          it != this->_internal_index_to_item().end(); ++it) {
-        target = LabelMap_IndexToItemEntry_DoNotUse::Funcs::InternalSerialize(1, it->first, it->second, target, stream);
-      }
-    }
-  }
-
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:mediapipe.LabelMap)
-  return target;
-}
-
-size_t LabelMap::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:mediapipe.LabelMap)
-  size_t total_size = 0;
-
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // map<int64, .mediapipe.LabelMapItem> index_to_item = 1;
-  total_size += 1 *
-      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(this->_internal_index_to_item_size());
-  for (::PROTOBUF_NAMESPACE_ID::Map< ::PROTOBUF_NAMESPACE_ID::int64, ::mediapipe::LabelMapItem >::const_iterator
-      it = this->_internal_index_to_item().begin();
-      it != this->_internal_index_to_item().end(); ++it) {
-    total_size += LabelMap_IndexToItemEntry_DoNotUse::Funcs::ByteSizeLong(it->first, it->second);
-  }
-
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
-        _internal_metadata_, total_size, &_cached_size_);
-  }
-  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void LabelMap::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:mediapipe.LabelMap)
-  GOOGLE_DCHECK_NE(&from, this);
-  const LabelMap* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<LabelMap>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:mediapipe.LabelMap)
-    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:mediapipe.LabelMap)
-    MergeFrom(*source);
-  }
-}
-
-void LabelMap::MergeFrom(const LabelMap& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:mediapipe.LabelMap)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  index_to_item_.MergeFrom(from.index_to_item_);
-}
-
-void LabelMap::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:mediapipe.LabelMap)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void LabelMap::CopyFrom(const LabelMap& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:mediapipe.LabelMap)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool LabelMap::IsInitialized() const {
-  return true;
-}
-
-void LabelMap::InternalSwap(LabelMap* other) {
-  using std::swap;
-  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
-  index_to_item_.InternalSwap(&other->index_to_item_);
-}
-
-::PROTOBUF_NAMESPACE_ID::Metadata LabelMap::GetMetadata() const {
-  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
-      &descriptor_table_mediapipe_2futil_2flabel_5fmap_2eproto_getter, &descriptor_table_mediapipe_2futil_2flabel_5fmap_2eproto_once,
-      file_level_metadata_mediapipe_2futil_2flabel_5fmap_2eproto[2]);
-}
-
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace mediapipe
 PROTOBUF_NAMESPACE_OPEN
 template<> PROTOBUF_NOINLINE ::mediapipe::LabelMapItem* Arena::CreateMaybeMessage< ::mediapipe::LabelMapItem >(Arena* arena) {
   return Arena::CreateMessageInternal< ::mediapipe::LabelMapItem >(arena);
-}
-template<> PROTOBUF_NOINLINE ::mediapipe::LabelMap_IndexToItemEntry_DoNotUse* Arena::CreateMaybeMessage< ::mediapipe::LabelMap_IndexToItemEntry_DoNotUse >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::mediapipe::LabelMap_IndexToItemEntry_DoNotUse >(arena);
-}
-template<> PROTOBUF_NOINLINE ::mediapipe::LabelMap* Arena::CreateMaybeMessage< ::mediapipe::LabelMap >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::mediapipe::LabelMap >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

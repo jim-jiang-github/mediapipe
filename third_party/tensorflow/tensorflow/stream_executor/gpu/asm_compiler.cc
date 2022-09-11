@@ -18,16 +18,16 @@ limitations under the License.
 #include <string>
 #include <utility>
 
+#include "absl/cleanup/cleanup.h"
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
 #include "absl/strings/str_format.h"
 #include "absl/strings/string_view.h"
 #include "absl/synchronization/mutex.h"
-#include "tensorflow/core/lib/core/errors.h"
-#include "tensorflow/core/lib/gtl/cleanup.h"
-#include "tensorflow/core/lib/io/path.h"
 #include "tensorflow/core/platform/cuda_libdevice_path.h"
 #include "tensorflow/core/platform/env.h"
+#include "tensorflow/core/platform/errors.h"
+#include "tensorflow/core/platform/path.h"
 #include "tensorflow/core/platform/regexp.h"
 #include "tensorflow/core/platform/subprocess.h"
 #include "tensorflow/stream_executor/gpu/gpu_driver.h"
@@ -99,27 +99,22 @@ static void WarnIfBadPtxasVersion(const std::string& ptxas_path) {
   // We need ptxas >= 9.0 as a hard requirement, because we compile targeting
   // PTX 6.0.  An older ptxas will just fail to compile any of our code.
   //
-  // ptxas 9.0 before 9.0.276 and ptxas 9.1 before 9.1.121 miscompile some
-  // address calculations with large offsets (e.g. "load ptr + large_constant"),
-  // b/70245379.
-  //
-  // ptxas 9.1.121 miscompiles some large multioutput fusions, again in a way
-  // that appears related to address calculations, b/111107644.  ptxas 9.2.88
-  // appears to work, as far as we can tell.
+  // ptxas versions before the version that shipped with CUDA 11.1 are known to
+  // miscompile XLA code.
   if (vmaj < 9) {
     LOG(ERROR)
         << "You are using ptxas 8.x, but TF requires ptxas 9.x (and strongly "
-           "prefers >= 9.2.88).  Compilation of XLA kernels below will likely "
-           "fail.\n\nYou do not need to update CUDA; cherry-picking the ptxas "
-           "binary is sufficient.";
-  } else if (std::make_tuple(vmaj, vmin, vdot) < std::make_tuple(9, 2, 88)) {
+           "prefers >= 11.1).  Compilation of XLA kernels below will likely "
+           "fail.\n\nYou may not need to update CUDA; cherry-picking the ptxas "
+           "binary is often sufficient.";
+  } else if (std::make_tuple(vmaj, vmin) < std::make_tuple(11, 1)) {
     LOG(WARNING)
         << "*** WARNING *** You are using ptxas " << vmaj << "." << vmin << "."
         << vdot
-        << ", which is older than 9.2.88. ptxas 9.x before 9.2.88 is known to "
+        << ", which is older than 11.1. ptxas before 11.1 is known to "
            "miscompile XLA code, leading to incorrect results or "
-           "invalid-address errors.\n\nYou do not need to update to CUDA "
-           "9.2.88; cherry-picking the ptxas binary is sufficient.";
+           "invalid-address errors.\n\nYou may not need to update to CUDA "
+           "11.1; cherry-picking the ptxas binary is often sufficient.";
   }
 }
 
@@ -266,20 +261,20 @@ port::StatusOr<std::vector<uint8>> CompileGpuAsm(int cc_major, int cc_minor,
       tensorflow::WriteStringToFile(env, ptx_path, ptx_contents));
   VLOG(2) << "ptx written to: " << ptx_path;
 
-  auto ptx_cleaner = tensorflow::gtl::MakeCleanup([&ptx_path] {
+  absl::Cleanup ptx_cleaner = [&ptx_path] {
     TF_CHECK_OK(tensorflow::Env::Default()->DeleteFile(ptx_path));
-  });
+  };
 
   // Invoke ptxas and collect its output.
   std::string cubin_path;
   if (!env->LocalTempFilename(&cubin_path)) {
     return port::InternalError("couldn't get temp CUBIN file name");
   }
-  auto cubin_cleaner = tensorflow::gtl::MakeCleanup([&cubin_path] {
+  absl::Cleanup cubin_cleaner = [&cubin_path] {
     // CUBIN file may never be created, so the failure to delete it should not
     // produce TF error.
     tensorflow::Env::Default()->DeleteFile(cubin_path).IgnoreError();
-  });
+  };
   tensorflow::SubProcess ptxas_info_dumper;
   std::vector<std::string> ptxas_args = {
       ptxas_path,
@@ -358,11 +353,11 @@ port::StatusOr<std::vector<uint8>> BundleGpuAsm(
     VLOG(2) << "image written to " << img_path;
     image_paths.push_back(std::move(img_path));
   }
-  auto image_files_cleaner = tensorflow::gtl::MakeCleanup([&image_paths] {
+  absl::Cleanup image_files_cleaner = [&image_paths] {
     for (const auto& path : image_paths) {
       TF_CHECK_OK(tensorflow::Env::Default()->DeleteFile(path));
     }
-  });
+  };
 
   // Prepare temorary result file.
   std::string result_path;
@@ -370,11 +365,11 @@ port::StatusOr<std::vector<uint8>> BundleGpuAsm(
     return port::InternalError(
         "Could not get temporary filename for fatbin result.");
   }
-  auto result_file_cleaner = tensorflow::gtl::MakeCleanup([&result_path] {
+  absl::Cleanup result_file_cleaner = [&result_path] {
     // This file may never be created, so the failure to delete it should not
     // propagate to TF.
     tensorflow::Env::Default()->DeleteFile(result_path).IgnoreError();
-  });
+  };
 
   // Compute the ptxas options that were used to produce the cubins.
   std::vector<std::string> ptxas_options;
@@ -463,11 +458,11 @@ port::StatusOr<std::vector<uint8>> BundleGpuAsm(
     targets_list << ",hip-amdgcn-amd-amdhsa-" << img.gfx_arch;
     image_paths.push_back(std::move(img_path));
   }
-  auto image_files_cleaner = tensorflow::gtl::MakeCleanup([&image_paths] {
+  absl::Cleanup image_files_cleaner = [&image_paths] {
     for (const auto& path : image_paths) {
       TF_CHECK_OK(tensorflow::Env::Default()->DeleteFile(path));
     }
-  });
+  };
 
   // Prepare temorary result file.
   std::string result_path;
@@ -475,11 +470,11 @@ port::StatusOr<std::vector<uint8>> BundleGpuAsm(
     return port::InternalError(
         "Could not get temporary filename for fatbin result.");
   }
-  auto result_file_cleaner = tensorflow::gtl::MakeCleanup([&result_path] {
+  absl::Cleanup result_file_cleaner = [&result_path] {
     // This file may never be created, so the failure to delete it should not
     // propagate to TF.
     tensorflow::Env::Default()->DeleteFile(result_path).IgnoreError();
-  });
+  };
 
   // Invoke clang_offload_bundler and collect its output.
   tensorflow::SubProcess clang_offload_bundler;

@@ -106,11 +106,13 @@ const char descriptor_table_protodef_mediapipe_2fframework_2fpacket_5ffactory_2e
   "\002 \001(\t\022\030\n\017external_output\030\352\007 \001(\t\0220\n\007optio"
   "ns\030\003 \001(\0132\037.mediapipe.PacketFactoryOption"
   "s\"E\n\023PacketManagerConfig\022.\n\006packet\030\001 \003(\013"
-  "2\036.mediapipe.PacketFactoryConfig"
+  "2\036.mediapipe.PacketFactoryConfigB0\n\032com."
+  "google.mediapipe.protoB\022PacketFactoryPro"
+  "to"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fframework_2fpacket_5ffactory_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fframework_2fpacket_5ffactory_2eproto = {
-  false, false, 312, descriptor_table_protodef_mediapipe_2fframework_2fpacket_5ffactory_2eproto, "mediapipe/framework/packet_factory.proto", 
+  false, false, 362, descriptor_table_protodef_mediapipe_2fframework_2fpacket_5ffactory_2eproto, "mediapipe/framework/packet_factory.proto", 
   &descriptor_table_mediapipe_2fframework_2fpacket_5ffactory_2eproto_once, nullptr, 0, 3,
   schemas, file_default_instances, TableStruct_mediapipe_2fframework_2fpacket_5ffactory_2eproto::offsets,
   file_level_metadata_mediapipe_2fframework_2fpacket_5ffactory_2eproto, file_level_enum_descriptors_mediapipe_2fframework_2fpacket_5ffactory_2eproto, file_level_service_descriptors_mediapipe_2fframework_2fpacket_5ffactory_2eproto,

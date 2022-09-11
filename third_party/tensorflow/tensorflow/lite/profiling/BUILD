@@ -1,6 +1,11 @@
+load("//tensorflow:tensorflow.bzl", "clean_dep")
 load("//tensorflow:tensorflow.bzl", "get_compatible_with_portable")
 load("//tensorflow/lite:build_def.bzl", "tflite_copts", "tflite_copts_warnings")
 load("//tensorflow/lite:special_rules.bzl", "tflite_portable_test_suite_combined")
+
+# copybara:uncomment_begin(google-only)
+# load("//tensorflow/lite/experimental/perfetto_profiling:build_def.bzl", "tflite_perfetto_copts")
+# copybara:uncomment_end
 
 package(
     default_visibility = ["//visibility:public"],
@@ -40,7 +45,6 @@ cc_library(
     visibility = ["//visibility:private"],
     deps = [
         "//tensorflow/lite/core/api",
-        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -69,10 +73,19 @@ cc_library(
     srcs = ["platform_profiler.cc"],
     hdrs = ["platform_profiler.h"],
     compatible_with = get_compatible_with_portable(),
-    copts = common_copts,
+    copts =
+        # copybara:uncomment_begin(google-only)
+        # tflite_perfetto_copts() +
+        # copybara:uncomment_end
+        common_copts,
     deps = [
         "//tensorflow/lite/core/api",
     ] + select({
+        # copybara:uncomment_begin(google-only)
+        # clean_dep("//tensorflow/lite/experimental/perfetto_profiling:enable_tflite_perfetto_profiler_explicit_true"): [
+        # "//tensorflow/lite/experimental/perfetto_profiling:perfetto_profiler",
+        # ],
+        # copybara:uncomment_end
         "//tensorflow:android": [":atrace_profiler"],
         "//tensorflow:ios": [":signpost_profiler"],
         "//conditions:default": [],
@@ -141,6 +154,32 @@ cc_test(
 )
 
 cc_library(
+    name = "memory_usage_monitor",
+    srcs = ["memory_usage_monitor.cc"],
+    hdrs = ["memory_usage_monitor.h"],
+    copts = common_copts,
+    deps = [
+        ":memory_info",
+        "//tensorflow/lite:minimal_logging",
+        "@com_google_absl//absl/synchronization",
+        "@com_google_absl//absl/time",
+    ],
+)
+
+cc_test(
+    name = "memory_usage_monitor_test",
+    srcs = ["memory_usage_monitor_test.cc"],
+    tags = [
+    ],
+    deps = [
+        ":memory_info",
+        ":memory_usage_monitor",
+        "@com_google_absl//absl/time",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "profile_summary_formatter",
     srcs = ["profile_summary_formatter.cc"],
     hdrs = ["profile_summary_formatter.h"],
@@ -155,6 +194,7 @@ cc_test(
     srcs = ["profile_summary_formatter_test.cc"],
     deps = [
         ":profile_summary_formatter",
+        "@com_google_absl//absl/strings",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -171,6 +211,25 @@ cc_library(
         "//tensorflow/core/util:stats_calculator_portable",
         "//tensorflow/lite:framework",
         "//tensorflow/lite/schema:schema_fbs",
+    ],
+)
+
+cc_library(
+    name = "root_profiler",
+    srcs = ["root_profiler.cc"],
+    hdrs = ["root_profiler.h"],
+    compatible_with = get_compatible_with_portable(),
+    copts = common_copts,
+    deps = ["//tensorflow/lite/core/api"],
+)
+
+cc_test(
+    name = "root_profiler_test",
+    srcs = ["root_profiler_test.cc"],
+    deps = [
+        ":root_profiler",
+        "//tensorflow/lite/core/api",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -19,7 +19,7 @@ void xnn_f16_vhswish_ukernel__neonfp16arith_x16(
     size_t n,
     const void* restrict x_ptr,
     void* restrict y_ptr,
-    const struct xnn_f16_hswish_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN
+    const union xnn_f16_hswish_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
   assert(n != 0);
   assert(n % sizeof(__fp16) == 0);
@@ -27,9 +27,9 @@ void xnn_f16_vhswish_ukernel__neonfp16arith_x16(
   const __fp16* x = (const __fp16*) x_ptr;
   __fp16* y = (__fp16*) y_ptr;
 
-  const float16x8_t vsixth = vld1q_dup_f16(&params->sixth);
-  const float16x8_t vthree = vld1q_dup_f16(&params->three);
-  const int16x8_t vsix = vreinterpretq_s16_f16(vld1q_dup_f16(&params->six));
+  const float16x8_t vsixth = vreinterpretq_f16_u16(vld1q_dup_u16(&params->neon.sixth));
+  const float16x8_t vthree = vreinterpretq_f16_u16(vld1q_dup_u16(&params->neon.three));
+  const int16x8_t vsix = vreinterpretq_s16_u16(vld1q_dup_u16(&params->neon.six));
   const int16x8_t vzero = vdupq_n_s16(0);
 
   for (; n >= 16 * sizeof(__fp16); n -= 16 * sizeof(__fp16)) {
@@ -76,7 +76,7 @@ void xnn_f16_vhswish_ukernel__neonfp16arith_x16(
       vacc_lo = vget_high_f16(vacc);
     }
     if (n & (2 * sizeof(__fp16))) {
-      vst1_lane_u32(__builtin_assume_aligned(y, 1), vreinterpret_u32_f16(vacc_lo), 0); y += 2;
+      vst1_lane_u32((void*) y, vreinterpret_u32_f16(vacc_lo), 0); y += 2;
       vacc_lo = vext_f16(vacc_lo, vacc_lo, 2);
     }
     if (n & (1 * sizeof(__fp16))) {

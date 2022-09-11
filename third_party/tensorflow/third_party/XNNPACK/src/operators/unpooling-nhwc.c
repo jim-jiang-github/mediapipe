@@ -21,14 +21,6 @@
 #include <xnnpack/indirection.h>
 
 
-static inline size_t compute_output_dimension(
-    size_t input_dimension,
-    size_t input_padding_dimension,
-    size_t kernel_dimension)
-{
-  return doz(kernel_dimension * input_dimension, input_padding_dimension);
-}
-
 enum xnn_status xnn_create_unpooling2d_nhwc_x32(
     uint32_t input_padding_top,
     uint32_t input_padding_right,
@@ -167,10 +159,10 @@ enum xnn_status xnn_setup_unpooling2d_nhwc_x32(
   unpooling_op->input_width = input_width;
   unpooling_op->input = input;
 
-  unpooling_op->output_height = compute_output_dimension(
+  unpooling_op->output_height = xnn_compute_unpooling_output_dimension(
     input_height, unpooling_op->padding_top + unpooling_op->padding_bottom,
     unpooling_op->kernel_height);
-  unpooling_op->output_width = compute_output_dimension(
+  unpooling_op->output_width = xnn_compute_unpooling_output_dimension(
     input_width, unpooling_op->padding_left + unpooling_op->padding_right,
     unpooling_op->kernel_width);
   unpooling_op->output = output;
@@ -193,14 +185,14 @@ enum xnn_status xnn_setup_unpooling2d_nhwc_x32(
   const size_t pooling_size = pooling_height * pooling_width;
 
   const size_t indirection_buffer_size = sizeof(void*) * (batch_size * input_height * input_width * pooling_size);
-  void** indirection_buffer = (void**) xnn_reallocate_memory(unpooling_op->indirection_buffer, indirection_buffer_size);
+  const void** indirection_buffer = (const void**) xnn_reallocate_memory(unpooling_op->indirection_buffer, indirection_buffer_size);
   if (indirection_buffer == NULL) {
     xnn_log_error(
       "failed to allocate %zu bytes for %s operator indirection buffer",
       indirection_buffer_size, xnn_operator_type_to_string(xnn_operator_type_unpooling_nhwc_x32));
     return xnn_status_out_of_memory;
   }
-  unpooling_op->indirection_buffer = (const void**) indirection_buffer;
+  unpooling_op->indirection_buffer = indirection_buffer;
 
   xnn_indirection_init_unpool2d(unpooling_op, valid_batch_size, 2 /* log2(sizeof(type32)) */);
 

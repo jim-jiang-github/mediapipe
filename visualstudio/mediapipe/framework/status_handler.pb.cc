@@ -67,14 +67,15 @@ const char descriptor_table_protodef_mediapipe_2fframework_2fstatus_5fhandler_2e
   "ig\022\026\n\016status_handler\030\001 \001(\t\022\031\n\021input_side"
   "_packet\030\002 \003(\t\022\027\n\016external_input\030\352\007 \003(\t\022,"
   "\n\007options\030\003 \001(\0132\033.mediapipe.MediaPipeOpt"
-  "ions"
+  "ionsB0\n\032com.google.mediapipe.protoB\022Stat"
+  "usHandlerProto"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fframework_2fstatus_5fhandler_2eproto_deps[1] = {
   &::descriptor_table_mediapipe_2fframework_2fmediapipe_5foptions_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fframework_2fstatus_5fhandler_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fframework_2fstatus_5fhandler_2eproto = {
-  false, false, 244, descriptor_table_protodef_mediapipe_2fframework_2fstatus_5fhandler_2eproto, "mediapipe/framework/status_handler.proto", 
+  false, false, 294, descriptor_table_protodef_mediapipe_2fframework_2fstatus_5fhandler_2eproto, "mediapipe/framework/status_handler.proto", 
   &descriptor_table_mediapipe_2fframework_2fstatus_5fhandler_2eproto_once, descriptor_table_mediapipe_2fframework_2fstatus_5fhandler_2eproto_deps, 1, 1,
   schemas, file_default_instances, TableStruct_mediapipe_2fframework_2fstatus_5fhandler_2eproto::offsets,
   file_level_metadata_mediapipe_2fframework_2fstatus_5fhandler_2eproto, file_level_enum_descriptors_mediapipe_2fframework_2fstatus_5fhandler_2eproto, file_level_service_descriptors_mediapipe_2fframework_2fstatus_5fhandler_2eproto,

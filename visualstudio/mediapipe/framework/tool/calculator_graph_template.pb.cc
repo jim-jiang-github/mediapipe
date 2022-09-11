@@ -184,37 +184,39 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 const char descriptor_table_protodef_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n8mediapipe/framework/tool/calculator_gr"
   "aph_template.proto\022\tmediapipe\032$mediapipe"
-  "/framework/calculator.proto\032/mediapipe/f"
-  "ramework/deps/proto_descriptor.proto\"\270\001\n"
-  "\022TemplateExpression\022\r\n\005param\030\001 \001(\t\022\n\n\002op"
-  "\030\002 \001(\t\022*\n\003arg\030\003 \003(\0132\035.mediapipe.Template"
-  "Expression\022\014\n\004path\030\004 \001(\t\0228\n\nfield_type\030\005"
-  " \001(\0162$.mediapipe.FieldDescriptorProto.Ty"
-  "pe\022\023\n\013field_value\030\007 \001(\t\"x\n\027CalculatorGra"
-  "phTemplate\0220\n\006config\030\001 \001(\0132 .mediapipe.C"
-  "alculatorGraphConfig\022+\n\004rule\030\002 \003(\0132\035.med"
-  "iapipe.TemplateExpression\"\226\001\n\020TemplateAr"
-  "gument\022\r\n\003str\030\001 \001(\tH\000\022\r\n\003num\030\002 \001(\001H\000\022\'\n\004"
-  "dict\030\003 \001(\0132\027.mediapipe.TemplateDictH\000\022,\n"
-  "\007element\030\004 \003(\0132\033.mediapipe.TemplateArgum"
-  "entB\r\n\013param_value\"\204\001\n\014TemplateDict\022.\n\003a"
-  "rg\030\001 \003(\0132!.mediapipe.TemplateDict.Parame"
-  "ter\032D\n\tParameter\022\013\n\003key\030\001 \001(\t\022*\n\005value\030\002"
-  " \001(\0132\033.mediapipe.TemplateArgument\"\222\001\n\027Te"
-  "mplateSubgraphOptions\022%\n\004dict\030\001 \001(\0132\027.me"
-  "diapipe.TemplateDict2P\n\003ext\022\034.mediapipe."
-  "CalculatorOptions\030\365\374\276R \001(\0132\".mediapipe.T"
-  "emplateSubgraphOptionsB0\n\032com.google.med"
-  "iapipe.protoB\022GraphTemplateProto"
+  "/framework/calculator.proto\032,mediapipe/f"
+  "ramework/calculator_options.proto\032/media"
+  "pipe/framework/deps/proto_descriptor.pro"
+  "to\"\270\001\n\022TemplateExpression\022\r\n\005param\030\001 \001(\t"
+  "\022\n\n\002op\030\002 \001(\t\022*\n\003arg\030\003 \003(\0132\035.mediapipe.Te"
+  "mplateExpression\022\014\n\004path\030\004 \001(\t\0228\n\nfield_"
+  "type\030\005 \001(\0162$.mediapipe.FieldDescriptorPr"
+  "oto.Type\022\023\n\013field_value\030\007 \001(\t\"x\n\027Calcula"
+  "torGraphTemplate\0220\n\006config\030\001 \001(\0132 .media"
+  "pipe.CalculatorGraphConfig\022+\n\004rule\030\002 \003(\013"
+  "2\035.mediapipe.TemplateExpression\"\226\001\n\020Temp"
+  "lateArgument\022\r\n\003str\030\001 \001(\tH\000\022\r\n\003num\030\002 \001(\001"
+  "H\000\022\'\n\004dict\030\003 \001(\0132\027.mediapipe.TemplateDic"
+  "tH\000\022,\n\007element\030\004 \003(\0132\033.mediapipe.Templat"
+  "eArgumentB\r\n\013param_value\"\204\001\n\014TemplateDic"
+  "t\022.\n\003arg\030\001 \003(\0132!.mediapipe.TemplateDict."
+  "Parameter\032D\n\tParameter\022\013\n\003key\030\001 \001(\t\022*\n\005v"
+  "alue\030\002 \001(\0132\033.mediapipe.TemplateArgument\""
+  "\222\001\n\027TemplateSubgraphOptions\022%\n\004dict\030\001 \001("
+  "\0132\027.mediapipe.TemplateDict2P\n\003ext\022\034.medi"
+  "apipe.CalculatorOptions\030\365\374\276R \001(\0132\".media"
+  "pipe.TemplateSubgraphOptionsB0\n\032com.goog"
+  "le.mediapipe.protoB\022GraphTemplateProto"
   ;
-static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto_deps[2] = {
+static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto_deps[3] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
+  &::descriptor_table_mediapipe_2fframework_2fcalculator_5foptions_2eproto,
   &::descriptor_table_mediapipe_2fframework_2fdeps_2fproto_5fdescriptor_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto = {
-  false, false, 952, descriptor_table_protodef_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto, "mediapipe/framework/tool/calculator_graph_template.proto", 
-  &descriptor_table_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto_once, descriptor_table_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto_deps, 2, 6,
+  false, false, 998, descriptor_table_protodef_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto, "mediapipe/framework/tool/calculator_graph_template.proto", 
+  &descriptor_table_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto_once, descriptor_table_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto_deps, 3, 6,
   schemas, file_default_instances, TableStruct_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto::offsets,
   file_level_metadata_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto, file_level_enum_descriptors_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto, file_level_service_descriptors_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto,
 };

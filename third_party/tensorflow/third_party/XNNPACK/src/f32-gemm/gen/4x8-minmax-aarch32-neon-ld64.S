@@ -21,11 +21,11 @@
 //     uint8_t*restrict c,       sp + 104 -> r11
 //     size_t cm_stride,         sp + 108 -> (r6)
 //     size_t cn_stride,         sp + 112 -> r7
-//     const union xnn_f32_minmax_params params[restrict XNN_MIN_ELEMENTS(1)])  sp + 116 -> (r7)
+//     const union xnn_f32_minmax_params params)  sp + 116 -> (r7)
 
+// d8-d15, r4-r11,r14(lr) need to be preserved if used. r13(sp),r15(pc) are reserved.
 
-// inner loop registers
-
+// Register usage
 // A0   r3  d0
 // A1  r12  d1
 // A2  r10  d2
@@ -121,7 +121,7 @@ BEGIN_FUNCTION xnn_f32_gemm_minmax_ukernel_4x8__aarch32_neon_ld64
         VMLA.F32 q15, q7, d3[1]
         BHS     1b
 
-        # Is there a remainder?- 1 floats of A (4 bytes)
+        # Is there a remainder?- 1 float of A (4 bytes)
         TST     r5, 4
         BNE     3f
 
@@ -162,7 +162,7 @@ BEGIN_FUNCTION xnn_f32_gemm_minmax_ukernel_4x8__aarch32_neon_ld64
         BX      lr
 
 3:
-        # Remainder- 1 floats of A (4 bytes)
+        # Remainder- 1 float of A (4 bytes)
         VLDM    r3!,  {s0}              // A0
         VLDM    r9!, {d8-d11}           // B0
         VLDM    r12!, {s2}              // A1
@@ -183,24 +183,24 @@ BEGIN_FUNCTION xnn_f32_gemm_minmax_ukernel_4x8__aarch32_neon_ld64
         TST     r1, 4
         BEQ     5f
         VST1.32 {d16-d17}, [r11]!
-        VMOV    q8,  q9
         VST1.32 {d20-d21},  [r4]!
+        VMOV    q8,  q9
         VMOV    q10, q11
         VST1.32 {d24-d25},  [r8]!
-        VMOV    q12, q13
         VST1.32 {d28-d29},  [r6]!
+        VMOV    q12, q13
         VMOV    q14, q15
 
 5:
         TST     r1, 2
         BEQ     6f
         VST1.32 {d16}, [r11]!
-        VMOV    d16, d17
         VST1.32 {d20},  [r4]!
+        VMOV    d16, d17
         VMOV    d20, d21
         VST1.32 {d24},  [r8]!
-        VMOV    d24, d25
         VST1.32 {d28},  [r6]!
+        VMOV    d24, d25
         VMOV    d28, d29
 
 6:

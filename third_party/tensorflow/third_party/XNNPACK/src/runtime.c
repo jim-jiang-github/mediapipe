@@ -3,14 +3,21 @@
 // This source code is licensed under the BSD-style license found in the
 // LICENSE file in the root directory of this source tree.
 
+#ifndef __MACH__
+#define _POSIX_C_SOURCE 199309L
+#endif
+
+#include <assert.h>
 #include <math.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h> // For snprintf.
 #include <stdlib.h>
-#include <stdio.h>
 
 #include <xnnpack.h>
 #include <xnnpack/allocator.h>
+#include <xnnpack/cache.h>
+#include <xnnpack/common.h>
 #include <xnnpack/log.h>
 #include <xnnpack/math.h>
 #include <xnnpack/memory-planner.h>
@@ -18,6 +25,94 @@
 #include <xnnpack/params.h>
 #include <xnnpack/subgraph.h>
 
+#if defined(__EMSCRIPTEN__)
+#include <emscripten/emscripten.h>
+#elif XNN_PLATFORM_WINDOWS
+#include <windows.h>
+#else
+#include <errno.h>
+#include <time.h>
+#endif
+
+#ifndef XNN_ENABLE_JIT
+  #error "XNN_ENABLE_JIT is not defined"
+#endif
+
+enum xnn_status xnn_create_workspace(xnn_workspace_t* workspace_out)
+{
+  if ((xnn_params.init_flags & XNN_INIT_FLAG_XNNPACK) == 0) {
+    xnn_log_error("failed to create workspace: XNNPACK is not initialized");
+    return xnn_status_uninitialized;
+  }
+
+  struct xnn_workspace* workspace = NULL;
+  workspace = xnn_allocate_zero_memory(sizeof(struct xnn_workspace));
+  if (workspace == NULL) {
+    xnn_log_error("failed to allocate %zu bytes for workspace descriptor", sizeof(struct xnn_workspace));
+    return xnn_status_out_of_memory;
+  }
+  workspace->ref_count = 1;
+  *workspace_out = workspace;
+  return xnn_status_success;
+}
+
+static inline void xnn_retain_workspace(xnn_workspace_t workspace)
+{
+  workspace->ref_count++;
+}
+
+enum xnn_status xnn_release_workspace(xnn_workspace_t workspace)
+{
+  assert(workspace->ref_count != 0);
+  if (--workspace->ref_count == 0) {
+    xnn_release_simd_memory(workspace->data);
+    xnn_release_memory(workspace);
+  }
+  return xnn_status_success;
+}
+
+enum xnn_status xnn_create_weights_cache_with_size(size_t size, xnn_weights_cache_t* weights_cache_out)
+{
+  struct xnn_weights_cache* weights_cache = NULL;
+  enum xnn_status status = xnn_status_uninitialized;
+
+  if ((xnn_params.init_flags & XNN_INIT_FLAG_XNNPACK) == 0) {
+    xnn_log_error("failed to create weights cache: XNNPACK is not initialized");
+    goto error;
+  }
+
+  weights_cache = xnn_allocate_zero_memory(sizeof(struct xnn_weights_cache));
+  if (weights_cache == NULL) {
+    xnn_log_error("failed to allocate %zu bytes for weights cache descriptor", sizeof(struct xnn_weights_cache));
+    goto error;
+  }
+
+  status = xnn_init_weights_cache_with_size(weights_cache, size);
+  if (status != xnn_status_success) {
+    goto error;
+  }
+  *weights_cache_out = weights_cache;
+  return xnn_status_success;
+
+error:
+  xnn_release_weights_cache(weights_cache);
+  return status;
+}
+
+enum xnn_status xnn_create_weights_cache(xnn_weights_cache_t* weights_cache_out)
+{
+  return xnn_create_weights_cache_with_size(XNN_DEFAULT_WEIGHTS_BUFFER_SIZE, weights_cache_out);
+}
+
+enum xnn_status xnn_delete_weights_cache(xnn_weights_cache_t weights_cache)
+{
+  enum xnn_status status = xnn_release_weights_cache(weights_cache);
+  if (status != xnn_status_success) {
+    return status;
+  }
+  xnn_release_memory(weights_cache);
+  return xnn_status_success;
+}
 
 enum xnn_status xnn_create_runtime(
   xnn_subgraph_t subgraph,
@@ -26,30 +121,107 @@ enum xnn_status xnn_create_runtime(
   return xnn_create_runtime_v2(subgraph, NULL /* threadpool */, 0 /* flags */, runtime_out);
 }
 
-// Product of all shape dimensions
-static size_t product_all_dims(
-  const struct xnn_shape shape[restrict XNN_MIN_ELEMENTS(1)])
-{
-  size_t batch_size = 1;
-  for (size_t i = 0; i < shape->num_dims; i++) {
-    batch_size *= shape->dim[i];
-  }
-  return batch_size;
-}
-
-// Product of all shape dimensions, except for the last (channel) one
-static size_t product_non_channel_dims(
-  const struct xnn_shape shape[restrict XNN_MIN_ELEMENTS(1)])
-{
-  size_t batch_size = 1;
-  for (size_t i = 0; i + 1 < shape->num_dims; i++) {
-    batch_size *= shape->dim[i];
-  }
-  return batch_size;
-}
-
 enum xnn_status xnn_create_runtime_v2(
   xnn_subgraph_t subgraph,
+  pthreadpool_t threadpool,
+  uint32_t flags,
+  xnn_runtime_t* runtime_out)
+{
+  return xnn_create_runtime_v3(subgraph, /* weights_cache */ NULL, threadpool, flags, runtime_out);
+}
+
+enum xnn_status xnn_create_runtime_v3(
+  xnn_subgraph_t subgraph,
+  xnn_weights_cache_t weights_cache,
+  pthreadpool_t threadpool,
+  uint32_t flags,
+  xnn_runtime_t* runtime_out)
+{
+  xnn_workspace_t workspace;
+  enum xnn_status status = xnn_create_workspace(&workspace);
+  if (status != xnn_status_success) {
+    return status;
+  }
+  status = xnn_create_runtime_v4(subgraph, weights_cache, workspace, threadpool, flags, runtime_out);
+  // Release workspace regardless of return status of creating runtime.
+  xnn_release_workspace(workspace);
+  return status;
+}
+
+static enum xnn_status initialize_workspace_blobs(
+    xnn_subgraph_t subgraph,
+    xnn_runtime_t runtime,
+    struct xnn_value_allocation_tracker* mem_alloc_tracker)
+{
+  assert(runtime->workspace != NULL);
+
+  size_t mem_arena_size = mem_alloc_tracker->mem_arena_size;
+  if (mem_arena_size == 0) {
+    return xnn_status_success;
+  }
+  // Sparse microkernels can read up to 2 * XNN_EXTRA_BYTES beyond array bounds.
+  mem_arena_size += 2 * XNN_EXTRA_BYTES;
+
+  // Records how much the workspace has moved by due to allocating a larger workspace.
+  ptrdiff_t workspace_data_delta = 0;
+  // Allocates larger workspace here if needed.
+  if (runtime->workspace->size < mem_arena_size) {
+    void* old_workspace_data = runtime->workspace->data;
+    if (runtime->workspace->size != 0) {
+      // Free up the workspace's current data. Free first then allocate to keep peak memory usage low.
+      xnn_release_simd_memory(runtime->workspace->data);
+    }
+    void* new_workspace_data = xnn_allocate_simd_memory(mem_arena_size);
+    if (new_workspace_data == NULL) {
+      xnn_log_error("failed to allocate %zu bytes for runtime workspace", mem_arena_size);
+      return xnn_status_out_of_memory;
+    }
+    runtime->workspace->data = new_workspace_data;
+    runtime->workspace->size = mem_arena_size;
+    // Keep track of how much the workspace data moved.
+    if (old_workspace_data != NULL) {
+      workspace_data_delta = (uintptr_t) new_workspace_data - (uintptr_t) old_workspace_data;
+    }
+  }
+
+  assert(runtime->workspace->size >= mem_arena_size);
+
+  // Initialize current runtime's blob pointers.
+  for (size_t i = 0; i < subgraph->num_values; i++) {
+    const struct xnn_value* value = &subgraph->values[i];
+    struct xnn_blob* blob = &runtime->blobs[i];
+    if (value->datatype != xnn_datatype_invalid && value->type == xnn_value_type_dense_tensor) {
+      if (blob->allocation_type == xnn_allocation_type_workspace) {
+        // Value is purely internal to the runtime, allocate it in the workspace.
+        blob->data = (void*) ((uintptr_t) runtime->workspace->data + mem_alloc_tracker->usage[i].alloc_offset);
+      }
+    }
+  }
+
+  // Adjust the blob pointers of all runtimes that share this workspace.
+  if (workspace_data_delta != 0) {
+    for (struct xnn_runtime* rt = runtime->workspace->first_user; rt != NULL; rt = rt->next_workspace_user) {
+      // The current runtime already has the correct offset.
+      if (rt == runtime) {
+        continue;
+      }
+      for (size_t i = 0; i < rt->num_blobs; i++) {
+        struct xnn_blob* blob = &rt->blobs[i];
+        if (blob->allocation_type == xnn_allocation_type_workspace) {
+          assert(blob->data != NULL);
+          blob->data = (void*) ((uintptr_t) blob->data + workspace_data_delta);
+        }
+      }
+    }
+  }
+
+  return xnn_status_success;
+}
+
+enum xnn_status xnn_create_runtime_v4(
+  xnn_subgraph_t subgraph,
+  xnn_weights_cache_t weights_cache,
+  xnn_workspace_t workspace,
   pthreadpool_t threadpool,
   uint32_t flags,
   xnn_runtime_t* runtime_out)
@@ -62,7 +234,19 @@ enum xnn_status xnn_create_runtime_v2(
     goto error;
   }
 
-  xnn_subgraph_optimize(subgraph, flags & XNN_FLAG_SPARSE_INFERENCE);
+  if (workspace == NULL) {
+    xnn_log_error("failed to create runtime: workspace is NULL");
+    status = xnn_status_invalid_parameter;
+    goto error;
+  }
+
+  const uint32_t optimization_flags = XNN_FLAG_SPARSE_INFERENCE | XNN_FLAG_HINT_FP16_INFERENCE |
+    XNN_FLAG_FORCE_FP16_INFERENCE | XNN_FLAG_NO_OPERATOR_FUSION;
+  status = xnn_subgraph_optimize(subgraph, flags & optimization_flags);
+  if (status != xnn_status_success) {
+    xnn_log_error("failed to optimize subgraph");
+    goto error;
+  }
 
   status = xnn_status_out_of_memory;
 
@@ -75,7 +259,7 @@ enum xnn_status xnn_create_runtime_v2(
   runtime->opdata = xnn_allocate_zero_memory(sizeof(struct xnn_operator_data) * subgraph->num_nodes);
   if (runtime->opdata == NULL) {
     xnn_log_error("failed to allocate %zu bytes for opdata descriptors",
-      sizeof(struct xnn_operator_data) * subgraph->num_nodes);
+      sizeof(struct xnn_operator_data) * (size_t) subgraph->num_nodes);
     goto error;
   }
   runtime->num_ops = subgraph->num_nodes;
@@ -93,1131 +277,42 @@ enum xnn_status xnn_create_runtime_v2(
     }
   }
 
+  struct xnn_code_cache* code_cache = NULL;
+#if XNN_PLATFORM_JIT && XNN_ENABLE_JIT
+  code_cache = &runtime->code_cache;
+  status = xnn_init_code_cache(code_cache);
+  if (status != xnn_status_success) {
+    goto error;
+  }
+#endif
+  const struct xnn_caches caches = {
+    .code_cache = code_cache,
+    .weights_cache = weights_cache,
+  };
+
   struct xnn_value* values = subgraph->values;
   for (size_t i = 0; i < subgraph->num_nodes; i++) {
     const struct xnn_node* node = subgraph->nodes + i;
-    switch (node->type) {
-      case xnn_node_type_invalid:
-        // Node was fused
-        continue;
-      case xnn_node_type_abs:
-        status = xnn_create_abs_nc_f32(
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = product_non_channel_dims(&values[node->inputs[0]].shape);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_add2:
-        switch (values[node->outputs[0]].datatype) {
-          case xnn_datatype_fp32:
-            status = xnn_create_add_nd_f32(
-              node->activation.output_min,
-              node->activation.output_max,
-              node->flags,
-              &runtime->opdata[i].operator_object);
-            break;
-#ifndef XNN_NO_QS8_OPERATORS
-          case xnn_datatype_qint8:
-          {
-            const float output_scale = values[node->outputs[0]].quantization.scale;
-            const int32_t output_zero_point = values[node->outputs[0]].quantization.zero_point;
-            const int8_t output_min =
-              (int8_t) lrintf(fminf(fmaxf(node->activation.output_min / output_scale + (float) output_zero_point, -128.0f), 127.0f));
-            const int8_t output_max =
-              (int8_t) lrintf(fminf(fmaxf(node->activation.output_max / output_scale + (float) output_zero_point, -128.0f), 127.0f));
-            status = xnn_create_add_nd_qs8(
-              (int8_t) values[node->inputs[0]].quantization.zero_point,
-              values[node->inputs[0]].quantization.scale,
-              (int8_t) values[node->inputs[1]].quantization.zero_point,
-              values[node->inputs[1]].quantization.scale,
-              (int8_t) output_zero_point,
-              output_scale, output_min, output_max, node->flags,
-              &runtime->opdata[i].operator_object);
-            break;
-          }
-#endif  // !defined(XNN_NO_QS8_OPERATORS)
-#ifndef XNN_NO_QU8_OPERATORS
-          case xnn_datatype_quint8:
-          {
-            const float output_scale = values[node->outputs[0]].quantization.scale;
-            const int32_t output_zero_point = values[node->outputs[0]].quantization.zero_point;
-            const uint8_t output_min =
-              (uint8_t) lrintf(fminf(fmaxf(node->activation.output_min / output_scale + (float) output_zero_point, 0.0f), 255.0f));
-            const uint8_t output_max =
-              (uint8_t) lrintf(fminf(fmaxf(node->activation.output_max / output_scale + (float) output_zero_point, 0.0f), 255.0f));
-            status = xnn_create_add_nd_qu8(
-              (uint8_t) values[node->inputs[0]].quantization.zero_point,
-              values[node->inputs[0]].quantization.scale,
-              (uint8_t) values[node->inputs[1]].quantization.zero_point,
-              values[node->inputs[1]].quantization.scale,
-              (uint8_t) output_zero_point,
-              output_scale, output_min, output_max, node->flags,
-              &runtime->opdata[i].operator_object);
-            break;
-          }
-#endif  // !defined(XNN_NO_QU8_OPERATORS)
-          default:
-            XNN_UNREACHABLE;
-        }
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].shape1.num_dims = values[node->inputs[0]].shape.num_dims;
-        runtime->opdata[i].shape2.num_dims = values[node->inputs[1]].shape.num_dims;
-        if (values[node->outputs[0]].layout == xnn_layout_type_nchw) {
-          assert(values[node->inputs[0]].layout == xnn_layout_type_nchw);
-          assert(values[node->inputs[1]].layout == xnn_layout_type_nchw);
-          runtime->opdata[i].shape1.dim[0] = values[node->inputs[0]].shape.dim[0];
-          runtime->opdata[i].shape1.dim[1] = values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1];
-          if (values[node->inputs[0]].shape.num_dims > 2) {
-            memcpy(&runtime->opdata[i].shape1.dim[2], &values[node->inputs[0]].shape.dim[1], (values[node->inputs[0]].shape.num_dims - 2) * sizeof(size_t));
-          }
-          runtime->opdata[i].shape2.dim[0] = values[node->inputs[1]].shape.dim[0];
-          runtime->opdata[i].shape2.dim[1] = values[node->inputs[1]].shape.dim[values[node->inputs[0]].shape.num_dims - 1];
-          if (values[node->inputs[0]].shape.num_dims > 2) {
-            memcpy(&runtime->opdata[i].shape2.dim[2], &values[node->inputs[1]].shape.dim[1], (values[node->inputs[1]].shape.num_dims - 2) * sizeof(size_t));
-          }
-        } else {
-          assert(values[node->outputs[0]].layout == xnn_layout_type_nhwc);
-          assert(values[node->inputs[0]].layout == xnn_layout_type_nhwc);
-          assert(values[node->inputs[1]].layout == xnn_layout_type_nhwc);
-          memcpy(runtime->opdata[i].shape1.dim, values[node->inputs[0]].shape.dim, values[node->inputs[0]].shape.num_dims * sizeof(size_t));
-          memcpy(runtime->opdata[i].shape2.dim, values[node->inputs[1]].shape.dim, values[node->inputs[1]].shape.num_dims * sizeof(size_t));
-        }
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].inputs[1] = node->inputs[1];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_argmax_pooling_2d:
-        status = xnn_create_argmax_pooling2d_nhwc_f32(
-          node->params.pooling_2d.padding_top,
-          node->params.pooling_2d.padding_right,
-          node->params.pooling_2d.padding_bottom,
-          node->params.pooling_2d.padding_left,
-          node->params.pooling_2d.pooling_height,
-          node->params.pooling_2d.pooling_width,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = values[node->inputs[0]].shape.dim[0];
-        runtime->opdata[i].input_height = values[node->inputs[0]].shape.dim[1];
-        runtime->opdata[i].input_width = values[node->inputs[0]].shape.dim[2];
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        runtime->opdata[i].outputs[1] = node->outputs[1];
-        break;
-      case xnn_node_type_average_pooling_2d:
-        status = xnn_create_average_pooling2d_nhwc_f32(
-          node->params.pooling_2d.padding_top,
-          node->params.pooling_2d.padding_right,
-          node->params.pooling_2d.padding_bottom,
-          node->params.pooling_2d.padding_left,
-          node->params.pooling_2d.pooling_height,
-          node->params.pooling_2d.pooling_width,
-          node->params.pooling_2d.stride_height,
-          node->params.pooling_2d.stride_width,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->activation.output_min,
-          node->activation.output_max,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = values[node->inputs[0]].shape.dim[0];
-        runtime->opdata[i].input_height = values[node->inputs[0]].shape.dim[1];
-        runtime->opdata[i].input_width = values[node->inputs[0]].shape.dim[2];
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_bankers_rounding:
-        status = xnn_create_bankers_rounding_nc_f32(
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = product_non_channel_dims(&values[node->inputs[0]].shape);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_ceiling:
-        status = xnn_create_ceiling_nc_f32(
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = product_non_channel_dims(&values[node->inputs[0]].shape);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_convolution_2d:
-      {
-        assert(values[node->inputs[1]].data != NULL);
-        const void* bias_data = NULL;
-        if (node->num_inputs > 2) {
-          bias_data = values[node->inputs[2]].data;
-          assert(bias_data != NULL);
-        }
-        if (values[node->outputs[0]].layout == xnn_layout_type_nchw) {
-          status = xnn_create_convolution2d_nchw_f32(
-            node->params.convolution_2d.input_padding_top,
-            node->params.convolution_2d.input_padding_right,
-            node->params.convolution_2d.input_padding_bottom,
-            node->params.convolution_2d.input_padding_left,
-            node->params.convolution_2d.kernel_height,
-            node->params.convolution_2d.kernel_width,
-            node->params.convolution_2d.subsampling_height,
-            node->params.convolution_2d.subsampling_width,
-            node->params.convolution_2d.dilation_height,
-            node->params.convolution_2d.dilation_width,
-            node->params.convolution_2d.groups,
-            node->params.convolution_2d.group_input_channels,
-            node->params.convolution_2d.group_output_channels,
-            node->params.convolution_2d.group_input_channels * node->params.convolution_2d.groups /* input_pixel_stride */,
-            node->params.convolution_2d.group_output_channels * node->params.convolution_2d.groups /* output_pixel_stride */,
-            values[node->inputs[1]].data,
-            bias_data,
-            node->activation.output_min,
-            node->activation.output_max,
-            node->flags | (values[node->inputs[0]].layout == xnn_layout_type_nhwc ? XNN_FLAG_INPUT_NHWC : 0),
-            &runtime->opdata[i].operator_object);
-        } else {
-          assert(values[node->inputs[0]].layout == xnn_layout_type_nhwc);
-          assert(values[node->outputs[0]].layout == xnn_layout_type_nhwc);
-          switch (values[node->inputs[1]].datatype) {
-            case xnn_datatype_fp32:
-              status = xnn_create_convolution2d_nhwc_f32(
-                node->params.convolution_2d.input_padding_top,
-                node->params.convolution_2d.input_padding_right,
-                node->params.convolution_2d.input_padding_bottom,
-                node->params.convolution_2d.input_padding_left,
-                node->params.convolution_2d.kernel_height,
-                node->params.convolution_2d.kernel_width,
-                node->params.convolution_2d.subsampling_height,
-                node->params.convolution_2d.subsampling_width,
-                node->params.convolution_2d.dilation_height,
-                node->params.convolution_2d.dilation_width,
-                node->params.convolution_2d.groups,
-                node->params.convolution_2d.group_input_channels,
-                node->params.convolution_2d.group_output_channels,
-                node->params.convolution_2d.group_input_channels * node->params.convolution_2d.groups /* input_pixel_stride */,
-                node->params.convolution_2d.group_output_channels * node->params.convolution_2d.groups /* output_pixel_stride */,
-                values[node->inputs[1]].data,
-                bias_data,
-                node->activation.output_min,
-                node->activation.output_max,
-                node->flags,
-                &runtime->opdata[i].operator_object);
-              break;
-#ifndef XNN_NO_QS8_OPERATORS
-            case xnn_datatype_qint8:
-            {
-              const float output_scale = values[node->outputs[0]].quantization.scale;
-              const int32_t output_zero_point = values[node->outputs[0]].quantization.zero_point;
-              const int8_t output_min =
-                (int8_t) lrintf(fminf(fmaxf(node->activation.output_min / output_scale + (float) output_zero_point, -128.0f), 127.0f));
-              const int8_t output_max =
-                (int8_t) lrintf(fminf(fmaxf(node->activation.output_max / output_scale + (float) output_zero_point, -128.0f), 127.0f));
-              status = xnn_create_convolution2d_nhwc_qs8(
-                node->params.convolution_2d.input_padding_top,
-                node->params.convolution_2d.input_padding_right,
-                node->params.convolution_2d.input_padding_bottom,
-                node->params.convolution_2d.input_padding_left,
-                node->params.convolution_2d.kernel_height,
-                node->params.convolution_2d.kernel_width,
-                node->params.convolution_2d.subsampling_height,
-                node->params.convolution_2d.subsampling_width,
-                node->params.convolution_2d.dilation_height,
-                node->params.convolution_2d.dilation_width,
-                node->params.convolution_2d.groups,
-                node->params.convolution_2d.group_input_channels,
-                node->params.convolution_2d.group_output_channels,
-                node->params.convolution_2d.group_input_channels * node->params.convolution_2d.groups /* input_pixel_stride */,
-                node->params.convolution_2d.group_output_channels * node->params.convolution_2d.groups /* output_pixel_stride */,
-                (int8_t) values[node->inputs[0]].quantization.zero_point,
-                values[node->inputs[0]].quantization.scale,
-                values[node->inputs[1]].quantization.scale,
-                values[node->inputs[1]].data,
-                bias_data,
-                (int8_t) output_zero_point,
-                output_scale, output_min, output_max,
-                node->flags,
-                &runtime->opdata[i].operator_object);
-              break;
-            }
-            case xnn_datatype_qcint8:
-            {
-              const float output_scale = values[node->outputs[0]].quantization.scale;
-              const int32_t output_zero_point = values[node->outputs[0]].quantization.zero_point;
-              const int8_t output_min =
-                (int8_t) lrintf(fminf(fmaxf(node->activation.output_min / output_scale + (float) output_zero_point, -128.0f), 127.0f));
-              const int8_t output_max =
-                (int8_t) lrintf(fminf(fmaxf(node->activation.output_max / output_scale + (float) output_zero_point, -128.0f), 127.0f));
-              status = xnn_create_convolution2d_nhwc_qc8(
-                node->params.convolution_2d.input_padding_top,
-                node->params.convolution_2d.input_padding_right,
-                node->params.convolution_2d.input_padding_bottom,
-                node->params.convolution_2d.input_padding_left,
-                node->params.convolution_2d.kernel_height,
-                node->params.convolution_2d.kernel_width,
-                node->params.convolution_2d.subsampling_height,
-                node->params.convolution_2d.subsampling_width,
-                node->params.convolution_2d.dilation_height,
-                node->params.convolution_2d.dilation_width,
-                node->params.convolution_2d.groups,
-                node->params.convolution_2d.group_input_channels,
-                node->params.convolution_2d.group_output_channels,
-                node->params.convolution_2d.group_input_channels * node->params.convolution_2d.groups /* input_pixel_stride */,
-                node->params.convolution_2d.group_output_channels * node->params.convolution_2d.groups /* output_pixel_stride */,
-                (int8_t) values[node->inputs[0]].quantization.zero_point,
-                values[node->inputs[0]].quantization.scale,
-                values[node->inputs[1]].quantization.channelwise_scale,
-                values[node->inputs[1]].data,
-                bias_data,
-                (int8_t) output_zero_point,
-                output_scale, output_min, output_max,
-                node->flags,
-                &runtime->opdata[i].operator_object);
-              break;
-            }
-#endif  // !defined(XNN_NO_QS8_OPERATORS)
-#ifndef XNN_NO_QU8_OPERATORS
-            case xnn_datatype_quint8:
-            {
-              const float output_scale = values[node->outputs[0]].quantization.scale;
-              const int32_t output_zero_point = values[node->outputs[0]].quantization.zero_point;
-              const uint8_t output_min =
-                (uint8_t) lrintf(fminf(fmaxf(node->activation.output_min / output_scale + (float) output_zero_point, 0.0f), 255.0f));
-              const uint8_t output_max =
-                (uint8_t) lrintf(fminf(fmaxf(node->activation.output_max / output_scale + (float) output_zero_point, 0.0f), 255.0f));
-              status = xnn_create_convolution2d_nhwc_qu8(
-                node->params.convolution_2d.input_padding_top,
-                node->params.convolution_2d.input_padding_right,
-                node->params.convolution_2d.input_padding_bottom,
-                node->params.convolution_2d.input_padding_left,
-                node->params.convolution_2d.kernel_height,
-                node->params.convolution_2d.kernel_width,
-                node->params.convolution_2d.subsampling_height,
-                node->params.convolution_2d.subsampling_width,
-                node->params.convolution_2d.dilation_height,
-                node->params.convolution_2d.dilation_width,
-                node->params.convolution_2d.groups,
-                node->params.convolution_2d.group_input_channels,
-                node->params.convolution_2d.group_output_channels,
-                node->params.convolution_2d.group_input_channels * node->params.convolution_2d.groups /* input_pixel_stride */,
-                node->params.convolution_2d.group_output_channels * node->params.convolution_2d.groups /* output_pixel_stride */,
-                (uint8_t) values[node->inputs[0]].quantization.zero_point,
-                values[node->inputs[0]].quantization.scale,
-                (uint8_t) values[node->inputs[1]].quantization.zero_point,
-                values[node->inputs[1]].quantization.scale,
-                values[node->inputs[1]].data,
-                bias_data,
-                (uint8_t) output_zero_point,
-                output_scale, output_min, output_max,
-                node->flags,
-                &runtime->opdata[i].operator_object);
-              break;
-            }
-#endif  // !defined(XNN_NO_QU8_OPERATORS)
-            default:
-              XNN_UNREACHABLE;
-          }
-        }
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = values[node->inputs[0]].shape.dim[0];
-        runtime->opdata[i].input_height = values[node->inputs[0]].shape.dim[1];
-        runtime->opdata[i].input_width = values[node->inputs[0]].shape.dim[2];
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      }
-      case xnn_node_type_clamp:
-        status = xnn_create_clamp_nc_f32(
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->activation.output_min,
-          node->activation.output_max,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = product_non_channel_dims(&values[node->inputs[0]].shape);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_deconvolution_2d:
-        assert(values[node->inputs[1]].data != NULL);
-        assert(values[node->inputs[2]].data != NULL);
-        status = xnn_create_deconvolution2d_nhwc_f32(
-          node->params.deconvolution_2d.padding_top,
-          node->params.deconvolution_2d.padding_right,
-          node->params.deconvolution_2d.padding_bottom,
-          node->params.deconvolution_2d.padding_left,
-          node->params.deconvolution_2d.kernel_height,
-          node->params.deconvolution_2d.kernel_width,
-          node->params.deconvolution_2d.upsampling_height,
-          node->params.deconvolution_2d.upsampling_width,
-          node->params.deconvolution_2d.dilation_height,
-          node->params.deconvolution_2d.dilation_width,
-          node->params.deconvolution_2d.groups,
-          node->params.deconvolution_2d.group_input_channels,
-          node->params.deconvolution_2d.group_output_channels,
-          node->params.deconvolution_2d.group_input_channels * node->params.deconvolution_2d.groups /* input_pixel_stride */,
-          node->params.deconvolution_2d.group_output_channels * node->params.deconvolution_2d.groups /* output_pixel_stride */,
-          values[node->inputs[1]].data,
-          values[node->inputs[2]].data,
-          node->activation.output_min,
-          node->activation.output_max,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = values[node->inputs[0]].shape.dim[0];
-        runtime->opdata[i].input_height = values[node->inputs[0]].shape.dim[1];
-        runtime->opdata[i].input_width = values[node->inputs[0]].shape.dim[2];
-        runtime->opdata[i].adjustment_height = node->params.deconvolution_2d.adjustment_height;
-        runtime->opdata[i].adjustment_width = node->params.deconvolution_2d.adjustment_width;
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_depthwise_convolution_2d:
-      {
-        assert(values[node->inputs[1]].data != NULL);
-        const void* bias_data = NULL;
-        if (node->num_inputs > 2) {
-          bias_data = values[node->inputs[2]].data;
-          assert(bias_data != NULL);
-        }
-        if (values[node->outputs[0]].layout == xnn_layout_type_nchw) {
-          assert(values[node->inputs[0]].layout == xnn_layout_type_nchw);
-          status = xnn_create_convolution2d_nchw_f32(
-            node->params.depthwise_convolution_2d.input_padding_top,
-            node->params.depthwise_convolution_2d.input_padding_right,
-            node->params.depthwise_convolution_2d.input_padding_bottom,
-            node->params.depthwise_convolution_2d.input_padding_left,
-            node->params.depthwise_convolution_2d.kernel_height,
-            node->params.depthwise_convolution_2d.kernel_width,
-            node->params.depthwise_convolution_2d.subsampling_height,
-            node->params.depthwise_convolution_2d.subsampling_width,
-            node->params.depthwise_convolution_2d.dilation_height,
-            node->params.depthwise_convolution_2d.dilation_width,
-            node->params.depthwise_convolution_2d.input_channels /* groups */,
-            1 /* group_input_channels */,
-            node->params.depthwise_convolution_2d.depth_multiplier /* group_output_channels */,
-            node->params.depthwise_convolution_2d.input_channels /* input_channel_stride */,
-            node->params.depthwise_convolution_2d.input_channels * node->params.depthwise_convolution_2d.depth_multiplier /* output_channel_stride */,
-            values[node->inputs[1]].data,
-            bias_data,
-            node->activation.output_min,
-            node->activation.output_max,
-            node->flags | XNN_FLAG_DEPTHWISE_CONVOLUTION,
-            &runtime->opdata[i].operator_object);
-        } else {
-          assert(values[node->inputs[0]].layout == xnn_layout_type_nhwc);
-          assert(values[node->outputs[0]].layout == xnn_layout_type_nhwc);
-          switch (values[node->inputs[1]].datatype) {
-            case xnn_datatype_fp32:
-              status = xnn_create_convolution2d_nhwc_f32(
-                node->params.depthwise_convolution_2d.input_padding_top,
-                node->params.depthwise_convolution_2d.input_padding_right,
-                node->params.depthwise_convolution_2d.input_padding_bottom,
-                node->params.depthwise_convolution_2d.input_padding_left,
-                node->params.depthwise_convolution_2d.kernel_height,
-                node->params.depthwise_convolution_2d.kernel_width,
-                node->params.depthwise_convolution_2d.subsampling_height,
-                node->params.depthwise_convolution_2d.subsampling_width,
-                node->params.depthwise_convolution_2d.dilation_height,
-                node->params.depthwise_convolution_2d.dilation_width,
-                node->params.depthwise_convolution_2d.input_channels /* groups */,
-                1 /* group_input_channels */,
-                node->params.depthwise_convolution_2d.depth_multiplier /* group_output_channels */,
-                node->params.depthwise_convolution_2d.input_channels /* input_channel_stride */,
-                node->params.depthwise_convolution_2d.input_channels * node->params.depthwise_convolution_2d.depth_multiplier /* output_channel_stride */,
-                values[node->inputs[1]].data,
-                bias_data,
-                node->activation.output_min,
-                node->activation.output_max,
-                node->flags | XNN_FLAG_DEPTHWISE_CONVOLUTION,
-                &runtime->opdata[i].operator_object);
-              break;
-#ifndef XNN_NO_QS8_OPERATORS
-            case xnn_datatype_qint8:
-            {
-              const float output_scale = values[node->outputs[0]].quantization.scale;
-              const int32_t output_zero_point = values[node->outputs[0]].quantization.zero_point;
-              const int8_t output_min =
-                (int8_t) lrintf(fminf(fmaxf(node->activation.output_min / output_scale + (float) output_zero_point, -128.0f), 127.0f));
-              const int8_t output_max =
-                (int8_t) lrintf(fminf(fmaxf(node->activation.output_max / output_scale + (float) output_zero_point, -128.0f), 127.0f));
-              status = xnn_create_convolution2d_nhwc_qs8(
-                node->params.depthwise_convolution_2d.input_padding_top,
-                node->params.depthwise_convolution_2d.input_padding_right,
-                node->params.depthwise_convolution_2d.input_padding_bottom,
-                node->params.depthwise_convolution_2d.input_padding_left,
-                node->params.depthwise_convolution_2d.kernel_height,
-                node->params.depthwise_convolution_2d.kernel_width,
-                node->params.depthwise_convolution_2d.subsampling_height,
-                node->params.depthwise_convolution_2d.subsampling_width,
-                node->params.depthwise_convolution_2d.dilation_height,
-                node->params.depthwise_convolution_2d.dilation_width,
-                node->params.depthwise_convolution_2d.input_channels /* groups */,
-                1 /* group_input_channels */,
-                node->params.depthwise_convolution_2d.depth_multiplier /* group_output_channels */,
-                node->params.depthwise_convolution_2d.input_channels /* input_channel_stride */,
-                node->params.depthwise_convolution_2d.input_channels * node->params.depthwise_convolution_2d.depth_multiplier /* output_channel_stride */,
-                (int8_t) values[node->inputs[0]].quantization.zero_point,
-                values[node->inputs[0]].quantization.scale,
-                values[node->inputs[1]].quantization.scale,
-                values[node->inputs[1]].data,
-                bias_data,
-                (int8_t) output_zero_point,
-                output_scale, output_min, output_max,
-                node->flags | XNN_FLAG_DEPTHWISE_CONVOLUTION,
-                &runtime->opdata[i].operator_object);
-              break;
-            }
-            case xnn_datatype_qcint8:
-            {
-              const float output_scale = values[node->outputs[0]].quantization.scale;
-              const int32_t output_zero_point = values[node->outputs[0]].quantization.zero_point;
-              const int8_t output_min =
-                (int8_t) lrintf(fminf(fmaxf(node->activation.output_min / output_scale + (float) output_zero_point, -128.0f), 127.0f));
-              const int8_t output_max =
-                (int8_t) lrintf(fminf(fmaxf(node->activation.output_max / output_scale + (float) output_zero_point, -128.0f), 127.0f));
-              status = xnn_create_convolution2d_nhwc_qc8(
-                node->params.depthwise_convolution_2d.input_padding_top,
-                node->params.depthwise_convolution_2d.input_padding_right,
-                node->params.depthwise_convolution_2d.input_padding_bottom,
-                node->params.depthwise_convolution_2d.input_padding_left,
-                node->params.depthwise_convolution_2d.kernel_height,
-                node->params.depthwise_convolution_2d.kernel_width,
-                node->params.depthwise_convolution_2d.subsampling_height,
-                node->params.depthwise_convolution_2d.subsampling_width,
-                node->params.depthwise_convolution_2d.dilation_height,
-                node->params.depthwise_convolution_2d.dilation_width,
-                node->params.depthwise_convolution_2d.input_channels /* groups */,
-                1 /* group_input_channels */,
-                node->params.depthwise_convolution_2d.depth_multiplier /* group_output_channels */,
-                node->params.depthwise_convolution_2d.input_channels /* input_channel_stride */,
-                node->params.depthwise_convolution_2d.input_channels * node->params.depthwise_convolution_2d.depth_multiplier /* output_channel_stride */,
-                (int8_t) values[node->inputs[0]].quantization.zero_point,
-                values[node->inputs[0]].quantization.scale,
-                values[node->inputs[1]].quantization.channelwise_scale,
-                values[node->inputs[1]].data,
-                bias_data,
-                (int8_t) output_zero_point,
-                output_scale, output_min, output_max,
-                node->flags | XNN_FLAG_DEPTHWISE_CONVOLUTION,
-                &runtime->opdata[i].operator_object);
-              break;
-            }
-#endif  // !defined(XNN_NO_QS8_OPERATORS)
-#ifndef XNN_NO_QU8_OPERATORS
-            case xnn_datatype_quint8:
-            {
-              const float output_scale = values[node->outputs[0]].quantization.scale;
-              const int32_t output_zero_point = values[node->outputs[0]].quantization.zero_point;
-              const uint8_t output_min =
-                (uint8_t) lrintf(fminf(fmaxf(node->activation.output_min / output_scale + (float) output_zero_point, 0.0f), 255.0f));
-              const uint8_t output_max =
-                (uint8_t) lrintf(fminf(fmaxf(node->activation.output_max / output_scale + (float) output_zero_point, 0.0f), 255.0f));
-              status = xnn_create_convolution2d_nhwc_qu8(
-                node->params.depthwise_convolution_2d.input_padding_top,
-                node->params.depthwise_convolution_2d.input_padding_right,
-                node->params.depthwise_convolution_2d.input_padding_bottom,
-                node->params.depthwise_convolution_2d.input_padding_left,
-                node->params.depthwise_convolution_2d.kernel_height,
-                node->params.depthwise_convolution_2d.kernel_width,
-                node->params.depthwise_convolution_2d.subsampling_height,
-                node->params.depthwise_convolution_2d.subsampling_width,
-                node->params.depthwise_convolution_2d.dilation_height,
-                node->params.depthwise_convolution_2d.dilation_width,
-                node->params.depthwise_convolution_2d.input_channels /* groups */,
-                1 /* group_input_channels */,
-                node->params.depthwise_convolution_2d.depth_multiplier /* group_output_channels */,
-                node->params.depthwise_convolution_2d.input_channels /* input_channel_stride */,
-                node->params.depthwise_convolution_2d.input_channels * node->params.depthwise_convolution_2d.depth_multiplier /* output_channel_stride */,
-                (uint8_t) values[node->inputs[0]].quantization.zero_point,
-                values[node->inputs[0]].quantization.scale,
-                (uint8_t) values[node->inputs[1]].quantization.zero_point,
-                values[node->inputs[1]].quantization.scale,
-                values[node->inputs[1]].data,
-                bias_data,
-                (uint8_t) output_zero_point,
-                output_scale, output_min, output_max,
-                node->flags | XNN_FLAG_DEPTHWISE_CONVOLUTION,
-                &runtime->opdata[i].operator_object);
-              break;
-            }
-#endif  // !defined(XNN_NO_QU8_OPERATORS)
-            default:
-              XNN_UNREACHABLE;
-          }
-        }
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = values[node->inputs[0]].shape.dim[0];
-        runtime->opdata[i].input_height = values[node->inputs[0]].shape.dim[1];
-        runtime->opdata[i].input_width = values[node->inputs[0]].shape.dim[2];
 
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
+    // Ignore fused nodes
+    if (node->type != xnn_node_type_invalid) {
+      assert(node->create != NULL);
+      status = node->create(node, values, subgraph->num_values, runtime->opdata + i, &caches);
+      if (status != xnn_status_success) {
+        goto error;
       }
-      case xnn_node_type_depth_to_space:
-        status = xnn_status_unsupported_parameter;
-        if (values[node->inputs[0]].layout == xnn_layout_type_nchw) {
-          assert(values[node->outputs[0]].layout == xnn_layout_type_nhwc);
-          status = xnn_create_depth_to_space_nchw2nhwc_x32(
-              values[node->outputs[0]].shape.dim[values[node->outputs[0]].shape.num_dims - 1] /* output channels */,
-              values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-              values[node->outputs[0]].shape.dim[values[node->outputs[0]].shape.num_dims - 1] /* output stride */,
-              node->params.depth_to_space.block_size,
-              node->flags,
-              &runtime->opdata[i].operator_object);
-        } else {
-          assert(values[node->inputs[0]].layout == xnn_layout_type_nhwc);
-          assert(values[node->outputs[0]].layout == xnn_layout_type_nhwc);
-          status = xnn_create_depth_to_space_nhwc_x32(
-              values[node->outputs[0]].shape.dim[values[node->outputs[0]].shape.num_dims - 1] /* output channels */,
-              values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-              values[node->outputs[0]].shape.dim[values[node->outputs[0]].shape.num_dims - 1] /* output stride */,
-              node->params.depth_to_space.block_size,
-              node->flags,
-              &runtime->opdata[i].operator_object);
-        }
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = values[node->inputs[0]].shape.dim[0];
-        runtime->opdata[i].input_height = values[node->inputs[0]].shape.dim[1];
-        runtime->opdata[i].input_width = values[node->inputs[0]].shape.dim[2];
-        runtime->opdata[i].output_height = values[node->outputs[0]].shape.dim[1];
-        runtime->opdata[i].output_width = values[node->outputs[0]].shape.dim[2];
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_divide:
-        status = xnn_create_divide_nd_f32(
-          node->activation.output_min,
-          node->activation.output_max,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].shape1.num_dims = values[node->inputs[0]].shape.num_dims;
-        runtime->opdata[i].shape2.num_dims = values[node->inputs[1]].shape.num_dims;
-        memcpy(runtime->opdata[i].shape1.dim, values[node->inputs[0]].shape.dim, values[node->inputs[0]].shape.num_dims * sizeof(size_t));
-        memcpy(runtime->opdata[i].shape2.dim, values[node->inputs[1]].shape.dim, values[node->inputs[1]].shape.num_dims * sizeof(size_t));
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].inputs[1] = node->inputs[1];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_elu:
-        status = xnn_create_elu_nc_f32(
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->params.elu.alpha,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = product_non_channel_dims(&values[node->inputs[0]].shape);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_fully_connected:
-      {
-        const size_t num_input_elements = product_all_dims(&values[node->inputs[0]].shape);
-        size_t output_channels, input_channels;
-        if (node->flags & XNN_FLAG_TRANSPOSE_WEIGHTS) {
-          input_channels = values[node->inputs[1]].shape.dim[0];
-          output_channels = values[node->inputs[1]].shape.dim[1];
-        } else {
-          output_channels = values[node->inputs[1]].shape.dim[0];
-          input_channels = values[node->inputs[1]].shape.dim[1];
-        }
-        const void* bias_data = NULL;
-        if (node->num_inputs > 2) {
-          bias_data = values[node->inputs[2]].data;
-        }
-        switch (values[node->outputs[0]].datatype) {
-          case xnn_datatype_fp32:
-            status = xnn_create_fully_connected_nc_f32(
-              input_channels,
-              output_channels,
-              input_channels /* input stride */,
-              output_channels /* output stride */,
-              values[node->inputs[1]].data,
-              bias_data,
-              node->activation.output_min,
-              node->activation.output_max,
-              node->flags /* flags */,
-              &runtime->opdata[i].operator_object);
-            break;
-#ifndef XNN_NO_QS8_OPERATORS
-          case xnn_datatype_qint8:
-          {
-            const float output_scale = values[node->outputs[0]].quantization.scale;
-            const int32_t output_zero_point = values[node->outputs[0]].quantization.zero_point;
-            const int8_t output_min =
-              (int8_t) lrintf(fminf(fmaxf(node->activation.output_min / output_scale + (float) output_zero_point, -128.0f), 127.0f));
-            const int8_t output_max =
-              (int8_t) lrintf(fminf(fmaxf(node->activation.output_max / output_scale + (float) output_zero_point, -128.0f), 127.0f));
-            status = xnn_create_fully_connected_nc_qs8(
-              input_channels,
-              output_channels,
-              input_channels /* input stride */,
-              output_channels /* output stride */,
-              (int8_t) values[node->inputs[0]].quantization.zero_point,
-              values[node->inputs[0]].quantization.scale,
-              values[node->inputs[1]].quantization.scale,
-              values[node->inputs[1]].data,
-              bias_data,
-              (int8_t) output_zero_point,
-              output_scale, output_min, output_max,
-              node->flags /* flags */,
-              &runtime->opdata[i].operator_object);
-            break;
-          }
-#endif  // !defined(XNN_NO_QS8_OPERATORS)
-#ifndef XNN_NO_QU8_OPERATORS
-          case xnn_datatype_quint8:
-          {
-            const float output_scale = values[node->outputs[0]].quantization.scale;
-            const int32_t output_zero_point = values[node->outputs[0]].quantization.zero_point;
-            const uint8_t output_min =
-              (uint8_t) lrintf(fminf(fmaxf(node->activation.output_min / output_scale + (float) output_zero_point, 0.0f), 255.0f));
-            const uint8_t output_max =
-              (uint8_t) lrintf(fminf(fmaxf(node->activation.output_max / output_scale + (float) output_zero_point, 0.0f), 255.0f));
-            status = xnn_create_fully_connected_nc_qu8(
-              input_channels,
-              output_channels,
-              input_channels /* input stride */,
-              output_channels /* output stride */,
-              (uint8_t) values[node->inputs[0]].quantization.zero_point,
-              values[node->inputs[0]].quantization.scale,
-              (uint8_t) values[node->inputs[1]].quantization.zero_point,
-              values[node->inputs[1]].quantization.scale,
-              values[node->inputs[1]].data,
-              bias_data,
-              (uint8_t) output_zero_point,
-              output_scale, output_min, output_max,
-              node->flags /* flags */,
-              &runtime->opdata[i].operator_object);
-            break;
-          }
-#endif  // !defined(XNN_NO_QU8_OPERATORS)
-          default:
-            XNN_UNREACHABLE;
-        }
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = num_input_elements / input_channels;
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      }
-      case xnn_node_type_floor:
-        status = xnn_create_floor_nc_f32(
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = product_non_channel_dims(&values[node->inputs[0]].shape);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_global_average_pooling_2d:
-        if (values[node->inputs[0]].layout == xnn_layout_type_nchw) {
-          status = xnn_create_global_average_pooling_ncw_f32(
-            values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-            node->activation.output_min,
-            node->activation.output_max,
-            node->flags,
-            &runtime->opdata[i].operator_object);
-        } else {
-          assert(values[node->inputs[0]].layout == xnn_layout_type_nhwc);
-          assert(values[node->outputs[0]].layout == xnn_layout_type_nhwc);
-          status = xnn_create_global_average_pooling_nwc_f32(
-            values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-            values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-            values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-            node->activation.output_min,
-            node->activation.output_max,
-            node->flags,
-            &runtime->opdata[i].operator_object);
-        }
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = values[node->inputs[0]].shape.dim[0];
-        runtime->opdata[i].input_width = values[node->inputs[0]].shape.dim[1] * values[node->inputs[0]].shape.dim[2];
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_hardswish:
-        status = xnn_create_hardswish_nc_f32(
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = product_non_channel_dims(&values[node->inputs[0]].shape);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_leaky_relu:
-        status = xnn_create_leaky_relu_nc_f32(
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->params.leaky_relu.negative_slope,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = product_non_channel_dims(&values[node->inputs[0]].shape);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_max_pooling_2d:
-        status = xnn_create_max_pooling2d_nhwc_f32(
-          node->params.pooling_2d.padding_top,
-          node->params.pooling_2d.padding_right,
-          node->params.pooling_2d.padding_bottom,
-          node->params.pooling_2d.padding_left,
-          node->params.pooling_2d.pooling_height,
-          node->params.pooling_2d.pooling_width,
-          node->params.pooling_2d.stride_height,
-          node->params.pooling_2d.stride_width,
-          node->params.pooling_2d.dilation_height,
-          node->params.pooling_2d.dilation_width,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->activation.output_min,
-          node->activation.output_max,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = values[node->inputs[0]].shape.dim[0];
-        runtime->opdata[i].input_height = values[node->inputs[0]].shape.dim[1];
-        runtime->opdata[i].input_width = values[node->inputs[0]].shape.dim[2];
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_maximum2:
-        status = xnn_create_maximum_nd_f32(
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].shape1.num_dims = values[node->inputs[0]].shape.num_dims;
-        runtime->opdata[i].shape2.num_dims = values[node->inputs[1]].shape.num_dims;
-        memcpy(runtime->opdata[i].shape1.dim, values[node->inputs[0]].shape.dim, values[node->inputs[0]].shape.num_dims * sizeof(size_t));
-        memcpy(runtime->opdata[i].shape2.dim, values[node->inputs[1]].shape.dim, values[node->inputs[1]].shape.num_dims * sizeof(size_t));
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].inputs[1] = node->inputs[1];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_minimum2:
-        status = xnn_create_minimum_nd_f32(
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].shape1.num_dims = values[node->inputs[0]].shape.num_dims;
-        runtime->opdata[i].shape2.num_dims = values[node->inputs[1]].shape.num_dims;
-        memcpy(runtime->opdata[i].shape1.dim, values[node->inputs[0]].shape.dim, values[node->inputs[0]].shape.num_dims * sizeof(size_t));
-        memcpy(runtime->opdata[i].shape2.dim, values[node->inputs[1]].shape.dim, values[node->inputs[1]].shape.num_dims * sizeof(size_t));
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].inputs[1] = node->inputs[1];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_multiply2:
-        status = xnn_create_multiply_nd_f32(
-          node->activation.output_min,
-          node->activation.output_max,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].shape1.num_dims = values[node->inputs[0]].shape.num_dims;
-        runtime->opdata[i].shape2.num_dims = values[node->inputs[1]].shape.num_dims;
-        if (values[node->outputs[0]].layout == xnn_layout_type_nchw) {
-          assert(values[node->inputs[0]].layout == xnn_layout_type_nchw);
-          assert(values[node->inputs[1]].layout == xnn_layout_type_nchw);
-          runtime->opdata[i].shape1.dim[0] = values[node->inputs[0]].shape.dim[0];
-          runtime->opdata[i].shape1.dim[1] = values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1];
-          if (values[node->inputs[0]].shape.num_dims > 2) {
-            memcpy(&runtime->opdata[i].shape1.dim[2], &values[node->inputs[0]].shape.dim[1], (values[node->inputs[0]].shape.num_dims - 2) * sizeof(size_t));
-          }
-          runtime->opdata[i].shape2.dim[0] = values[node->inputs[1]].shape.dim[0];
-          runtime->opdata[i].shape2.dim[1] = values[node->inputs[1]].shape.dim[values[node->inputs[0]].shape.num_dims - 1];
-          if (values[node->inputs[0]].shape.num_dims > 2) {
-            memcpy(&runtime->opdata[i].shape2.dim[2], &values[node->inputs[1]].shape.dim[1], (values[node->inputs[1]].shape.num_dims - 2) * sizeof(size_t));
-          }
-        } else {
-          assert(values[node->outputs[0]].layout == xnn_layout_type_nhwc);
-          assert(values[node->inputs[0]].layout == xnn_layout_type_nhwc);
-          assert(values[node->inputs[1]].layout == xnn_layout_type_nhwc);
-          memcpy(runtime->opdata[i].shape1.dim, values[node->inputs[0]].shape.dim, values[node->inputs[0]].shape.num_dims * sizeof(size_t));
-          memcpy(runtime->opdata[i].shape2.dim, values[node->inputs[1]].shape.dim, values[node->inputs[1]].shape.num_dims * sizeof(size_t));
-        }
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].inputs[1] = node->inputs[1];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_negate:
-        status = xnn_create_negate_nc_f32(
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = product_non_channel_dims(&values[node->inputs[0]].shape);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_prelu:
-        status = xnn_create_prelu_nc_f32(
-          values[node->inputs[1]].shape.dim[values[node->inputs[1]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[1]].shape.dim[values[node->inputs[1]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[1]].shape.dim[values[node->inputs[1]].shape.num_dims - 1] /* output stride */,
-          values[node->inputs[1]].data /* negative slope */,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = product_non_channel_dims(&values[node->inputs[0]].shape);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_sigmoid:
-        status = xnn_create_sigmoid_nc_f32(
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = product_non_channel_dims(&values[node->inputs[0]].shape);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_softmax:
-        status = xnn_create_softmax_nc_f32(
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = product_non_channel_dims(&values[node->inputs[0]].shape);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_static_constant_pad:
-        status = xnn_create_constant_pad_nd_x32(
-          &node->params.static_pad.padding_value,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].shape1 = values[node->inputs[0]].shape;
-        memcpy(runtime->opdata[i].pre_paddings, node->params.static_pad.pre_paddings, sizeof(size_t) * XNN_MAX_TENSOR_DIMS);
-        memcpy(runtime->opdata[i].post_paddings, node->params.static_pad.post_paddings, sizeof(size_t) * XNN_MAX_TENSOR_DIMS);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_static_reshape:
-        status = xnn_create_copy_nc_x32(
-          1 /* channels */,
-          1 /* input stride */,
-          1 /* output stride */,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = product_all_dims(&values[node->inputs[0]].shape);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_static_resize_bilinear_2d:
-        if (values[node->inputs[0]].layout == xnn_layout_type_nchw) {
-          status = xnn_create_resize_bilinear2d_nchw_f32(
-            values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-            values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-            values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-            node->flags,
-            &runtime->opdata[i].operator_object);
-        } else {
-          assert(values[node->inputs[0]].layout == xnn_layout_type_nhwc);
-          assert(values[node->outputs[0]].layout == xnn_layout_type_nhwc);
-          status = xnn_create_resize_bilinear2d_nhwc_f32(
-            values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-            values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-            values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-            node->flags,
-            &runtime->opdata[i].operator_object);
-        }
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = values[node->inputs[0]].shape.dim[0];
-        runtime->opdata[i].input_height = values[node->inputs[0]].shape.dim[1];
-        runtime->opdata[i].input_width = values[node->inputs[0]].shape.dim[2];
-        runtime->opdata[i].output_height = values[node->outputs[0]].shape.dim[1];
-        runtime->opdata[i].output_width = values[node->outputs[0]].shape.dim[2];
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_square:
-        status = xnn_create_square_nc_f32(
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = product_non_channel_dims(&values[node->inputs[0]].shape);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_square_root:
-        status = xnn_create_square_root_nc_f32(
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = product_non_channel_dims(&values[node->inputs[0]].shape);
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_squared_difference:
-        status = xnn_create_squared_difference_nd_f32(
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].shape1.num_dims = values[node->inputs[0]].shape.num_dims;
-        runtime->opdata[i].shape2.num_dims = values[node->inputs[1]].shape.num_dims;
-        memcpy(runtime->opdata[i].shape1.dim, values[node->inputs[0]].shape.dim, values[node->inputs[0]].shape.num_dims * sizeof(size_t));
-        memcpy(runtime->opdata[i].shape2.dim, values[node->inputs[1]].shape.dim, values[node->inputs[1]].shape.num_dims * sizeof(size_t));
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].inputs[1] = node->inputs[1];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_subtract:
-        status = xnn_create_subtract_nd_f32(
-          node->activation.output_min,
-          node->activation.output_max,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].shape1.num_dims = values[node->inputs[0]].shape.num_dims;
-        runtime->opdata[i].shape2.num_dims = values[node->inputs[1]].shape.num_dims;
-        memcpy(runtime->opdata[i].shape1.dim, values[node->inputs[0]].shape.dim, values[node->inputs[0]].shape.num_dims * sizeof(size_t));
-        memcpy(runtime->opdata[i].shape2.dim, values[node->inputs[1]].shape.dim, values[node->inputs[1]].shape.num_dims * sizeof(size_t));
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].inputs[1] = node->inputs[1];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
-      case xnn_node_type_unpooling_2d:
-        status = xnn_create_unpooling2d_nhwc_x32(
-          node->params.pooling_2d.padding_top,
-          node->params.pooling_2d.padding_right,
-          node->params.pooling_2d.padding_bottom,
-          node->params.pooling_2d.padding_left,
-          node->params.pooling_2d.pooling_height,
-          node->params.pooling_2d.pooling_width,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* channels */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* input stride */,
-          values[node->inputs[0]].shape.dim[values[node->inputs[0]].shape.num_dims - 1] /* output stride */,
-          node->flags,
-          &runtime->opdata[i].operator_object);
-        if (status != xnn_status_success) {
-          goto error;
-        }
-        runtime->opdata[i].batch_size = values[node->inputs[0]].shape.dim[0];
-        runtime->opdata[i].input_height = values[node->inputs[0]].shape.dim[1];
-        runtime->opdata[i].input_width = values[node->inputs[0]].shape.dim[2];
-        runtime->opdata[i].inputs[0] = node->inputs[0];
-        runtime->opdata[i].inputs[1] = node->inputs[1];
-        runtime->opdata[i].outputs[0] = node->outputs[0];
-        break;
+      runtime->opdata[i].setup = node->setup;
     }
   }
+
+#if XNN_PLATFORM_JIT && XNN_ENABLE_JIT
+  xnn_finalize_code_memory(&code_cache->cache.code);
+#endif
 
   runtime->blobs = xnn_allocate_zero_memory(sizeof(struct xnn_blob) * subgraph->num_values);
   if (runtime->blobs == NULL) {
     xnn_log_error("failed to allocate %zu bytes for blob descriptors",
-      sizeof(struct xnn_blob) * subgraph->num_values);
+      sizeof(struct xnn_blob) * (size_t) subgraph->num_values);
     goto error;
   }
   runtime->num_blobs = subgraph->num_values;
@@ -1226,44 +321,42 @@ enum xnn_status xnn_create_runtime_v2(
   xnn_init_value_allocation_tracker(&mem_alloc_tracker, subgraph);
 
   for (uint32_t i = 0; i < subgraph->num_values; i++) {
-    const struct xnn_value* value = &subgraph->values[i];
+    struct xnn_value* value = &subgraph->values[i];
     struct xnn_blob* blob = &runtime->blobs[i];
     if (value->datatype != xnn_datatype_invalid && value->type == xnn_value_type_dense_tensor) {
       blob->size = xnn_tensor_get_size(subgraph, i);
-      blob->data = (void*) value->data;
+      blob->data = (void*) (uintptr_t) value->data;
       if (blob->data == NULL) {
         if ((value->flags & (XNN_VALUE_FLAG_EXTERNAL_INPUT | XNN_VALUE_FLAG_EXTERNAL_OUTPUT)) == 0) {
           // Value is purely internal to the runtime, and must be allocated in its workspace.
           xnn_add_value_allocation_tracker(&mem_alloc_tracker, i, round_up_po2(blob->size, XNN_EXTRA_BYTES));
+          blob->allocation_type = xnn_allocation_type_workspace;
         } else {
           // Value is non-static and external to the runtime: must be specified via a call to xnn_setup_runtime.
-          blob->external = true;
+          blob->allocation_type = xnn_allocation_type_external;
         }
+      } else {
+        blob->allocation_type = xnn_allocation_type_static;
       }
     }
   }
   xnn_plan_value_allocation_tracker(&mem_alloc_tracker);
 
-  if (mem_alloc_tracker.mem_arena_size != 0) {
-    // XNN_EXTRA_BYTES ensures that out-of-bound reads of intermediate values don't segfault.
-    const size_t mem_arena_size = mem_alloc_tracker.mem_arena_size + XNN_EXTRA_BYTES;
-    runtime->workspace = xnn_allocate_simd_memory(mem_arena_size);
-    if (runtime->workspace == NULL) {
-      xnn_log_error("failed to allocate %zu bytes for runtime workspace", mem_arena_size);
-      xnn_release_value_allocation_tracker(&mem_alloc_tracker);
-      goto error;
-    }
-    for (size_t i = 0; i < subgraph->num_values; i++) {
-      const struct xnn_value* value = &subgraph->values[i];
-      struct xnn_blob* blob = &runtime->blobs[i];
-      if (value->datatype != xnn_datatype_invalid && value->type == xnn_value_type_dense_tensor) {
-        if (value->data == NULL && !blob->external) {
-          // Value is purely internal to the runtime, allocate it in the workspace.
-          blob->data = (void*) ((uintptr_t) runtime->workspace + mem_alloc_tracker.usage[i].alloc_offset);
-        }
-      }
-    }
+  xnn_retain_workspace(workspace);
+  runtime->workspace = workspace;
+  runtime->next_workspace_user = runtime->workspace->first_user;
+  runtime->workspace->first_user = runtime;
+
+  status = initialize_workspace_blobs(subgraph, runtime, &mem_alloc_tracker);
+  if (status != xnn_status_success) {
+    xnn_release_value_allocation_tracker(&mem_alloc_tracker);
+    goto error;
   }
+
+  if (flags & XNN_FLAG_BASIC_PROFILING) {
+    runtime->profiling = true;
+  }
+
   xnn_release_value_allocation_tracker(&mem_alloc_tracker);
 
   runtime->threadpool = threadpool;
@@ -1293,7 +386,7 @@ enum xnn_status xnn_setup_runtime(
     }
 
     const struct xnn_blob* blob = &runtime->blobs[value_id];
-    if (!blob->external) {
+    if (blob->allocation_type != xnn_allocation_type_external) {
       xnn_log_error("failed to setup runtime: Value %" PRIu32 " is not external", value_id);
       return xnn_status_invalid_parameter;
     }
@@ -1309,558 +402,20 @@ enum xnn_status xnn_setup_runtime(
 
   for (size_t i = 0; i < runtime->num_ops; i++) {
     const struct xnn_operator_data* opdata = &runtime->opdata[i];
-    if (opdata->operator_object == NULL) {
+    if (opdata->operator_objects[0] == NULL) {
       // Operator was removed during optimization
       continue;
     }
 
-    enum xnn_status status = xnn_status_success;
-    switch (opdata->operator_object->type) {
-      case xnn_operator_type_abs_nc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_abs_nc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_add_nd_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->inputs[1]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_add_nd_f32(
-          opdata->operator_object,
-          opdata->shape1.num_dims,
-          opdata->shape1.dim,
-          opdata->shape2.num_dims,
-          opdata->shape2.dim,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->inputs[1]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-#ifndef XNN_NO_QS8_OPERATORS
-      case xnn_operator_type_add_nd_qs8:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->inputs[1]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_add_nd_qs8(
-          opdata->operator_object,
-          opdata->shape1.num_dims,
-          opdata->shape1.dim,
-          opdata->shape2.num_dims,
-          opdata->shape2.dim,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->inputs[1]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-#endif  // !defined(XNN_NO_QS8_OPERATORS)
-#ifndef XNN_NO_QU8_OPERATORS
-      case xnn_operator_type_add_nd_qu8:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->inputs[1]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_add_nd_qu8(
-          opdata->operator_object,
-          opdata->shape1.num_dims,
-          opdata->shape1.dim,
-          opdata->shape2.num_dims,
-          opdata->shape2.dim,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->inputs[1]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-#endif  // !defined(XNN_NO_QU8_OPERATORS)
-      case xnn_operator_type_argmax_pooling_nhwc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[1]].data != NULL);
-        status = xnn_setup_argmax_pooling2d_nhwc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          opdata->input_height,
-          opdata->input_width,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->blobs[opdata->outputs[1]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_average_pooling_nhwc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_average_pooling2d_nhwc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          opdata->input_height,
-          opdata->input_width,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_bankers_rounding_nc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_bankers_rounding_nc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_ceiling_nc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_ceiling_nc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_constant_pad_nd_x32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_constant_pad_nd_x32(
-          opdata->operator_object,
-          opdata->shape1.num_dims,
-          opdata->shape1.dim,
-          opdata->pre_paddings,
-          opdata->post_paddings,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_convolution_nchw_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_convolution2d_nchw_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          opdata->input_height,
-          opdata->input_width,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_convolution_nhwc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_convolution2d_nhwc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          opdata->input_height,
-          opdata->input_width,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-#ifndef XNN_NO_QS8_OPERATORS
-      case xnn_operator_type_convolution_nhwc_qc8:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_convolution2d_nhwc_qc8(
-          opdata->operator_object,
-          opdata->batch_size,
-          opdata->input_height,
-          opdata->input_width,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_convolution_nhwc_qs8:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_convolution2d_nhwc_qs8(
-          opdata->operator_object,
-          opdata->batch_size,
-          opdata->input_height,
-          opdata->input_width,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-#endif  // !defined(XNN_NO_QS8_OPERATORS)
-#ifndef XNN_NO_QU8_OPERATORS
-      case xnn_operator_type_convolution_nhwc_qu8:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_convolution2d_nhwc_qu8(
-          opdata->operator_object,
-          opdata->batch_size,
-          opdata->input_height,
-          opdata->input_width,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-#endif  // !defined(XNN_NO_QU8_OPERATORS)
-      case xnn_operator_type_copy_nc_x32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_copy_nc_x32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_clamp_nc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_clamp_nc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_deconvolution_nhwc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_deconvolution2d_nhwc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          opdata->input_height,
-          opdata->input_width,
-          opdata->adjustment_height,
-          opdata->adjustment_width,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_depth_to_space_nchw2nhwc_x32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_depth_to_space_nchw2nhwc_x32(
-            opdata->operator_object,
-            opdata->batch_size,
-            opdata->input_height,
-            opdata->input_width,
-            runtime->blobs[opdata->inputs[0]].data,
-            runtime->blobs[opdata->outputs[0]].data,
-            runtime->threadpool);
-        break;
-      case xnn_operator_type_depth_to_space_nhwc_x32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_depth_to_space_nhwc_x32(
-            opdata->operator_object,
-            opdata->batch_size,
-            opdata->input_height,
-            opdata->input_width,
-            runtime->blobs[opdata->inputs[0]].data,
-            runtime->blobs[opdata->outputs[0]].data,
-            runtime->threadpool);
-        break;
-      case xnn_operator_type_divide_nd_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->inputs[1]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_divide_nd_f32(
-          opdata->operator_object,
-          opdata->shape1.num_dims,
-          opdata->shape1.dim,
-          opdata->shape2.num_dims,
-          opdata->shape2.dim,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->inputs[1]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_elu_nc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_elu_nc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_fully_connected_nc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_fully_connected_nc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-#ifndef XNN_NO_QS8_OPERATORS
-      case xnn_operator_type_fully_connected_nc_qs8:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_fully_connected_nc_qs8(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-#endif  // !defined(XNN_NO_QS8_OPERATORS)
-#ifndef XNN_NO_QU8_OPERATORS
-      case xnn_operator_type_fully_connected_nc_qu8:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_fully_connected_nc_qu8(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-#endif  // !defined(XNN_NO_QU8_OPERATORS)
-      case xnn_operator_type_floor_nc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_floor_nc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_global_average_pooling_ncw_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_global_average_pooling_ncw_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          opdata->input_width,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_global_average_pooling_nwc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_global_average_pooling_nwc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          opdata->input_width,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_hardswish_nc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_hardswish_nc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_leaky_relu_nc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_leaky_relu_nc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_max_pooling_nhwc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_max_pooling2d_nhwc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          opdata->input_height,
-          opdata->input_width,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_maximum_nd_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->inputs[1]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_maximum_nd_f32(
-          opdata->operator_object,
-          opdata->shape1.num_dims,
-          opdata->shape1.dim,
-          opdata->shape2.num_dims,
-          opdata->shape2.dim,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->inputs[1]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_minimum_nd_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->inputs[1]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_minimum_nd_f32(
-          opdata->operator_object,
-          opdata->shape1.num_dims,
-          opdata->shape1.dim,
-          opdata->shape2.num_dims,
-          opdata->shape2.dim,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->inputs[1]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_multiply_nd_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->inputs[1]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_multiply_nd_f32(
-          opdata->operator_object,
-          opdata->shape1.num_dims,
-          opdata->shape1.dim,
-          opdata->shape2.num_dims,
-          opdata->shape2.dim,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->inputs[1]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_negate_nc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_negate_nc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_prelu_nc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_prelu_nc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_resize_bilinear_nchw_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_resize_bilinear2d_nchw_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          opdata->input_height,
-          opdata->input_width,
-          opdata->output_height,
-          opdata->output_width,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_resize_bilinear_nhwc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_resize_bilinear2d_nhwc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          opdata->input_height,
-          opdata->input_width,
-          opdata->output_height,
-          opdata->output_width,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_sigmoid_nc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_sigmoid_nc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_softmax_nc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_softmax_nc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_square_nc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_square_nc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_square_root_nc_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_square_root_nc_f32(
-          opdata->operator_object,
-          opdata->batch_size,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_squared_difference_nd_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->inputs[1]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_squared_difference_nd_f32(
-          opdata->operator_object,
-          opdata->shape1.num_dims,
-          opdata->shape1.dim,
-          opdata->shape2.num_dims,
-          opdata->shape2.dim,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->inputs[1]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_subtract_nd_f32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->inputs[1]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_subtract_nd_f32(
-          opdata->operator_object,
-          opdata->shape1.num_dims,
-          opdata->shape1.dim,
-          opdata->shape2.num_dims,
-          opdata->shape2.dim,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->inputs[1]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      case xnn_operator_type_unpooling_nhwc_x32:
-        assert(runtime->blobs[opdata->inputs[0]].data != NULL);
-        assert(runtime->blobs[opdata->inputs[1]].data != NULL);
-        assert(runtime->blobs[opdata->outputs[0]].data != NULL);
-        status = xnn_setup_unpooling2d_nhwc_x32(
-          opdata->operator_object,
-          opdata->batch_size,
-          opdata->input_height,
-          opdata->input_width,
-          runtime->blobs[opdata->inputs[0]].data,
-          runtime->blobs[opdata->inputs[1]].data,
-          runtime->blobs[opdata->outputs[0]].data,
-          runtime->threadpool);
-        break;
-      default:
-        xnn_log_fatal("unexpected operator type %s in operator #%zu",
-          xnn_operator_type_to_string(opdata->operator_object->type), i);
-        XNN_UNREACHABLE;
+    // Ensure that weights cache is finalized.
+    struct xnn_weights_cache* weights_cache = opdata->operator_objects[0]->weights_cache;
+    if (weights_cache != NULL && !xnn_weights_cache_is_finalized(weights_cache)) {
+      xnn_log_error("weights cache needs to be finalized before setup/infer");
+      return xnn_status_invalid_state;
     }
+
+    assert(opdata->setup != NULL);
+    const enum xnn_status status = opdata->setup(opdata, runtime->blobs, runtime->num_blobs, runtime->threadpool);
     if (status != xnn_status_success) {
       xnn_log_error("failed to setup runtime: error in operator #%zu", i);
       return status;
@@ -1870,18 +425,172 @@ enum xnn_status xnn_setup_runtime(
   return xnn_status_success;
 }
 
+static xnn_timestamp xnn_read_timer() {
+  xnn_timestamp timestamp;
+#ifdef __MACH__
+  timestamp = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
+  if (timestamp == 0) {
+    xnn_log_warning("clock_gettime failed: error code %d", errno);
+  }
+#elif __EMSCRIPTEN__
+  timestamp = emscripten_get_now();
+#elif XNN_PLATFORM_WINDOWS
+  BOOL res = QueryPerformanceCounter(&timestamp);
+  if (!res) {
+    xnn_log_error("QueryPerformanceCounter failed: error code %u", GetLastError());
+    memset(&timestamp, 0, sizeof(timestamp));
+  }
+#else
+  int res = clock_gettime(CLOCK_MONOTONIC, &timestamp);
+  if (res != 0) {
+    xnn_log_error("clock_gettime failed: error code %d", errno);
+    memset(&timestamp, 0, sizeof(timestamp));
+  }
+#endif
+  return timestamp;
+}
+
+static inline uint64_t xnn_get_elapsed_time(const xnn_timestamp* start, const xnn_timestamp* end) {
+#ifdef __MACH__
+  const uint64_t kMicrosInNanos = 1000;
+  return (*end - *start) / kMicrosInNanos;
+#elif __EMSCRIPTEN__
+  const double kMillisInMicros = 1.0e3;
+  return (uint64_t) ((*end - *start) * kMillisInMicros);
+#elif XNN_PLATFORM_WINDOWS
+  const uint64_t kMicrosInSec = 1000 * 1000;
+  LARGE_INTEGER frequency;
+  BOOL res = QueryPerformanceFrequency(&frequency);
+  if (!res) {
+    xnn_log_error("QueryPerformanceFrequency failed: error code %u", GetLastError());
+    return 0;
+  }
+  return ((end->QuadPart - start->QuadPart) * kMicrosInSec) / frequency.QuadPart;
+#else
+  const uint64_t kNanosInMicro = UINT64_C(1000);
+  const uint64_t kNanosInSec = UINT64_C(1000000000);
+  const uint64_t secs = (end->tv_sec - start->tv_sec) * kNanosInSec;
+  const uint64_t ns_secs = (end->tv_nsec - start->tv_nsec);
+  return (secs + ns_secs) / kNanosInMicro;
+#endif
+}
+
+enum xnn_status xnn_get_runtime_profiling_info(xnn_runtime_t runtime,
+                                               enum xnn_profile_info param_name,
+                                               size_t param_value_size,
+                                               void* param_value,
+                                               size_t* param_value_size_ret)
+{
+  if (!runtime->profiling) {
+    return xnn_status_invalid_state;
+  }
+  enum xnn_status status = xnn_status_success;
+  size_t required_size = 0;
+  const struct xnn_operator_data* opdata = runtime->opdata;
+  switch (param_name) {
+    case xnn_profile_info_num_operators:
+      required_size = sizeof(size_t);
+      if (param_value_size < required_size){
+        *param_value_size_ret = required_size;
+        status = xnn_status_out_of_memory;
+      } else {
+        size_t num_valid_ops = 0;
+        for (size_t i = 0; i < runtime->num_ops; ++i) {
+          if (opdata[i].operator_objects[0] != NULL) {
+            num_valid_ops += 1;
+          }
+        }
+        memcpy(param_value, &num_valid_ops, required_size);
+      }
+      break;
+    case xnn_profile_info_operator_name:
+      for (size_t i = 0; i < runtime->num_ops; ++i) {
+        if (opdata[i].operator_objects[0] != NULL) {
+          const char* op_name = xnn_operator_type_to_string(opdata[i].operator_objects[0]->type);
+          size_t op_name_len = strlen(op_name) + 1;
+          if (opdata[i].operator_objects[0]->ukernel.type != xnn_ukernel_type_default ) {
+            op_name_len += strlen(xnn_ukernel_type_to_string(opdata[i].operator_objects[0]->ukernel.type)) + 1;
+          }
+          required_size += op_name_len;
+        }
+      }
+      if (param_value_size < required_size) {
+        *param_value_size_ret = required_size;
+        status = xnn_status_out_of_memory;
+      } else {
+        char* name_out = (char*) param_value;
+        for (size_t i = 0; i < runtime->num_ops; ++i) {
+          if (opdata[i].operator_objects[0] != NULL) {
+            const char* op_name = xnn_operator_type_to_string(opdata[i].operator_objects[0]->type);
+            size_t op_name_len = strlen(op_name) + 1;
+            if (opdata[i].operator_objects[0]->ukernel.type != xnn_ukernel_type_default ) {
+              const char* ukernel_type = xnn_ukernel_type_to_string(opdata[i].operator_objects[0]->ukernel.type);
+              op_name_len += strlen(ukernel_type) + 1;
+              snprintf(name_out, op_name_len, "%s %s", op_name, ukernel_type);
+            } else {
+              snprintf(name_out, op_name_len, "%s", op_name);
+            }
+            name_out += op_name_len;
+          }
+        }
+      }
+      break;
+    case xnn_profile_info_operator_timing:
+    {
+      size_t num_valid_ops = 0;
+      for (size_t i = 0; i < runtime->num_ops; ++i) {
+        if (opdata[i].operator_objects[0] != NULL) {
+          num_valid_ops += 1;
+        }
+      }
+      required_size = num_valid_ops * sizeof(uint64_t);
+      if (param_value_size < required_size) {
+        *param_value_size_ret = required_size;
+        status = xnn_status_out_of_memory;
+      } else {
+        xnn_timestamp previous_ts = runtime->start_ts;
+        uint64_t* data = (uint64_t*) param_value;
+        for (size_t i = 0; i < runtime->num_ops; ++i) {
+          if (opdata[i].operator_objects[0] != NULL) {
+            uint64_t op_time = 0;
+            for (size_t j = 0; j < XNN_MAX_OPERATOR_OBJECTS; j++) {
+              if (opdata[i].operator_objects[j] != NULL) {
+                op_time += xnn_get_elapsed_time(&previous_ts, &opdata[i].end_ts[j]);
+                previous_ts = opdata[i].end_ts[j];
+              }
+            }
+            *data++ = op_time;
+          }
+        }
+      }
+      break;
+    }
+    default:
+      status = xnn_status_invalid_parameter;
+  }
+  return status;
+}
+
 enum xnn_status xnn_invoke_runtime(
   xnn_runtime_t runtime)
 {
+  if (runtime->profiling) {
+    runtime->start_ts = xnn_read_timer();
+  }
   for (size_t i = 0; i < runtime->num_ops; i++) {
-    if (runtime->opdata[i].operator_object == NULL) {
-      // Operator was removed after fusion
-      continue;
-    }
+    for (size_t j = 0; j < XNN_MAX_OPERATOR_OBJECTS; j++) {
+      if (runtime->opdata[i].operator_objects[j] == NULL) {
+        // Operator was removed after fusion
+        continue;
+      }
 
-    const enum xnn_status status = xnn_run_operator(runtime->opdata[i].operator_object, runtime->threadpool);
-    if (status != xnn_status_success) {
-      return status;
+      const enum xnn_status status = xnn_run_operator(runtime->opdata[i].operator_objects[j], runtime->threadpool);
+      if (status != xnn_status_success) {
+        return status;
+      }
+      if (runtime->profiling) {
+        runtime->opdata[i].end_ts[j] = xnn_read_timer();
+      }
     }
   }
   return xnn_status_success;
@@ -1893,13 +602,34 @@ enum xnn_status xnn_delete_runtime(
   if (runtime != NULL) {
     if (runtime->opdata != NULL) {
       for (size_t i = 0; i < runtime->num_ops; i++) {
-        xnn_delete_operator(runtime->opdata[i].operator_object);
+        for (size_t j = 0; j < XNN_MAX_OPERATOR_OBJECTS; j++) {
+          xnn_delete_operator(runtime->opdata[i].operator_objects[j]);
+        }
       }
       xnn_release_memory(runtime->opdata);
 
       xnn_release_memory(runtime->blobs);
-      xnn_release_simd_memory(runtime->workspace);
+      if (runtime->workspace != NULL) {
+        // Remove this runtime from the list of users of the workspace.
+        assert(runtime->workspace->first_user != NULL);
+        if (runtime->workspace->first_user == runtime) {
+          runtime->workspace->first_user = runtime->next_workspace_user;
+        } else {
+          xnn_runtime_t prev = runtime->workspace->first_user;
+          xnn_runtime_t curr = prev->next_workspace_user;
+          while (curr != runtime) {
+            prev = curr;
+            curr = curr->next_workspace_user;
+          }
+          assert(curr == runtime);
+          prev->next_workspace_user = curr->next_workspace_user;
+        }
+        xnn_release_workspace(runtime->workspace);
+      }
     }
+#if XNN_PLATFORM_JIT && XNN_ENABLE_JIT
+    xnn_release_code_cache(&runtime->code_cache);
+#endif
     xnn_release_memory(runtime);
   }
   return xnn_status_success;

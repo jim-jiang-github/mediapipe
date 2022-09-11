@@ -24,13 +24,13 @@ void xnn_f32_dwconv_minmax_ukernel_up8x4__wasmsimd_arm(
     size_t output_increment,
     size_t input_offset,
     const float* zero,
-    const union xnn_f32_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN
+    const union xnn_f32_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
   assert(channels != 0);
   assert(output_width != 0);
 
-  const v128_t vmin = wasm_v128_load32_splat(&params->scalar.min);
-  const v128_t vmax = wasm_v128_load32_splat(&params->scalar.max);
+  const v128_t vmin = wasm_v128_load64_splat(params->wasmsimd.min);
+  const v128_t vmax = wasm_v128_load64_splat(params->wasmsimd.max);
   do {
     const float* i0 = input[0];
     assert(i0 != NULL);
@@ -100,11 +100,11 @@ void xnn_f32_dwconv_minmax_ukernel_up8x4__wasmsimd_arm(
       w += 40;
 
 
-      v128_t vacc0123 = wasm_f32x4_max(vacc0123p0, vmin);
-      v128_t vacc4567 = wasm_f32x4_max(vacc4567p0, vmin);
+      v128_t vacc0123 = wasm_f32x4_max(vmin, vacc0123p0);
+      v128_t vacc4567 = wasm_f32x4_max(vmin, vacc4567p0);
 
-      vacc0123 = wasm_f32x4_min(vacc0123, vmax);
-      vacc4567 = wasm_f32x4_min(vacc4567, vmax);
+      vacc0123 = wasm_f32x4_min(vmax, vacc0123);
+      vacc4567 = wasm_f32x4_min(vmax, vacc4567);
 
       wasm_v128_store(output, vacc0123);
       wasm_v128_store(output + 4, vacc4567);
@@ -140,8 +140,8 @@ void xnn_f32_dwconv_minmax_ukernel_up8x4__wasmsimd_arm(
       w += 4;
 
 
-      v128_t vacc0123 = wasm_f32x4_max(vacc0123p0, vmin);
-      vacc0123 = wasm_f32x4_min(vacc0123, vmax);
+      v128_t vacc0123 = wasm_f32x4_max(vmin, vacc0123p0);
+      vacc0123 = wasm_f32x4_min(vmax, vacc0123);
 
       wasm_v128_store(output, vacc0123);
       output += 4;
@@ -166,8 +166,8 @@ void xnn_f32_dwconv_minmax_ukernel_up8x4__wasmsimd_arm(
       vacc0123p0 = wasm_f32x4_add(vacc0123p0, wasm_f32x4_mul(vi3x0123, vk3x0123));
 
 
-      v128_t vacc0123 = wasm_f32x4_max(vacc0123p0, vmin);
-      vacc0123 = wasm_f32x4_min(vacc0123, vmax);
+      v128_t vacc0123 = wasm_f32x4_max(vmin, vacc0123p0);
+      vacc0123 = wasm_f32x4_min(vmax, vacc0123);
 
       if (c & 2) {
         *((double*) output) = wasm_f64x2_extract_lane(vacc0123, 0);

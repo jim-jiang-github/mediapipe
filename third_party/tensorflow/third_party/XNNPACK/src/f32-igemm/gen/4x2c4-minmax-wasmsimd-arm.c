@@ -26,7 +26,7 @@ void xnn_f32_igemm_minmax_ukernel_4x2c4__wasmsimd_arm(
     size_t cn_stride,
     size_t a_offset,
     const float* zero,
-    const union xnn_f32_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN
+    const union xnn_f32_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
   assert(mr != 0);
   assert(mr <= 4);
@@ -54,10 +54,10 @@ void xnn_f32_igemm_minmax_ukernel_4x2c4__wasmsimd_arm(
     c3 = c2;
   }
 
-  const v128_t vmin = wasm_v128_load32_splat(&params->scalar.min);
-  const v128_t vmax = wasm_v128_load32_splat(&params->scalar.max);
+  const v128_t vmin = wasm_v128_load64_splat(params->wasmsimd.min);
+  const v128_t vmax = wasm_v128_load64_splat(params->wasmsimd.max);
   do {
-    v128_t vacc0x0c4 = wasm_f32x4_replace_lane(wasm_f32x4_splat(0.0f), 0, w[0]);
+    v128_t vacc0x0c4 = wasm_f32x4_replace_lane(wasm_f32x4_const_splat(0.0f), 0, w[0]);
     v128_t vacc0x1c4 = wasm_f32x4_replace_lane(vacc0x0c4, 0, w[1]);
     v128_t vacc1x0c4 = vacc0x0c4;
     v128_t vacc1x1c4 = vacc0x1c4;
@@ -125,7 +125,7 @@ void xnn_f32_igemm_minmax_ukernel_4x2c4__wasmsimd_arm(
         const v128_t vb1 = wasm_v128_load(w + 4);
         w += 8;
 
-        const v128_t vzero = wasm_f32x4_splat(0.0f);
+        const v128_t vzero = wasm_f32x4_const_splat(0.0f);
         const v128_t vmask0 = wasm_f32x4_eq(vb0, vzero);
         const v128_t vmask1 = wasm_f32x4_eq(vb1, vzero);
 
@@ -161,11 +161,11 @@ void xnn_f32_igemm_minmax_ukernel_4x2c4__wasmsimd_arm(
       wasm_v32x4_shuffle(vacc2x01c2, vacc3x01c2, 0, 1, 4, 5),
       wasm_v32x4_shuffle(vacc2x01c2, vacc3x01c2, 2, 3, 6, 7));
 
-    vacc01x01 = wasm_f32x4_max(vacc01x01, vmin);
-    vacc23x01 = wasm_f32x4_max(vacc23x01, vmin);
+    vacc01x01 = wasm_f32x4_max(vmin, vacc01x01);
+    vacc23x01 = wasm_f32x4_max(vmin, vacc23x01);
 
-    vacc01x01 = wasm_f32x4_min(vacc01x01, vmax);
-    vacc23x01 = wasm_f32x4_min(vacc23x01, vmax);
+    vacc01x01 = wasm_f32x4_min(vmax, vacc01x01);
+    vacc23x01 = wasm_f32x4_min(vmax, vacc23x01);
 
     if XNN_LIKELY(nc >= 2) {
       *((double*) c3) = wasm_f64x2_extract_lane(vacc23x01, 1);

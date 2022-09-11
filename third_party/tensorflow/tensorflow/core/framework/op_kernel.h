@@ -21,6 +21,9 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
+#include "absl/time/time.h"
+#include "absl/types/optional.h"
+#include "absl/types/span.h"
 #include "tensorflow/core/framework/allocator.h"
 #include "tensorflow/core/framework/cancellation.h"
 #include "tensorflow/core/framework/control_flow.h"
@@ -79,6 +82,13 @@ class ScopedStepContainer;
 class CollectiveExecutor;
 class StepStatsCollectorInterface;
 class CoordinationServiceAgent;
+
+// A label that is added to kernels that are JIT compiled. These labels will be
+// removed before kernels are looked up, so they can be used without specifying
+// the label. This label is a temporary measure to allow JIT kernels to be
+// disabled if needed.
+extern const char* kJitKernelLabel;
+extern const char* kDisableJitKernelsEnvVar;
 
 class OpKernel {
  public:
@@ -553,10 +563,13 @@ class OpKernelContext {
     ~Params() { delete eigen_gpu_device; }
 
     // The step being executed.
-    int64 step_id = 0;
+    int64_t step_id = 0;
 
     // Timestamp for the start of graph execution. Used for latency metrics.
-    int64 start_time_usecs = 0;
+    int64_t start_time_usecs = 0;
+
+    // The deadline for the session to complete by. Empty if unspecified.
+    absl::optional<absl::Time> deadline;
 
     // The op kernel being computed.
     OpKernel* op_kernel = nullptr;
@@ -628,11 +641,10 @@ class OpKernelContext {
     CancellationManager* cancellation_manager = nullptr;
 
     // Inputs to this op kernel.
-    const gtl::InlinedVector<TensorValue, 4>* inputs = nullptr;
+    absl::Span<const TensorValue> inputs;
     bool is_input_dead = false;
 
-    const gtl::InlinedVector<AllocatorAttributes, 4>* input_alloc_attrs =
-        nullptr;
+    absl::Span<const AllocatorAttributes> input_alloc_attrs;
 
     // Device context.
     DeviceContext* op_device_context = nullptr;
@@ -669,7 +681,7 @@ class OpKernelContext {
     bool* outputs_required_array = nullptr;
 
     // For access to distributed coordination service.
-    CoordinationServiceAgent* coordination_service_agent;
+    CoordinationServiceAgent* coordination_service_agent = nullptr;
   };
 
   // params must outlive the OpKernelContext.
@@ -679,9 +691,13 @@ class OpKernelContext {
 
   Env* env() const { return params_->device->env(); }
 
-  int64 step_id() const { return params_->step_id; }
+  int64_t step_id() const { return params_->step_id; }
 
-  int64 start_time_usecs() const { return params_->start_time_usecs; }
+  int64_t start_time_usecs() const { return params_->start_time_usecs; }
+
+  // The deadline for the session to complete by. Empty if unspecified in
+  // RunOptions.
+  absl::optional<absl::Time> deadline() const { return params_->deadline; }
 
   const OpKernel& op_kernel() const { return *params_->op_kernel; }
 
@@ -692,7 +708,7 @@ class OpKernelContext {
 
   // Input/output signature.
 
-  int num_inputs() const { return params_->inputs->size(); }
+  int num_inputs() const { return params_->inputs.size(); }
   DataType input_dtype(int index) const;
   Status input_dtype(StringPiece name, DataType* dtype) const;
   MemoryType input_memory_type(int index) const;
@@ -1012,19 +1028,19 @@ class OpKernelContext {
   DeviceContext* op_device_context() {
     DeviceContext* ret = params_->op_device_context;
     if (ret == nullptr) {
-      auto* dev_info = device()->tensorflow_gpu_device_info();
+      auto* dev_info = device()->tensorflow_accelerator_device_info();
       if (dev_info) ret = dev_info->default_context;
     }
     return ret;
   }
 
   AllocatorAttributes input_alloc_attr(int index) const {
-    if (params_->input_alloc_attrs == nullptr) {
+    if (params_->input_alloc_attrs.empty()) {
       return AllocatorAttributes();
     } else {
       DCHECK_GE(index, 0);
-      DCHECK_LT(index, params_->input_alloc_attrs->size());
-      return (*params_->input_alloc_attrs)[index];
+      DCHECK_LT(index, params_->input_alloc_attrs.size());
+      return params_->input_alloc_attrs[index];
     }
   }
 
@@ -1171,7 +1187,7 @@ class OpKernelContext {
       TF_LOCKS_EXCLUDED(tracking_state_->stats_mu);
 
   // Returns recorded size of temporary memory;
-  int64 temp_memory_allocated() const
+  int64_t temp_memory_allocated() const
       TF_LOCKS_EXCLUDED(tracking_state_->stats_mu);
 
   // Records persistent memory allocation, size can be negative indicating
@@ -1180,10 +1196,10 @@ class OpKernelContext {
       TF_LOCKS_EXCLUDED(tracking_state_->stats_mu);
 
   // Returns recorded size and ids of persistent memory.
-  int64 persistent_memory_allocated() const
+  int64_t persistent_memory_allocated() const
       TF_LOCKS_EXCLUDED(tracking_state_->stats_mu);
 
-  std::vector<int64> persistent_alloc_ids() const
+  std::vector<int64_t> persistent_alloc_ids() const
       TF_LOCKS_EXCLUDED(tracking_state_->stats_mu);
 
   // Resets counters for temp and persistent memory and recorded ids.
@@ -1266,12 +1282,12 @@ class OpKernelContext {
         TF_GUARDED_BY(mu);
 
     mutable mutex stats_mu;
-    int64 temp_memory_allocated TF_GUARDED_BY(stats_mu) = 0;
+    int64_t temp_memory_allocated TF_GUARDED_BY(stats_mu) = 0;
 
-    int64 persistent_memory_allocated TF_GUARDED_BY(stats_mu) = 0;
-    gtl::InlinedVector<std::pair<const void*, int64>, 2>
+    int64_t persistent_memory_allocated TF_GUARDED_BY(stats_mu) = 0;
+    gtl::InlinedVector<std::pair<const void*, int64_t>, 2>
         temp_tensor_buffer_and_size TF_GUARDED_BY(stats_mu);
-    gtl::InlinedVector<int64, 2> persistent_alloc_ids TF_GUARDED_BY(stats_mu);
+    gtl::InlinedVector<int64_t, 2> persistent_alloc_ids TF_GUARDED_BY(stats_mu);
   };
   std::unique_ptr<TrackingState> tracking_state_;
 
@@ -1527,7 +1543,7 @@ Status OpKernelConstruction::GetAttr(StringPiece attr_name, T* value) const {
 inline DataType OpKernelContext::input_dtype(int index) const {
   DCHECK_GE(index, 0);
   DCHECK_LT(index, num_inputs());
-  const TensorValue& value((*params_->inputs)[index]);
+  const TensorValue& value(params_->inputs[index]);
   return value.dtype();
 }
 
@@ -1550,7 +1566,7 @@ inline MemoryType OpKernelContext::output_memory_type(int index) const {
 }
 
 inline bool OpKernelContext::input_is_ref(int index) const {
-  const TensorValue& value((*params_->inputs)[index]);
+  const TensorValue& value(params_->inputs[index]);
   return value.is_ref();
 }
 
@@ -1558,14 +1574,14 @@ inline bool OpKernelContext::input_is_ref(int index) const {
 inline bool OpKernelContext::has_input(int index) const {
   DCHECK_GE(index, 0);
   DCHECK_LT(index, num_inputs());
-  return (*params_->inputs)[index].tensor != nullptr;
+  return params_->inputs[index].tensor != nullptr;
 }
 
 inline mutex* OpKernelContext::input_ref_mutex(int index) {
   DCHECK_GE(index, 0);
   DCHECK_LT(index, num_inputs());
   DCHECK(input_is_ref(index));
-  return (*params_->inputs)[index].mutex_if_ref;
+  return params_->inputs[index].mutex_if_ref;
 }
 
 inline Tensor* OpKernelContext::mutable_output(int index) {
@@ -1591,7 +1607,7 @@ inline Status OpKernelContext::forward_input_or_allocate_output(
       if (forwarded_input != nullptr) {
         *forwarded_input = input_index;
       }
-      return Status::OK();
+      return OkStatus();
     }
   }
   if (forwarded_input != nullptr) {
@@ -1607,7 +1623,7 @@ inline Status OpKernelContext::forward_input_or_allocate_output(
     if (forward_input_to_output_with_shape(input_name, output_name,
                                            output_shape, output)
             .ok()) {
-      return Status::OK();
+      return OkStatus();
     }
   }
   return allocate_output(output_name, output_shape, output);

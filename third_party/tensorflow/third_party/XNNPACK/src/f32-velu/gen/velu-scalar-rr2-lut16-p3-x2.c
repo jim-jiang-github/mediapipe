@@ -11,9 +11,8 @@
 #include <math.h>
 
 #include <xnnpack/common.h>
+#include <xnnpack/math.h>
 #include <xnnpack/vunary.h>
-
-#include <fp16/bitcasts.h>
 
 
 extern XNN_INTERNAL const uint32_t xnn_table_exp2minus_k_over_16[16];
@@ -26,19 +25,18 @@ void xnn_f32_velu_ukernel__scalar_rr2_lut16_p3_x2(
 {
   assert(n % sizeof(float) == 0);
 
-  const float vprescale = params->scalar.prescale;
-  const float valpha = params->scalar.alpha;
-  const float vbeta = params->scalar.beta;
-
-  const float vmagic_bias = 0x1.800000p19f;
-  const float vlog2e = 0x1.715476p+0f;
+  const float vprescale = params->scalar_rr2_lut16_p3.prescale;
+  const float valpha = params->scalar_rr2_lut16_p3.alpha;
+  const float vbeta = params->scalar_rr2_lut16_p3.beta;
+  const float vmagic_bias = params->scalar_rr2_lut16_p3.magic_bias;
+  const float vlog2e = params->scalar_rr2_lut16_p3.log2e;
   const uint32_t vindex_mask = UINT32_C(0xF);
-  const float vsat_cutoff = -0x1.154246p+4f;
-  const float vminus_ln2_hi = -0x1.62E400p-1f;
-  const float vminus_ln2_lo = -0x1.7F7D1Cp-20f;
-  const float vc3 = 0x1.55561Cp-3f;
-  const float vc2 = 0x1.0001ECp-1f;
-  const float vone = 1.0f;
+  const float vsat_cutoff = params->scalar_rr2_lut16_p3.sat_cutoff;
+  const float vminus_ln2_hi = params->scalar_rr2_lut16_p3.minus_ln2_hi;
+  const float vminus_ln2_lo = params->scalar_rr2_lut16_p3.minus_ln2_lo;
+  const float vc3 = params->scalar_rr2_lut16_p3.c3;
+  const float vc2 = params->scalar_rr2_lut16_p3.c2;
+  const float vone = params->scalar_rr2_lut16_p3.one;
 
   for (; n >= 2 * sizeof(float); n -= 2 * sizeof(float)) {
     float vx0 = x[0];
@@ -51,17 +49,17 @@ void xnn_f32_velu_ukernel__scalar_rr2_lut16_p3_x2(
     float vn0 = vz0 * vlog2e + vmagic_bias;
     float vn1 = vz1 * vlog2e + vmagic_bias;
 
-    const uint32_t ven0 = fp32_to_bits(vn0) << 19;
-    const uint32_t vidx0 = fp32_to_bits(vn0) & vindex_mask;
+    const uint32_t ven0 = float_as_uint32(vn0) << 19;
+    const uint32_t vidx0 = float_as_uint32(vn0) & vindex_mask;
     vn0 -= vmagic_bias;
-    const uint32_t ven1 = fp32_to_bits(vn1) << 19;
-    const uint32_t vidx1 = fp32_to_bits(vn1) & vindex_mask;
+    const uint32_t ven1 = float_as_uint32(vn1) << 19;
+    const uint32_t vidx1 = float_as_uint32(vn1) & vindex_mask;
     vn1 -= vmagic_bias;
 
     float vt0 = vn0 * vminus_ln2_hi + vz0;
-    float vs0 = fp32_from_bits(xnn_table_exp2minus_k_over_16[vidx0] + ven0);
+    float vs0 = uint32_as_float(xnn_table_exp2minus_k_over_16[vidx0] + ven0);
     float vt1 = vn1 * vminus_ln2_hi + vz1;
-    float vs1 = fp32_from_bits(xnn_table_exp2minus_k_over_16[vidx1] + ven1);
+    float vs1 = uint32_as_float(xnn_table_exp2minus_k_over_16[vidx1] + ven1);
 
     vt0 = vn0 * vminus_ln2_lo + vt0;
     if XNN_UNPREDICTABLE(vz0 <= vsat_cutoff) {
@@ -110,12 +108,12 @@ void xnn_f32_velu_ukernel__scalar_rr2_lut16_p3_x2(
     const float vz = vx * vprescale;
 
     float vn = vz * vlog2e + vmagic_bias;
-    const uint32_t ven = fp32_to_bits(vn) << 19;
-    const uint32_t vidx = fp32_to_bits(vn) & vindex_mask;
+    const uint32_t ven = float_as_uint32(vn) << 19;
+    const uint32_t vidx = float_as_uint32(vn) & vindex_mask;
     vn -= vmagic_bias;
 
     float vt = vn * vminus_ln2_hi + vz;
-    float vs = fp32_from_bits(xnn_table_exp2minus_k_over_16[vidx] + ven);
+    float vs = uint32_as_float(xnn_table_exp2minus_k_over_16[vidx] + ven);
 
     vt = vn * vminus_ln2_lo + vt;
     if XNN_UNPREDICTABLE(vz <= vsat_cutoff) {

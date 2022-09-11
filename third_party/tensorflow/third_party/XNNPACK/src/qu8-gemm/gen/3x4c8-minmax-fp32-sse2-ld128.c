@@ -13,6 +13,7 @@
 
 #include <xnnpack/gemm.h>
 #include <xnnpack/math.h>
+#include <xnnpack/unaligned.h>
 
 
 void xnn_qu8_gemm_minmax_fp32_ukernel_3x4c8__sse2_ld128(
@@ -25,7 +26,7 @@ void xnn_qu8_gemm_minmax_fp32_ukernel_3x4c8__sse2_ld128(
     uint8_t* restrict c,
     size_t cm_stride,
     size_t cn_stride,
-    const union xnn_qu8_conv_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN XNN_DISABLE_MSAN
+    const union xnn_qu8_conv_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
   assert(mr != 0);
   assert(mr <= 3);
@@ -53,10 +54,10 @@ void xnn_qu8_gemm_minmax_fp32_ukernel_3x4c8__sse2_ld128(
   }
 
   do {
-    __m128i vacc0x0 = _mm_cvtsi32_si128((int) ((const int32_t*) w)[0]);
-    __m128i vacc0x1 = _mm_cvtsi32_si128((int) ((const int32_t*) w)[1]);
-    __m128i vacc0x2 = _mm_cvtsi32_si128((int) ((const int32_t*) w)[2]);
-    __m128i vacc0x3 = _mm_cvtsi32_si128((int) ((const int32_t*) w)[3]);
+    __m128i vacc0x0 = _mm_cvtsi32_si128(((const int*) w)[0]);
+    __m128i vacc0x1 = _mm_cvtsi32_si128(((const int*) w)[1]);
+    __m128i vacc0x2 = _mm_cvtsi32_si128(((const int*) w)[2]);
+    __m128i vacc0x3 = _mm_cvtsi32_si128(((const int*) w)[3]);
     __m128i vacc1x0 = vacc0x0;
     __m128i vacc1x1 = vacc0x1;
     __m128i vacc1x2 = vacc0x2;
@@ -65,7 +66,7 @@ void xnn_qu8_gemm_minmax_fp32_ukernel_3x4c8__sse2_ld128(
     __m128i vacc2x1 = vacc0x1;
     __m128i vacc2x2 = vacc0x2;
     __m128i vacc2x3 = vacc0x3;
-    w = (const void*) ((const int32_t*) w + 4);
+    w = (const int32_t*) w + 4;
 
     size_t k = 0;
     const __m128i vb_zero_point = _mm_load_si128((const __m128i*) params->fp32_sse2.kernel_zero_point);
@@ -126,6 +127,11 @@ void xnn_qu8_gemm_minmax_fp32_ukernel_3x4c8__sse2_ld128(
     vscaled1x0123 = _mm_mul_ps(vscaled1x0123, vscale);
     vscaled2x0123 = _mm_mul_ps(vscaled2x0123, vscale);
 
+    const __m128 voutput_max_less_zero_point = _mm_load_ps(params->fp32_sse2.output_max_less_zero_point);
+    vscaled0x0123 = _mm_min_ps(vscaled0x0123, voutput_max_less_zero_point);
+    vscaled1x0123 = _mm_min_ps(vscaled1x0123, voutput_max_less_zero_point);
+    vscaled2x0123 = _mm_min_ps(vscaled2x0123, voutput_max_less_zero_point);
+
     vacc0x0123 = _mm_cvtps_epi32(vscaled0x0123);
     vacc1x0123 = _mm_cvtps_epi32(vscaled1x0123);
     vacc2x0123 = _mm_cvtps_epi32(vscaled2x0123);
@@ -137,14 +143,13 @@ void xnn_qu8_gemm_minmax_fp32_ukernel_3x4c8__sse2_ld128(
     __m128i vout = _mm_packus_epi16(vacc01x0123, vacc22x0123);
 
     vout = _mm_max_epu8(vout, _mm_load_si128((const __m128i*) params->fp32_sse2.output_min));
-    vout = _mm_min_epu8(vout, _mm_load_si128((const __m128i*) params->fp32_sse2.output_max));
 
     if (nc >= 4) {
-      *((uint32_t*) c0) = (uint32_t) _mm_cvtsi128_si32(vout);
+      unaligned_store_u32(c0, (uint32_t) _mm_cvtsi128_si32(vout));
       vout = _mm_srli_si128(vout, 4);
-      *((uint32_t*) c1) = (uint32_t) _mm_cvtsi128_si32(vout);
+      unaligned_store_u32(c1, (uint32_t) _mm_cvtsi128_si32(vout));
       vout = _mm_srli_si128(vout, 4);
-      *((uint32_t*) c2) = (uint32_t) _mm_cvtsi128_si32(vout);
+      unaligned_store_u32(c2, (uint32_t) _mm_cvtsi128_si32(vout));
 
       c0 = (uint8_t*) ((uintptr_t) c0 + cn_stride);
       c1 = (uint8_t*) ((uintptr_t) c1 + cn_stride);
@@ -157,11 +162,11 @@ void xnn_qu8_gemm_minmax_fp32_ukernel_3x4c8__sse2_ld128(
       nc -= 4;
     } else {
       if (nc & 2) {
-        *((uint16_t*) c0) = (uint16_t) _mm_extract_epi16(vout, 0);
+        unaligned_store_u16(c0, (uint16_t) _mm_extract_epi16(vout, 0));
         c0 += 2;
-        *((uint16_t*) c1) = (uint16_t) _mm_extract_epi16(vout, 2);
+        unaligned_store_u16(c1, (uint16_t) _mm_extract_epi16(vout, 2));
         c1 += 2;
-        *((uint16_t*) c2) = (uint16_t) _mm_extract_epi16(vout, 4);
+        unaligned_store_u16(c2, (uint16_t) _mm_extract_epi16(vout, 4));
         c2 += 2;
         vout = _mm_srli_epi32(vout, 16);
       }

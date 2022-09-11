@@ -32,7 +32,7 @@ namespace xla {
 
 /* static */ StatusOr<HloSchedule> HloSchedule::CreateFromProto(
     const HloModule* module, const HloScheduleProto& proto) {
-  absl::flat_hash_map<int64, const HloComputation*> id_to_computation;
+  absl::flat_hash_map<int64_t, const HloComputation*> id_to_computation;
   for (const HloComputation* computation : module->computations()) {
     id_to_computation[computation->unique_id()] = computation;
   }
@@ -42,11 +42,14 @@ namespace xla {
     int64_t computation_id = id_sequence.first;
 
     auto comp_it = id_to_computation.find(computation_id);
-    TF_RET_CHECK(comp_it != id_to_computation.end())
-        << "No computation exists in HLO module with id " << computation_id;
+    // Computation could have been removed if unused, so
+    // skip if not found.
+    if (comp_it == id_to_computation.end()) {
+      continue;
+    }
     const HloComputation* computation = comp_it->second;
 
-    absl::flat_hash_map<int64, HloInstruction*> id_to_instruction;
+    absl::flat_hash_map<int64_t, HloInstruction*> id_to_instruction;
     for (HloInstruction* instruction : computation->instructions()) {
       id_to_instruction[instruction->unique_id()] = instruction;
     }
@@ -194,7 +197,7 @@ Status HloSchedule::UpdateComputationSchedule(
   }
 
   set_sequence(computation, std::move(new_sequence));
-  return Status::OK();
+  return OkStatus();
 }
 
 Status HloSchedule::Update() {
@@ -210,7 +213,7 @@ Status HloSchedule::Update() {
   if (sequences_.size() > nonfusion_computations.size()) {
     // Schedule contains some computations which have been removed from the
     // HloModule. Remove them from the schedule as well.
-    absl::flat_hash_set<int64> nonfusion_computations_ids;
+    absl::flat_hash_set<int64_t> nonfusion_computations_ids;
     for (const HloComputation* computation : nonfusion_computations) {
       nonfusion_computations_ids.insert(computation->unique_id());
     }
@@ -229,7 +232,7 @@ Status HloSchedule::Update() {
   }
 
   TF_RETURN_IF_ERROR(Verify());
-  return Status::OK();
+  return OkStatus();
 }
 
 Status HloSchedule::Verify() const {
@@ -290,7 +293,7 @@ Status HloSchedule::Verify() const {
     }
   }
 
-  return Status::OK();
+  return OkStatus();
 }
 
 namespace {
@@ -308,8 +311,8 @@ const HloComputation* IdToComputation(const HloModule* module, int64_t id) {
 
 }  // namespace
 
-string HloSchedule::ToString() const {
-  std::vector<string> pieces;
+std::string HloSchedule::ToString() const {
+  std::vector<std::string> pieces;
 
   pieces.push_back("HloSchedule");
   for (const auto& id_sequence : sequences_) {

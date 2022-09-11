@@ -27,6 +27,7 @@ limitations under the License.
 #include "tensorflow/lite/experimental/acceleration/mini_benchmark/status_codes.h"
 #include "tensorflow/lite/experimental/acceleration/mini_benchmark/validator_runner.h"
 #include "tensorflow/lite/minimal_logging.h"
+#include "tensorflow/lite/nnapi/sl/include/SupportLibrary.h"
 
 namespace tflite {
 namespace acceleration {
@@ -44,6 +45,7 @@ class MemoizedBestAccelerationSelector {
       : settings_(settings),
         model_namespace_(model_namespace),
         model_id_(model_id),
+        number_of_events_in_memoized_call_(0),
         memoised_result_(nullptr),
         storage_(storage_path, tflite::DefaultErrorReporter()) {
     storage_.Read();
@@ -79,6 +81,14 @@ class MemoizedBestAccelerationSelector {
   ComputeSettingsT GetBestAcceleration(
       const std::vector<const BenchmarkEvent*>& events) {
     ComputeSettingsT result;
+    if (events.empty()) {
+      TFLITE_LOG_PROD_ONCE(
+          TFLITE_LOG_INFO,
+          "No completed events are available to calculate best "
+          "acceleration result for model (%s, %s).\n",
+          model_namespace_.c_str(), model_id_.c_str());
+      return result;
+    }
     if (memoised_result_ != nullptr &&
         (events.size() == number_of_events_in_memoized_call_)) {
       TFLITE_LOG_PROD_ONCE(TFLITE_LOG_INFO,
@@ -109,6 +119,13 @@ class MemoizedBestAccelerationSelector {
     StoreBestAcceleration(min_latency_event, min_latency);
     memoised_result_->UnPackTo(&result);
     return result;
+  }
+
+  // Note that events used here are all benchmark-run-ok events, i.e. those
+  // indicating the acceleration configuration has run successfully and produced
+  // correct results.
+  int NumEventsUsedInBestAcceleration() const {
+    return number_of_events_in_memoized_call_;
   }
 
  private:
@@ -228,7 +245,7 @@ class MemoizedBestAccelerationSelector {
   // The number of events we are basing our best acceleration decision on.
   // We are assuming that the events passed to this object will only increase
   // and never change.
-  int number_of_events_in_memoized_call_ = -1;
+  int number_of_events_in_memoized_call_ = 0;
   flatbuffers::FlatBufferBuilder memoised_result_buffer_;
   // Pointer to the 'memoised_result_buffer_' for convenience.
   const ComputeSettings* memoised_result_;
@@ -254,12 +271,26 @@ class MiniBenchmarkImpl : public MiniBenchmark {
     is_enabled_ = BenchmarkIsEnabled();
     if (!is_enabled_) return;
 
-    const std::string local_event_fp = LocalEventStorageFileName(settings);
-    best_acceleration_selector_.reset(new MemoizedBestAccelerationSelector(
-        *settings_, model_namespace, model_id, local_event_fp));
+    is_cpu_validation_specified_ = false;
+    total_validation_tests_ = settings_->settings_to_test()->size();
+    for (int i = 0; i < settings_->settings_to_test()->size(); i++) {
+      auto one_setting = settings_->settings_to_test()->Get(i);
+      if (one_setting->delegate() == Delegate_NONE) {
+        is_cpu_validation_specified_ = true;
+      }
+    }
+    // By default, will always add a cpu testing even if it's not requested.
+    if (total_validation_tests_ != 0 && !is_cpu_validation_specified_) {
+      total_validation_tests_ += 1;
+    }
 
-    storage_.reset(new FlatbufferStorage<MiniBenchmarkEvent>(
-        local_event_fp, tflite::DefaultErrorReporter()));
+    const std::string local_event_fp = LocalEventStorageFileName(settings);
+    best_acceleration_selector_ =
+        std::make_unique<MemoizedBestAccelerationSelector>(
+            *settings_, model_namespace, model_id, local_event_fp);
+
+    storage_ = std::make_unique<FlatbufferStorage<MiniBenchmarkEvent>>(
+        local_event_fp, tflite::DefaultErrorReporter());
     storage_->Read();
     for (int i = storage_->Count() - 1; i >= 0; i--) {
       auto* event = storage_->Get(i);
@@ -290,17 +321,13 @@ class MiniBenchmarkImpl : public MiniBenchmark {
     if (!validator_initialized_) return;
 
     std::vector<const TFLiteSettings*> settings;
-    bool seen_cpu = false;
     for (int i = 0; i < settings_->settings_to_test()->size(); i++) {
       auto one_setting = settings_->settings_to_test()->Get(i);
-      if (one_setting->delegate() == Delegate_NONE) {
-        seen_cpu = true;
-      }
       settings.push_back(one_setting);
     }
     // By default, always add a cpu testing even if it's not requested.
     flatbuffers::FlatBufferBuilder cpu_fbb;
-    if (!settings.empty() && !seen_cpu) {
+    if (!settings.empty() && !is_cpu_validation_specified_) {
       cpu_fbb.Finish(CreateTFLiteSettings(cpu_fbb));
       settings.push_back(
           flatbuffers::GetRoot<TFLiteSettings>(cpu_fbb.GetBufferPointer()));
@@ -361,6 +388,26 @@ class MiniBenchmarkImpl : public MiniBenchmark {
                             : timeout_us;
   }
 
+  int NumRemainingAccelerationTests() override {
+    // We return -1 when the overall mini-benchmark-related setup isn't properly
+    // initialized.
+    if (!is_enabled_ || !validator_initialized_) return -1;
+
+    // We first check if there has been a previous execution of the runner
+    // already using some of the validation results to decide the best
+    // acceleration.
+    const int to_complete_tests =
+        total_validation_tests_ -
+        best_acceleration_selector_->NumEventsUsedInBestAcceleration();
+    // No remaining tests, skip reading the validation events log and just
+    // return.
+    if (to_complete_tests == 0) return 0;
+
+    // Read the whole validation events log to find the number of completed
+    // runs.
+    return total_validation_tests_ - validator_->GetNumCompletedResults();
+  }
+
  private:
   static std::string LocalEventStorageFileName(
       const MinibenchmarkSettings& settings) {
@@ -407,19 +454,64 @@ class MiniBenchmarkImpl : public MiniBenchmark {
     return true;
   }
 
+  MinibenchmarkStatus GetNnApiSlPointerIfPresent(
+      const NnApiSLDriverImplFL5** nnapi_sl) {
+    *nnapi_sl = nullptr;
+    const auto& settings_to_test = *settings_->settings_to_test();
+    for (const auto* setting_to_test : settings_to_test) {
+      // Check that there are not two different NNAPI-with-SL configurations
+      // with different support library instances.
+      if (setting_to_test->delegate() == Delegate_NNAPI &&
+          setting_to_test->nnapi_settings() &&
+          setting_to_test->nnapi_settings()->support_library_handle()) {
+        const NnApiSLDriverImplFL5* curr_nnapi_sl_handle =
+            reinterpret_cast<const NnApiSLDriverImplFL5*>(
+                setting_to_test->nnapi_settings()->support_library_handle());
+
+        if (*nnapi_sl != nullptr && *nnapi_sl != curr_nnapi_sl_handle) {
+          return kMiniBenchmarkInvalidSupportLibraryConfiguration;
+        }
+
+        *nnapi_sl = curr_nnapi_sl_handle;
+      }
+    }
+    return kMinibenchmarkSuccess;
+  }
+
+  void LogInitializationFailure(MinibenchmarkStatus status) {
+    if (!initialization_failure_logged_) {
+      flatbuffers::FlatBufferBuilder fbb;
+      storage_->Append(&fbb, CreateMiniBenchmarkEvent(
+                                 fbb, /*is_log_flushing_event=*/false,
+                                 /*best_acceleration_decision=*/0,
+                                 ::tflite::CreateBenchmarkInitializationFailure(
+                                     fbb, status)));
+      initialization_failure_logged_ = true;
+    }
+  }
+
   void CreateValidatorIfNececessary() {
     if (validator_) return;
+
+    const NnApiSLDriverImplFL5* nnapi_sl;
+    MinibenchmarkStatus get_nnapi_sl_status =
+        GetNnApiSlPointerIfPresent(&nnapi_sl);
+    if (get_nnapi_sl_status != kMinibenchmarkSuccess) {
+      LogInitializationFailure(get_nnapi_sl_status);
+      return;
+    }
+
     if (settings_->model_file()->fd() <= 0) {
       validator_ = std::make_unique<ValidatorRunner>(
           settings_->model_file()->filename()->str(),
           settings_->storage_paths()->storage_file_path()->str(),
-          settings_->storage_paths()->data_directory_path()->str());
+          settings_->storage_paths()->data_directory_path()->str(), nnapi_sl);
     } else {
       validator_ = std::make_unique<ValidatorRunner>(
           settings_->model_file()->fd(), settings_->model_file()->offset(),
           settings_->model_file()->length(),
           settings_->storage_paths()->storage_file_path()->str(),
-          settings_->storage_paths()->data_directory_path()->str());
+          settings_->storage_paths()->data_directory_path()->str(), nnapi_sl);
     }
     MinibenchmarkStatus status = validator_->Init();
     if (status == kMinibenchmarkValidationEntrypointSymbolNotFound) {
@@ -434,16 +526,7 @@ class MiniBenchmarkImpl : public MiniBenchmark {
       validator_initialized_ = true;
     }
     if (status != kMinibenchmarkSuccess) {
-      if (!initialization_failure_logged_) {
-        flatbuffers::FlatBufferBuilder fbb;
-        storage_->Append(
-            &fbb,
-            CreateMiniBenchmarkEvent(
-                fbb, /*is_log_flushing_event=*/false,
-                /*best_acceleration_decision=*/0,
-                ::tflite::CreateBenchmarkInitializationFailure(fbb, status)));
-        initialization_failure_logged_ = true;
-      }
+      LogInitializationFailure(status);
     }
   }
 
@@ -451,6 +534,8 @@ class MiniBenchmarkImpl : public MiniBenchmark {
   // Just a pointer to the 'settings_buffer_' for convenience.
   const MinibenchmarkSettings* settings_ = nullptr;
   bool is_enabled_ = false;
+  int total_validation_tests_ = 0;
+  bool is_cpu_validation_specified_ = false;
 
   std::unique_ptr<ValidatorRunner> validator_ = nullptr;
   bool validator_initialized_ = false;

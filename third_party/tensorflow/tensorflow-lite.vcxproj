@@ -27,7 +27,6 @@
     <ClCompile Include=".\tensorflow\lite\core\api\tensor_utils.cc" />
     <ClCompile Include=".\tensorflow\lite\core\subgraph.cc" />
     <ClCompile Include=".\tensorflow\lite\create_op_resolver_with_builtin_ops.cc" />
-    <ClCompile Include=".\tensorflow\lite\c\common.c" />
     <ClCompile Include=".\tensorflow\lite\delegates\xnnpack\quantization_util.cc" />
     <ClCompile Include=".\tensorflow\lite\delegates\xnnpack\xnnpack_delegate.cc" />
     <ClCompile Include=".\tensorflow\lite\experimental\resource\resource_variable.cc" />
@@ -198,18 +197,30 @@
     <ClCompile Include=".\third_party\ruy\ruy\trmul.cc" />
     <ClCompile Include=".\third_party\ruy\ruy\tune.cc" />
     <ClCompile Include=".\third_party\ruy\ruy\wait.cc" />
+    <ClCompile Include="tensorflow\lite\c\common.cc" />
     <ClCompile Include="tensorflow\lite\experimental\resource\initialization_status.cc" />
+    <ClCompile Include="tensorflow\lite\kernels\atan2.cc" />
     <ClCompile Include="tensorflow\lite\kernels\broadcast_args.cc" />
+    <ClCompile Include="tensorflow\lite\kernels\bucketize.cc" />
     <ClCompile Include="tensorflow\lite\kernels\conv3d_transpose.cc" />
+    <ClCompile Include="tensorflow\lite\kernels\dynamic_update_slice.cc" />
+    <ClCompile Include="tensorflow\lite\kernels\internal\utils\sparsity_format_converter.cc" />
     <ClCompile Include="tensorflow\lite\kernels\multinomial.cc" />
+    <ClCompile Include="tensorflow\lite\kernels\random_ops.cc" />
+    <ClCompile Include="tensorflow\lite\kernels\random_standard_normal_custom.cc" />
+    <ClCompile Include="tensorflow\lite\kernels\random_uniform_custom.cc" />
     <ClCompile Include="tensorflow\lite\kernels\read_variable.cc" />
+    <ClCompile Include="tensorflow\lite\kernels\sign.cc" />
+    <ClCompile Include="tensorflow\lite\kernels\unsorted_segment.cc" />
     <ClCompile Include="tensorflow\lite\kernels\var_handle.cc" />
-    <ClCompile Include="tensorflow\lite\tools\optimize\sparsity\format_converter.cc" />
+    <ClCompile Include="tensorflow\lite\profiling\root_profiler.cc" />
+    <ClCompile Include="tensorflow\lite\signature_runner.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include=".\tensorflow\lite\c\common.h" />
     <ClInclude Include="tensorflow\lite\c\c_api_types.h" />
-    <ClInclude Include="tensorflow\lite\tools\optimize\sparsity\format_converter.h" />
+    <ClInclude Include="tensorflow\lite\kernels\internal\utils\sparsity_format_converter.h" />
+    <ClInclude Include="tensorflow\lite\signature_runner.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

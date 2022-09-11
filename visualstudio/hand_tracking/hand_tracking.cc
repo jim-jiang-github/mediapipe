@@ -1,5 +1,9 @@
 #include "../calculator_graph_util.h"
 
+// resource root to locate tflite and other files
+// see also mediapipe/mediapipe/util/resource_util_default.cc
+constexpr char const* resource_root = "../";
+
 // name of file containing text format CalculatorGraphConfig proto
 constexpr char const* calculator_graph_config_file = "../../mediapipe/graphs/hand_tracking/hand_tracking_desktop_live.pbtxt";
 
@@ -7,10 +11,10 @@ constexpr char const* calculator_graph_config_file = "../../mediapipe/graphs/han
 namespace mediapipe {
 DEFINE_SUBGRAPH(HandLandmarkTrackingCpu, "../../mediapipe/modules/hand_landmark/hand_landmark_tracking_cpu.pbtxt");
   DEFINE_SUBGRAPH(PalmDetectionCpu, "../../mediapipe/modules/palm_detection/palm_detection_cpu.pbtxt");
-    DEFINE_SUBGRAPH(PalmDetectionModelLoader, "palm_detection_model_loader.pbtxt"); //../../mediapipe/modules/palm_detection 
+    DEFINE_SUBGRAPH(PalmDetectionModelLoader, "../../mediapipe/modules/palm_detection/palm_detection_model_loader.pbtxt");
   DEFINE_SUBGRAPH(PalmDetectionDetectionToRoi, "../../mediapipe/modules/hand_landmark/palm_detection_detection_to_roi.pbtxt");
-  DEFINE_SUBGRAPH(HandLandmarkCpu, "hand_landmark_cpu.pbtxt"); // ../../mediapipe/modules/hand_landmark
-    DEFINE_SUBGRAPH(HandLandmarkModelLoader, "hand_landmark_model_loader.pbtxt"); // ../../mediapipe/modules/hand_landmark
+  DEFINE_SUBGRAPH(HandLandmarkCpu, "../../mediapipe/modules/hand_landmark/hand_landmark_cpu.pbtxt");
+    DEFINE_SUBGRAPH(HandLandmarkModelLoader, "../../mediapipe/modules/hand_landmark/hand_landmark_model_loader.pbtxt");
   DEFINE_SUBGRAPH(HandLandmarkLandmarksToRoi, "../../mediapipe/modules/hand_landmark/hand_landmark_landmarks_to_roi.pbtxt");
 
 DEFINE_SUBGRAPH(HandRendererSubgraph, "../../mediapipe/graphs/hand_tracking/subgraphs/hand_renderer_cpu.pbtxt");
@@ -20,6 +24,9 @@ DEFINE_SUBGRAPH(HandRendererSubgraph, "../../mediapipe/graphs/hand_tracking/subg
 absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {
   mediapipe::CalculatorGraphConfig config;
   if (read_config_from_pbtxt(config, calculator_graph_config_file)) {
+    download_mediapipe_asset_from_GCS("../mediapipe/modules/palm_detection/palm_detection_full.tflite");
+    download_mediapipe_asset_from_GCS("../mediapipe/modules/hand_landmark/hand_landmark_full.tflite");
+    download_mediapipe_asset_from_GCS("../mediapipe/modules/hand_landmark/handedness.txt");
     return graph.Initialize(config);
   }
   return absl::NotFoundError(calculator_graph_config_file);

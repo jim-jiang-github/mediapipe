@@ -18,8 +18,6 @@
 
 extern XNN_INTERNAL const int xnn_table_exp2minus_k_over_16[16];
 
-static const int32_t mask_table[14] = {-1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0};
-
 void xnn_f32_velu_ukernel__avx_rr2_lut16_p3_x48(
     size_t n,
     const float* x,
@@ -28,19 +26,18 @@ void xnn_f32_velu_ukernel__avx_rr2_lut16_p3_x48(
 {
   assert(n % sizeof(float) == 0);
 
-  const __m256 vprescale = _mm256_broadcast_ps((const __m128*) params->sse.prescale);
-  const __m256 valpha = _mm256_broadcast_ps((const __m128*) params->sse.alpha);
-  const __m256 vbeta = _mm256_broadcast_ps((const __m128*) params->sse.beta);
-
-  const __m256 vsat_cutoff = _mm256_set1_ps(-0x1.154246p+4f);
-  const __m256 vmagic_bias = _mm256_set1_ps(0x1.800000p19f);
-  const __m256 vlog2e = _mm256_set1_ps(0x1.715476p+0f);
-  const __m256 vindex_mask = _mm256_castsi256_ps(_mm256_set1_epi32(0xF));
-  const __m256 vminus_ln2_hi = _mm256_set1_ps(-0x1.62E400p-1f);
-  const __m256 vminus_ln2_lo = _mm256_set1_ps(-0x1.7F7D1Cp-20f);
-  const __m256 vc3 = _mm256_set1_ps(0x1.55561Cp-3f);
-  const __m256 vc2 = _mm256_set1_ps(0x1.0001ECp-1f);
-  const __m256 vone = _mm256_set1_ps(1.0f);
+  const __m256 vprescale = _mm256_load_ps(params->avx_rr2_lut16_p3.prescale);
+  const __m256 valpha = _mm256_load_ps(params->avx_rr2_lut16_p3.alpha);
+  const __m256 vbeta = _mm256_load_ps(params->avx_rr2_lut16_p3.beta);
+  const __m256 vsat_cutoff = _mm256_load_ps(params->avx_rr2_lut16_p3.sat_cutoff);
+  const __m256 vmagic_bias = _mm256_load_ps(params->avx_rr2_lut16_p3.magic_bias);
+  const __m256 vlog2e = _mm256_load_ps(params->avx_rr2_lut16_p3.log2e);
+  const __m256 vindex_mask = _mm256_load_ps((const float*) params->avx_rr2_lut16_p3.index_mask);
+  const __m256 vminus_ln2_hi = _mm256_load_ps(params->avx_rr2_lut16_p3.minus_ln2_hi);
+  const __m256 vminus_ln2_lo = _mm256_load_ps(params->avx_rr2_lut16_p3.minus_ln2_lo);
+  const __m256 vc3 = _mm256_load_ps(params->avx_rr2_lut16_p3.c3);
+  const __m256 vc2 = _mm256_load_ps(params->avx_rr2_lut16_p3.c2);
+  const __m256 vone = _mm256_load_ps(params->avx_rr2_lut16_p3.one);
 
   for (; n >= 48 * sizeof(float); n -= 48 * sizeof(float)) {
     __m256 vx0 = _mm256_loadu_ps(x);
@@ -74,19 +71,19 @@ void xnn_f32_velu_ukernel__avx_rr2_lut16_p3_x48(
       const uint64_t vidx0_lh = (uint64_t) _mm_extract_epi64(vidx0_lo, 1);
       const uint64_t vidx0_hl = (uint64_t) _mm_cvtsi128_si64(vidx0_hi);
       const uint64_t vidx0_hh = (uint64_t) _mm_extract_epi64(vidx0_hi, 1);
-      __m128i vl0_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx0_ll));
-      __m128i vl0_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx0_lh));
-      __m128i vl0_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx0_hl));
-      __m128i vl0_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx0_hh));
+      __m128i vl0_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx0_ll)));
+      __m128i vl0_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx0_lh)));
+      __m128i vl0_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx0_hl)));
+      __m128i vl0_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx0_hh)));
       vl0_ll = _mm_insert_epi32(vl0_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx0_ll >> 32))), 1);
       vl0_lh = _mm_insert_epi32(vl0_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx0_lh >> 32))), 1);
       vl0_hl = _mm_insert_epi32(vl0_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx0_hl >> 32))), 1);
       vl0_hh = _mm_insert_epi32(vl0_hh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx0_hh >> 32))), 1);
     #else
-      __m128i vl0_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx0_lo)));
-      __m128i vl0_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx0_lo, 2)));
-      __m128i vl0_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx0_hi)));
-      __m128i vl0_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx0_hi, 2)));
+      __m128i vl0_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx0_lo))));
+      __m128i vl0_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx0_lo, 2))));
+      __m128i vl0_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx0_hi))));
+      __m128i vl0_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx0_hi, 2))));
       vl0_ll = _mm_insert_epi32(vl0_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx0_lo, 1))), 1);
       vl0_lh = _mm_insert_epi32(vl0_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx0_lo, 3))), 1);
       vl0_hl = _mm_insert_epi32(vl0_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx0_hi, 1))), 1);
@@ -103,19 +100,19 @@ void xnn_f32_velu_ukernel__avx_rr2_lut16_p3_x48(
       const uint64_t vidx1_lh = (uint64_t) _mm_extract_epi64(vidx1_lo, 1);
       const uint64_t vidx1_hl = (uint64_t) _mm_cvtsi128_si64(vidx1_hi);
       const uint64_t vidx1_hh = (uint64_t) _mm_extract_epi64(vidx1_hi, 1);
-      __m128i vl1_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx1_ll));
-      __m128i vl1_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx1_lh));
-      __m128i vl1_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx1_hl));
-      __m128i vl1_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx1_hh));
+      __m128i vl1_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx1_ll)));
+      __m128i vl1_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx1_lh)));
+      __m128i vl1_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx1_hl)));
+      __m128i vl1_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx1_hh)));
       vl1_ll = _mm_insert_epi32(vl1_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx1_ll >> 32))), 1);
       vl1_lh = _mm_insert_epi32(vl1_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx1_lh >> 32))), 1);
       vl1_hl = _mm_insert_epi32(vl1_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx1_hl >> 32))), 1);
       vl1_hh = _mm_insert_epi32(vl1_hh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx1_hh >> 32))), 1);
     #else
-      __m128i vl1_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx1_lo)));
-      __m128i vl1_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx1_lo, 2)));
-      __m128i vl1_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx1_hi)));
-      __m128i vl1_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx1_hi, 2)));
+      __m128i vl1_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx1_lo))));
+      __m128i vl1_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx1_lo, 2))));
+      __m128i vl1_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx1_hi))));
+      __m128i vl1_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx1_hi, 2))));
       vl1_ll = _mm_insert_epi32(vl1_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx1_lo, 1))), 1);
       vl1_lh = _mm_insert_epi32(vl1_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx1_lo, 3))), 1);
       vl1_hl = _mm_insert_epi32(vl1_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx1_hi, 1))), 1);
@@ -132,19 +129,19 @@ void xnn_f32_velu_ukernel__avx_rr2_lut16_p3_x48(
       const uint64_t vidx2_lh = (uint64_t) _mm_extract_epi64(vidx2_lo, 1);
       const uint64_t vidx2_hl = (uint64_t) _mm_cvtsi128_si64(vidx2_hi);
       const uint64_t vidx2_hh = (uint64_t) _mm_extract_epi64(vidx2_hi, 1);
-      __m128i vl2_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx2_ll));
-      __m128i vl2_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx2_lh));
-      __m128i vl2_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx2_hl));
-      __m128i vl2_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx2_hh));
+      __m128i vl2_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx2_ll)));
+      __m128i vl2_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx2_lh)));
+      __m128i vl2_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx2_hl)));
+      __m128i vl2_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx2_hh)));
       vl2_ll = _mm_insert_epi32(vl2_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx2_ll >> 32))), 1);
       vl2_lh = _mm_insert_epi32(vl2_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx2_lh >> 32))), 1);
       vl2_hl = _mm_insert_epi32(vl2_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx2_hl >> 32))), 1);
       vl2_hh = _mm_insert_epi32(vl2_hh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx2_hh >> 32))), 1);
     #else
-      __m128i vl2_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx2_lo)));
-      __m128i vl2_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx2_lo, 2)));
-      __m128i vl2_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx2_hi)));
-      __m128i vl2_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx2_hi, 2)));
+      __m128i vl2_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx2_lo))));
+      __m128i vl2_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx2_lo, 2))));
+      __m128i vl2_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx2_hi))));
+      __m128i vl2_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx2_hi, 2))));
       vl2_ll = _mm_insert_epi32(vl2_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx2_lo, 1))), 1);
       vl2_lh = _mm_insert_epi32(vl2_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx2_lo, 3))), 1);
       vl2_hl = _mm_insert_epi32(vl2_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx2_hi, 1))), 1);
@@ -161,19 +158,19 @@ void xnn_f32_velu_ukernel__avx_rr2_lut16_p3_x48(
       const uint64_t vidx3_lh = (uint64_t) _mm_extract_epi64(vidx3_lo, 1);
       const uint64_t vidx3_hl = (uint64_t) _mm_cvtsi128_si64(vidx3_hi);
       const uint64_t vidx3_hh = (uint64_t) _mm_extract_epi64(vidx3_hi, 1);
-      __m128i vl3_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx3_ll));
-      __m128i vl3_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx3_lh));
-      __m128i vl3_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx3_hl));
-      __m128i vl3_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx3_hh));
+      __m128i vl3_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx3_ll)));
+      __m128i vl3_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx3_lh)));
+      __m128i vl3_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx3_hl)));
+      __m128i vl3_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx3_hh)));
       vl3_ll = _mm_insert_epi32(vl3_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx3_ll >> 32))), 1);
       vl3_lh = _mm_insert_epi32(vl3_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx3_lh >> 32))), 1);
       vl3_hl = _mm_insert_epi32(vl3_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx3_hl >> 32))), 1);
       vl3_hh = _mm_insert_epi32(vl3_hh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx3_hh >> 32))), 1);
     #else
-      __m128i vl3_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx3_lo)));
-      __m128i vl3_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx3_lo, 2)));
-      __m128i vl3_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx3_hi)));
-      __m128i vl3_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx3_hi, 2)));
+      __m128i vl3_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx3_lo))));
+      __m128i vl3_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx3_lo, 2))));
+      __m128i vl3_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx3_hi))));
+      __m128i vl3_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx3_hi, 2))));
       vl3_ll = _mm_insert_epi32(vl3_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx3_lo, 1))), 1);
       vl3_lh = _mm_insert_epi32(vl3_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx3_lo, 3))), 1);
       vl3_hl = _mm_insert_epi32(vl3_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx3_hi, 1))), 1);
@@ -190,19 +187,19 @@ void xnn_f32_velu_ukernel__avx_rr2_lut16_p3_x48(
       const uint64_t vidx4_lh = (uint64_t) _mm_extract_epi64(vidx4_lo, 1);
       const uint64_t vidx4_hl = (uint64_t) _mm_cvtsi128_si64(vidx4_hi);
       const uint64_t vidx4_hh = (uint64_t) _mm_extract_epi64(vidx4_hi, 1);
-      __m128i vl4_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx4_ll));
-      __m128i vl4_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx4_lh));
-      __m128i vl4_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx4_hl));
-      __m128i vl4_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx4_hh));
+      __m128i vl4_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx4_ll)));
+      __m128i vl4_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx4_lh)));
+      __m128i vl4_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx4_hl)));
+      __m128i vl4_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx4_hh)));
       vl4_ll = _mm_insert_epi32(vl4_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx4_ll >> 32))), 1);
       vl4_lh = _mm_insert_epi32(vl4_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx4_lh >> 32))), 1);
       vl4_hl = _mm_insert_epi32(vl4_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx4_hl >> 32))), 1);
       vl4_hh = _mm_insert_epi32(vl4_hh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx4_hh >> 32))), 1);
     #else
-      __m128i vl4_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx4_lo)));
-      __m128i vl4_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx4_lo, 2)));
-      __m128i vl4_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx4_hi)));
-      __m128i vl4_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx4_hi, 2)));
+      __m128i vl4_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx4_lo))));
+      __m128i vl4_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx4_lo, 2))));
+      __m128i vl4_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx4_hi))));
+      __m128i vl4_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx4_hi, 2))));
       vl4_ll = _mm_insert_epi32(vl4_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx4_lo, 1))), 1);
       vl4_lh = _mm_insert_epi32(vl4_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx4_lo, 3))), 1);
       vl4_hl = _mm_insert_epi32(vl4_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx4_hi, 1))), 1);
@@ -219,19 +216,19 @@ void xnn_f32_velu_ukernel__avx_rr2_lut16_p3_x48(
       const uint64_t vidx5_lh = (uint64_t) _mm_extract_epi64(vidx5_lo, 1);
       const uint64_t vidx5_hl = (uint64_t) _mm_cvtsi128_si64(vidx5_hi);
       const uint64_t vidx5_hh = (uint64_t) _mm_extract_epi64(vidx5_hi, 1);
-      __m128i vl5_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx5_ll));
-      __m128i vl5_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx5_lh));
-      __m128i vl5_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx5_hl));
-      __m128i vl5_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx5_hh));
+      __m128i vl5_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx5_ll)));
+      __m128i vl5_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx5_lh)));
+      __m128i vl5_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx5_hl)));
+      __m128i vl5_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx5_hh)));
       vl5_ll = _mm_insert_epi32(vl5_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx5_ll >> 32))), 1);
       vl5_lh = _mm_insert_epi32(vl5_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx5_lh >> 32))), 1);
       vl5_hl = _mm_insert_epi32(vl5_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx5_hl >> 32))), 1);
       vl5_hh = _mm_insert_epi32(vl5_hh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx5_hh >> 32))), 1);
     #else
-      __m128i vl5_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx5_lo)));
-      __m128i vl5_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx5_lo, 2)));
-      __m128i vl5_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx5_hi)));
-      __m128i vl5_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx5_hi, 2)));
+      __m128i vl5_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx5_lo))));
+      __m128i vl5_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx5_lo, 2))));
+      __m128i vl5_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx5_hi))));
+      __m128i vl5_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx5_hi, 2))));
       vl5_ll = _mm_insert_epi32(vl5_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx5_lo, 1))), 1);
       vl5_lh = _mm_insert_epi32(vl5_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx5_lo, 3))), 1);
       vl5_hl = _mm_insert_epi32(vl5_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx5_hi, 1))), 1);
@@ -370,19 +367,19 @@ void xnn_f32_velu_ukernel__avx_rr2_lut16_p3_x48(
       const uint64_t vidx_lh = (uint64_t) _mm_extract_epi64(vidx_lo, 1);
       const uint64_t vidx_hl = (uint64_t) _mm_cvtsi128_si64(vidx_hi);
       const uint64_t vidx_hh = (uint64_t) _mm_extract_epi64(vidx_hi, 1);
-      __m128i vl_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_ll));
-      __m128i vl_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_lh));
-      __m128i vl_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_hl));
-      __m128i vl_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_hh));
+      __m128i vl_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_ll)));
+      __m128i vl_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_lh)));
+      __m128i vl_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_hl)));
+      __m128i vl_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_hh)));
       vl_ll = _mm_insert_epi32(vl_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx_ll >> 32))), 1);
       vl_lh = _mm_insert_epi32(vl_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx_lh >> 32))), 1);
       vl_hl = _mm_insert_epi32(vl_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx_hl >> 32))), 1);
       vl_hh = _mm_insert_epi32(vl_hh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx_hh >> 32))), 1);
     #else
-      __m128i vl_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx_lo)));
-      __m128i vl_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx_lo, 2)));
-      __m128i vl_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx_hi)));
-      __m128i vl_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx_hi, 2)));
+      __m128i vl_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx_lo))));
+      __m128i vl_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx_lo, 2))));
+      __m128i vl_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx_hi))));
+      __m128i vl_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx_hi, 2))));
       vl_ll = _mm_insert_epi32(vl_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx_lo, 1))), 1);
       vl_lh = _mm_insert_epi32(vl_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx_lo, 3))), 1);
       vl_hl = _mm_insert_epi32(vl_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx_hi, 1))), 1);
@@ -419,7 +416,7 @@ void xnn_f32_velu_ukernel__avx_rr2_lut16_p3_x48(
   if XNN_UNLIKELY(n != 0) {
     assert(n >= 1 * sizeof(float));
     assert(n <= 7 * sizeof(float));
-    __m256i vmask = _mm256_loadu_si256((const __m256i*) ((uintptr_t) &mask_table[7] - n));
+    const __m256i vmask = _mm256_loadu_si256((const __m256i*) ((uintptr_t) &params->avx_rr2_lut16_p3.mask_table[7] - n));
 
     __m256 vx = _mm256_maskload_ps(x, vmask);
 
@@ -436,19 +433,19 @@ void xnn_f32_velu_ukernel__avx_rr2_lut16_p3_x48(
       const uint64_t vidx_lh = (uint64_t) _mm_extract_epi64(vidx_lo, 1);
       const uint64_t vidx_hl = (uint64_t) _mm_cvtsi128_si64(vidx_hi);
       const uint64_t vidx_hh = (uint64_t) _mm_extract_epi64(vidx_hi, 1);
-      __m128i vl_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_ll));
-      __m128i vl_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_lh));
-      __m128i vl_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_hl));
-      __m128i vl_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_hh));
+      __m128i vl_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_ll)));
+      __m128i vl_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_lh)));
+      __m128i vl_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_hl)));
+      __m128i vl_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) vidx_hh)));
       vl_ll = _mm_insert_epi32(vl_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx_ll >> 32))), 1);
       vl_lh = _mm_insert_epi32(vl_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx_lh >> 32))), 1);
       vl_hl = _mm_insert_epi32(vl_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx_hl >> 32))), 1);
       vl_hh = _mm_insert_epi32(vl_hh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) (vidx_hh >> 32))), 1);
     #else
-      __m128i vl_ll = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx_lo)));
-      __m128i vl_lh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx_lo, 2)));
-      __m128i vl_hl = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx_hi)));
-      __m128i vl_hh = _mm_loadu_si32((const void*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx_hi, 2)));
+      __m128i vl_ll = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx_lo))));
+      __m128i vl_lh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx_lo, 2))));
+      __m128i vl_hl = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_cvtsi128_si32(vidx_hi))));
+      __m128i vl_hh = _mm_cvtsi32_si128(*((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx_hi, 2))));
       vl_ll = _mm_insert_epi32(vl_ll, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx_lo, 1))), 1);
       vl_lh = _mm_insert_epi32(vl_lh, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx_lo, 3))), 1);
       vl_hl = _mm_insert_epi32(vl_hl, *((const int*) ((uintptr_t) xnn_table_exp2minus_k_over_16 + (uint32_t) _mm_extract_epi32(vidx_hi, 1))), 1);
@@ -479,7 +476,6 @@ void xnn_f32_velu_ukernel__avx_rr2_lut16_p3_x48(
     vx = _mm256_mul_ps(vx, vbeta);
     const __m256 vy = _mm256_blendv_ps(vx, ve, vx);
 
-    // _mm256_maskstore_ps(y, vmask, vf) could be used here, but triggers msan failures (probably an msan bug).
     __m128 vy_lo = _mm256_castps256_ps128(vy);
     if (n & (4 * sizeof(float))) {
       _mm_storeu_ps(y, vy_lo);

@@ -95,15 +95,14 @@ const char descriptor_table_protodef_mediapipe_2fcalculators_2fcore_2fpacket_5fr
   "OutputHeader\022\010\n\004NONE\020\000\022\017\n\013PASS_HEADER\020\001\022"
   "\027\n\023UPDATE_VIDEO_HEADER\020\0022Y\n\003ext\022\034.mediap"
   "ipe.CalculatorOptions\030\344\336\323- \001(\0132+.mediapi"
-  "pe.PacketResamplerCalculatorOptionsB\014\242\002\t"
-  "MediaPipe"
+  "pe.PacketResamplerCalculatorOptions"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fcalculators_2fcore_2fpacket_5fresampler_5fcalculator_2eproto_deps[1] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fcalculators_2fcore_2fpacket_5fresampler_5fcalculator_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fcalculators_2fcore_2fpacket_5fresampler_5fcalculator_2eproto = {
-  false, false, 649, descriptor_table_protodef_mediapipe_2fcalculators_2fcore_2fpacket_5fresampler_5fcalculator_2eproto, "mediapipe/calculators/core/packet_resampler_calculator.proto", 
+  false, false, 635, descriptor_table_protodef_mediapipe_2fcalculators_2fcore_2fpacket_5fresampler_5fcalculator_2eproto, "mediapipe/calculators/core/packet_resampler_calculator.proto", 
   &descriptor_table_mediapipe_2fcalculators_2fcore_2fpacket_5fresampler_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2fcore_2fpacket_5fresampler_5fcalculator_2eproto_deps, 1, 1,
   schemas, file_default_instances, TableStruct_mediapipe_2fcalculators_2fcore_2fpacket_5fresampler_5fcalculator_2eproto::offsets,
   file_level_metadata_mediapipe_2fcalculators_2fcore_2fpacket_5fresampler_5fcalculator_2eproto, file_level_enum_descriptors_mediapipe_2fcalculators_2fcore_2fpacket_5fresampler_5fcalculator_2eproto, file_level_service_descriptors_mediapipe_2fcalculators_2fcore_2fpacket_5fresampler_5fcalculator_2eproto,

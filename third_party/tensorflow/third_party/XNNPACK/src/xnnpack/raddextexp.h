@@ -8,7 +8,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <xnnpack/params.h>
 #include <xnnpack/common.h>
 
 #ifdef __cplusplus
@@ -47,8 +46,6 @@ DECLARE_F32_RADDEXTEXP_UKERNEL_FUNCTION(xnn_f32_raddextexp_ukernel__avx512f_p5_s
 DECLARE_F32_RADDEXTEXP_UKERNEL_FUNCTION(xnn_f32_raddextexp_ukernel__avx512f_p5_scalef_x192_acc3)
 DECLARE_F32_RADDEXTEXP_UKERNEL_FUNCTION(xnn_f32_raddextexp_ukernel__avx512f_p5_scalef_x192_acc6)
 
-DECLARE_F32_RADDEXTEXP_UKERNEL_FUNCTION(xnn_f32_raddextexp_ukernel__avx512f_p5_scalef_x128)
-DECLARE_F32_RADDEXTEXP_UKERNEL_FUNCTION(xnn_f32_raddextexp_ukernel__avx2_p5_x64)
 
 #ifdef __cplusplus
 } /* extern "C" */

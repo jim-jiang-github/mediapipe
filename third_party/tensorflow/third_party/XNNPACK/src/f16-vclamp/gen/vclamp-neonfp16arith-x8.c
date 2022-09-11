@@ -19,7 +19,7 @@ void xnn_f16_vclamp_ukernel__neonfp16arith_x8(
     size_t n,
     const void* restrict x_ptr,
     void* restrict y_ptr,
-    const struct xnn_f16_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_DISABLE_TSAN
+    const union xnn_f16_minmax_params params[restrict XNN_MIN_ELEMENTS(1)]) XNN_OOB_READS
 {
   assert(n != 0);
   assert(n % sizeof(__fp16) == 0);
@@ -29,17 +29,14 @@ void xnn_f16_vclamp_ukernel__neonfp16arith_x8(
   const __fp16* x = (const __fp16*) x_ptr;
   __fp16* y = (__fp16*) y_ptr;
 
-  const float16x8_t vy_min = vld1q_dup_f16(&params->min);
-  const float16x8_t vy_max = vld1q_dup_f16(&params->max);
+  const float16x8_t vy_min = vreinterpretq_f16_u16(vld1q_dup_u16(&params->neon.min));
+  const float16x8_t vy_max = vreinterpretq_f16_u16(vld1q_dup_u16(&params->neon.max));
 
   for (; n >= 8 * sizeof(__fp16); n -= 8 * sizeof(__fp16)) {
-    float16x8_t vacc01234567 = vld1q_f16(x); x += 8;
-
-    vacc01234567 = vmaxq_f16(vacc01234567, vy_min);
-
-    vacc01234567 = vminq_f16(vacc01234567, vy_max);
-
-    vst1q_f16(y, vacc01234567); y += 8;
+    float16x8_t vacc = vld1q_f16(x); x += 8;
+    vacc = vmaxq_f16(vacc, vy_min);
+    vacc = vminq_f16(vacc, vy_max);
+    vst1q_f16(y, vacc); y += 8;
   }
   if XNN_UNLIKELY(n != 0) {
     float16x8_t vacc = vld1q_f16(x);
@@ -52,7 +49,7 @@ void xnn_f16_vclamp_ukernel__neonfp16arith_x8(
       vacc_lo = vget_high_f16(vacc);
     }
     if (n & (2 * sizeof(__fp16))) {
-      vst1_lane_u32(__builtin_assume_aligned(y, 1), vreinterpret_u32_f16(vacc_lo), 0); y += 2;
+      vst1_lane_u32((void*) y, vreinterpret_u32_f16(vacc_lo), 0); y += 2;
       vacc_lo = vext_f16(vacc_lo, vacc_lo, 2);
     }
     if (n & (1 * sizeof(__fp16))) {

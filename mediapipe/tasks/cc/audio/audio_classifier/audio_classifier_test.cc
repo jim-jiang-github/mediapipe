@@ -37,7 +37,6 @@ limitations under the License.
 #include "mediapipe/tasks/cc/audio/core/running_mode.h"
 #include "mediapipe/tasks/cc/audio/utils/test_utils.h"
 #include "mediapipe/tasks/cc/common.h"
-#include "mediapipe/tasks/cc/components/classifier_options.pb.h"
 #include "mediapipe/tasks/cc/components/containers/category.pb.h"
 #include "mediapipe/tasks/cc/components/containers/classifications.pb.h"
 #include "tensorflow/lite/core/shims/cc/shims_test_util.h"
@@ -45,6 +44,7 @@ limitations under the License.
 namespace mediapipe {
 namespace tasks {
 namespace audio {
+namespace audio_classifier {
 namespace {
 
 using ::absl::StatusOr;
@@ -168,7 +168,7 @@ class CreateFromOptionsTest : public tflite_shims::testing::Test {};
 TEST_F(CreateFromOptionsTest, SucceedsForModelWithMetadata) {
   auto options = std::make_unique<AudioClassifierOptions>();
   options->classifier_options.max_results = 3;
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithMetadata);
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<AudioClassifier> audio_classifier,
                           AudioClassifier::Create(std::move(options)));
@@ -192,7 +192,7 @@ TEST_F(CreateFromOptionsTest, FailsWithMissingModel) {
 TEST_F(CreateFromOptionsTest, FailsWithInvalidMaxResults) {
   auto options = std::make_unique<AudioClassifierOptions>();
   options->classifier_options.max_results = 0;
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithMetadata);
   StatusOr<std::unique_ptr<AudioClassifier>> audio_classifier_or =
       AudioClassifier::Create(std::move(options));
@@ -208,7 +208,7 @@ TEST_F(CreateFromOptionsTest, FailsWithInvalidMaxResults) {
 
 TEST_F(CreateFromOptionsTest, FailsWithCombinedAllowlistAndDenylist) {
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithMetadata);
   options->classifier_options.category_allowlist.push_back("foo");
   options->classifier_options.category_denylist.push_back("bar");
@@ -226,7 +226,7 @@ TEST_F(CreateFromOptionsTest, FailsWithCombinedAllowlistAndDenylist) {
 
 TEST_F(CreateFromOptionsTest, FailsWithMissingMetadata) {
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithoutMetadata);
   StatusOr<std::unique_ptr<AudioClassifier>> audio_classifier_or =
       AudioClassifier::Create(std::move(options));
@@ -242,7 +242,7 @@ TEST_F(CreateFromOptionsTest, FailsWithMissingMetadata) {
 
 TEST_F(CreateFromOptionsTest, FailsWithMissingCallback) {
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithoutMetadata);
   options->running_mode = core::RunningMode::AUDIO_STREAM;
   options->sample_rate = 16000;
@@ -260,7 +260,7 @@ TEST_F(CreateFromOptionsTest, FailsWithMissingCallback) {
 
 TEST_F(CreateFromOptionsTest, FailsWithUnnecessaryCallback) {
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithoutMetadata);
   options->result_callback =
       [](absl::StatusOr<ClassificationResult> status_or_result) {};
@@ -279,7 +279,7 @@ TEST_F(CreateFromOptionsTest, FailsWithUnnecessaryCallback) {
 
 TEST_F(CreateFromOptionsTest, FailsWithMissingDefaultInputAudioSampleRate) {
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithoutMetadata);
   options->running_mode = core::RunningMode::AUDIO_STREAM;
   options->result_callback =
@@ -301,7 +301,7 @@ class ClassifyTest : public tflite_shims::testing::Test {};
 TEST_F(ClassifyTest, Succeeds) {
   auto audio_buffer = GetAudioData(k16kTestWavFilename);
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithMetadata);
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<AudioClassifier> audio_classifier,
                           AudioClassifier::Create(std::move(options)));
@@ -315,7 +315,7 @@ TEST_F(ClassifyTest, Succeeds) {
 TEST_F(ClassifyTest, SucceedsWithResampling) {
   auto audio_buffer = GetAudioData(k48kTestWavFilename);
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithMetadata);
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<AudioClassifier> audio_classifier,
                           AudioClassifier::Create(std::move(options)));
@@ -330,7 +330,7 @@ TEST_F(ClassifyTest, SucceedsWithInputsAtDifferentSampleRates) {
   auto audio_buffer_16k_hz = GetAudioData(k16kTestWavFilename);
   auto audio_buffer_48k_hz = GetAudioData(k48kTestWavFilename);
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithMetadata);
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<AudioClassifier> audio_classifier,
                           AudioClassifier::Create(std::move(options)));
@@ -349,7 +349,7 @@ TEST_F(ClassifyTest, SucceedsWithInputsAtDifferentSampleRates) {
 
 TEST_F(ClassifyTest, SucceedsWithInsufficientData) {
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithMetadata);
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<AudioClassifier> audio_classifier,
                           AudioClassifier::Create(std::move(options)));
@@ -374,7 +374,7 @@ TEST_F(ClassifyTest, SucceedsWithInsufficientData) {
 TEST_F(ClassifyTest, SucceedsWithMultiheadsModel) {
   auto audio_buffer = GetAudioData(k16kTestWavForTwoHeadsFilename);
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kTwoHeadsModelWithMetadata);
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<AudioClassifier> audio_classifier,
                           AudioClassifier::Create(std::move(options)));
@@ -388,7 +388,7 @@ TEST_F(ClassifyTest, SucceedsWithMultiheadsModel) {
 TEST_F(ClassifyTest, SucceedsWithMultiheadsModelAndResampling) {
   auto audio_buffer = GetAudioData(k44kTestWavForTwoHeadsFilename);
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kTwoHeadsModelWithMetadata);
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<AudioClassifier> audio_classifier,
                           AudioClassifier::Create(std::move(options)));
@@ -404,7 +404,7 @@ TEST_F(ClassifyTest,
   auto audio_buffer_44k_hz = GetAudioData(k44kTestWavForTwoHeadsFilename);
   auto audio_buffer_16k_hz = GetAudioData(k16kTestWavForTwoHeadsFilename);
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kTwoHeadsModelWithMetadata);
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<AudioClassifier> audio_classifier,
                           AudioClassifier::Create(std::move(options)));
@@ -424,7 +424,7 @@ TEST_F(ClassifyTest,
 TEST_F(ClassifyTest, SucceedsWithMaxResultOption) {
   auto audio_buffer = GetAudioData(k48kTestWavFilename);
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithMetadata);
   options->classifier_options.max_results = 1;
   options->classifier_options.score_threshold = 0.35f;
@@ -440,7 +440,7 @@ TEST_F(ClassifyTest, SucceedsWithMaxResultOption) {
 TEST_F(ClassifyTest, SucceedsWithScoreThresholdOption) {
   auto audio_buffer = GetAudioData(k48kTestWavFilename);
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithMetadata);
   options->classifier_options.score_threshold = 0.35f;
   MP_ASSERT_OK_AND_ASSIGN(std::unique_ptr<AudioClassifier> audio_classifier,
@@ -455,7 +455,7 @@ TEST_F(ClassifyTest, SucceedsWithScoreThresholdOption) {
 TEST_F(ClassifyTest, SucceedsWithCategoryAllowlist) {
   auto audio_buffer = GetAudioData(k48kTestWavFilename);
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithMetadata);
   options->classifier_options.score_threshold = 0.1f;
   options->classifier_options.category_allowlist.push_back("Speech");
@@ -471,7 +471,7 @@ TEST_F(ClassifyTest, SucceedsWithCategoryAllowlist) {
 TEST_F(ClassifyTest, SucceedsWithCategoryDenylist) {
   auto audio_buffer = GetAudioData(k48kTestWavFilename);
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithMetadata);
   options->classifier_options.score_threshold = 0.9f;
   options->classifier_options.category_denylist.push_back("Speech");
@@ -499,7 +499,7 @@ TEST_F(ClassifyAsyncTest, Succeeds) {
   constexpr int kSampleRateHz = 48000;
   auto audio_buffer = GetAudioData(k48kTestWavFilename);
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithMetadata);
   options->classifier_options.max_results = 1;
   options->classifier_options.score_threshold = 0.3f;
@@ -529,7 +529,7 @@ TEST_F(ClassifyAsyncTest, SucceedsWithNonDeterministicNumAudioSamples) {
   constexpr int kSampleRateHz = 48000;
   auto audio_buffer = GetAudioData(k48kTestWavFilename);
   auto options = std::make_unique<AudioClassifierOptions>();
-  options->base_options.model_file_name =
+  options->base_options.model_asset_path =
       JoinPath("./", kTestDataDirectory, kModelWithMetadata);
   options->classifier_options.max_results = 1;
   options->classifier_options.score_threshold = 0.3f;
@@ -558,6 +558,7 @@ TEST_F(ClassifyAsyncTest, SucceedsWithNonDeterministicNumAudioSamples) {
 }
 
 }  // namespace
+}  // namespace audio_classifier
 }  // namespace audio
 }  // namespace tasks
 }  // namespace mediapipe

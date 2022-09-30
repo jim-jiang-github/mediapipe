@@ -1,4 +1,4 @@
-# Copyright 2021 The TensorFlow Authors. All Rights Reserved.
+# Copyright 2022 The MediaPipe Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 import os
 
 from absl import flags
-import cv2
 
 from mediapipe.python._framework_bindings import image as image_module
 from mediapipe.python._framework_bindings import image_frame as image_frame_module
@@ -44,12 +43,3 @@ def get_test_data_path(file_or_dirname: str) -> str:
       if f.endswith(file_or_dirname):
         return os.path.join(directory, f)
   raise ValueError("No %s in test directory" % file_or_dirname)
-
-
-# TODO: Implement image util module to read image data from file.
-def read_test_image(image_file: str) -> _Image:
-  """Reads a MediaPipe Image from the image file."""
-  image_data = cv2.imread(image_file)
-  if image_data.shape[2] != _RGB_CHANNELS:
-    raise ValueError("Input image must contain three channel rgb data.")
-  return _Image(_ImageFormat.SRGB, cv2.cvtColor(image_data, cv2.COLOR_BGR2RGB))

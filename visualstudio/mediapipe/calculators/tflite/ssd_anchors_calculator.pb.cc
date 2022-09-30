@@ -30,9 +30,15 @@ constexpr SsdAnchorsCalculatorOptions::SsdAnchorsCalculatorOptions(
   , num_layers_(0)
   , reduce_boxes_in_lowest_layer_(false)
   , fixed_anchor_size_(false)
-  , interpolated_scale_aspect_ratio_(1)
+  , multiscale_anchor_generation_(false)
   , anchor_offset_x_(0.5f)
-  , anchor_offset_y_(0.5f){}
+  , anchor_offset_y_(0.5f)
+  , interpolated_scale_aspect_ratio_(1)
+  , min_level_(3)
+  , max_level_(7)
+  , anchor_scale_(4)
+  , scales_per_octave_(2)
+  , normalize_coordinates_(true){}
 struct SsdAnchorsCalculatorOptionsDefaultTypeInternal {
   constexpr SsdAnchorsCalculatorOptionsDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -67,6 +73,12 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fcalculators_2ftfli
   PROTOBUF_FIELD_OFFSET(::mediapipe::SsdAnchorsCalculatorOptions, reduce_boxes_in_lowest_layer_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::SsdAnchorsCalculatorOptions, interpolated_scale_aspect_ratio_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::SsdAnchorsCalculatorOptions, fixed_anchor_size_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::SsdAnchorsCalculatorOptions, multiscale_anchor_generation_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::SsdAnchorsCalculatorOptions, min_level_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::SsdAnchorsCalculatorOptions, max_level_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::SsdAnchorsCalculatorOptions, anchor_scale_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::SsdAnchorsCalculatorOptions, scales_per_octave_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::SsdAnchorsCalculatorOptions, normalize_coordinates_),
   0,
   1,
   2,
@@ -79,11 +91,17 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fcalculators_2ftfli
   ~0u,
   ~0u,
   5,
-  7,
+  10,
   6,
+  7,
+  11,
+  12,
+  13,
+  14,
+  15,
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 19, sizeof(::mediapipe::SsdAnchorsCalculatorOptions)},
+  { 0, 25, sizeof(::mediapipe::SsdAnchorsCalculatorOptions)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -93,7 +111,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 const char descriptor_table_protodef_mediapipe_2fcalculators_2ftflite_2fssd_5fanchors_5fcalculator_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n9mediapipe/calculators/tflite/ssd_ancho"
   "rs_calculator.proto\022\tmediapipe\032$mediapip"
-  "e/framework/calculator.proto\"\370\003\n\033SsdAnch"
+  "e/framework/calculator.proto\"\255\005\n\033SsdAnch"
   "orsCalculatorOptions\022\030\n\020input_size_width"
   "\030\001 \001(\005\022\031\n\021input_size_height\030\002 \001(\005\022\021\n\tmin"
   "_scale\030\003 \001(\002\022\021\n\tmax_scale\030\004 \001(\002\022\034\n\017ancho"
@@ -104,16 +122,20 @@ const char descriptor_table_protodef_mediapipe_2fcalculators_2ftflite_2fssd_5fan
   "\030\013 \003(\002\022+\n\034reduce_boxes_in_lowest_layer\030\014"
   " \001(\010:\005false\022*\n\037interpolated_scale_aspect"
   "_ratio\030\r \001(\002:\0011\022 \n\021fixed_anchor_size\030\016 \001"
-  "(\010:\005false2T\n\003ext\022\034.mediapipe.CalculatorO"
-  "ptions\030\377\270\363u \001(\0132&.mediapipe.SsdAnchorsCa"
-  "lculatorOptions"
+  "(\010:\005false\022+\n\034multiscale_anchor_generatio"
+  "n\030\017 \001(\010:\005false\022\024\n\tmin_level\030\020 \001(\005:\0013\022\024\n\t"
+  "max_level\030\021 \001(\005:\0017\022\027\n\014anchor_scale\030\022 \001(\002"
+  ":\0014\022\034\n\021scales_per_octave\030\023 \001(\005:\0012\022#\n\025nor"
+  "malize_coordinates\030\024 \001(\010:\004true2T\n\003ext\022\034."
+  "mediapipe.CalculatorOptions\030\377\270\363u \001(\0132&.m"
+  "ediapipe.SsdAnchorsCalculatorOptions"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fcalculators_2ftflite_2fssd_5fanchors_5fcalculator_2eproto_deps[1] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fcalculators_2ftflite_2fssd_5fanchors_5fcalculator_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fcalculators_2ftflite_2fssd_5fanchors_5fcalculator_2eproto = {
-  false, false, 615, descriptor_table_protodef_mediapipe_2fcalculators_2ftflite_2fssd_5fanchors_5fcalculator_2eproto, "mediapipe/calculators/tflite/ssd_anchors_calculator.proto", 
+  false, false, 796, descriptor_table_protodef_mediapipe_2fcalculators_2ftflite_2fssd_5fanchors_5fcalculator_2eproto, "mediapipe/calculators/tflite/ssd_anchors_calculator.proto", 
   &descriptor_table_mediapipe_2fcalculators_2ftflite_2fssd_5fanchors_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2ftflite_2fssd_5fanchors_5fcalculator_2eproto_deps, 1, 1,
   schemas, file_default_instances, TableStruct_mediapipe_2fcalculators_2ftflite_2fssd_5fanchors_5fcalculator_2eproto::offsets,
   file_level_metadata_mediapipe_2fcalculators_2ftflite_2fssd_5fanchors_5fcalculator_2eproto, file_level_enum_descriptors_mediapipe_2fcalculators_2ftflite_2fssd_5fanchors_5fcalculator_2eproto, file_level_service_descriptors_mediapipe_2fcalculators_2ftflite_2fssd_5fanchors_5fcalculator_2eproto,
@@ -156,10 +178,28 @@ class SsdAnchorsCalculatorOptions::_Internal {
     (*has_bits)[0] |= 32u;
   }
   static void set_has_interpolated_scale_aspect_ratio(HasBits* has_bits) {
-    (*has_bits)[0] |= 128u;
+    (*has_bits)[0] |= 1024u;
   }
   static void set_has_fixed_anchor_size(HasBits* has_bits) {
     (*has_bits)[0] |= 64u;
+  }
+  static void set_has_multiscale_anchor_generation(HasBits* has_bits) {
+    (*has_bits)[0] |= 128u;
+  }
+  static void set_has_min_level(HasBits* has_bits) {
+    (*has_bits)[0] |= 2048u;
+  }
+  static void set_has_max_level(HasBits* has_bits) {
+    (*has_bits)[0] |= 4096u;
+  }
+  static void set_has_anchor_scale(HasBits* has_bits) {
+    (*has_bits)[0] |= 8192u;
+  }
+  static void set_has_scales_per_octave(HasBits* has_bits) {
+    (*has_bits)[0] |= 16384u;
+  }
+  static void set_has_normalize_coordinates(HasBits* has_bits) {
+    (*has_bits)[0] |= 32768u;
   }
 };
 
@@ -182,19 +222,24 @@ SsdAnchorsCalculatorOptions::SsdAnchorsCalculatorOptions(const SsdAnchorsCalcula
       aspect_ratios_(from.aspect_ratios_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::memcpy(&input_size_width_, &from.input_size_width_,
-    static_cast<size_t>(reinterpret_cast<char*>(&anchor_offset_y_) -
-    reinterpret_cast<char*>(&input_size_width_)) + sizeof(anchor_offset_y_));
+    static_cast<size_t>(reinterpret_cast<char*>(&normalize_coordinates_) -
+    reinterpret_cast<char*>(&input_size_width_)) + sizeof(normalize_coordinates_));
   // @@protoc_insertion_point(copy_constructor:mediapipe.SsdAnchorsCalculatorOptions)
 }
 
 void SsdAnchorsCalculatorOptions::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&input_size_width_) - reinterpret_cast<char*>(this)),
-    0, static_cast<size_t>(reinterpret_cast<char*>(&fixed_anchor_size_) -
-    reinterpret_cast<char*>(&input_size_width_)) + sizeof(fixed_anchor_size_));
-interpolated_scale_aspect_ratio_ = 1;
+    0, static_cast<size_t>(reinterpret_cast<char*>(&multiscale_anchor_generation_) -
+    reinterpret_cast<char*>(&input_size_width_)) + sizeof(multiscale_anchor_generation_));
 anchor_offset_x_ = 0.5f;
 anchor_offset_y_ = 0.5f;
+interpolated_scale_aspect_ratio_ = 1;
+min_level_ = 3;
+max_level_ = 7;
+anchor_scale_ = 4;
+scales_per_octave_ = 2;
+normalize_coordinates_ = true;
 }
 
 SsdAnchorsCalculatorOptions::~SsdAnchorsCalculatorOptions() {
@@ -230,13 +275,18 @@ void SsdAnchorsCalculatorOptions::Clear() {
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x000000ffu) {
     ::memset(&input_size_width_, 0, static_cast<size_t>(
-        reinterpret_cast<char*>(&fixed_anchor_size_) -
-        reinterpret_cast<char*>(&input_size_width_)) + sizeof(fixed_anchor_size_));
-    interpolated_scale_aspect_ratio_ = 1;
+        reinterpret_cast<char*>(&multiscale_anchor_generation_) -
+        reinterpret_cast<char*>(&input_size_width_)) + sizeof(multiscale_anchor_generation_));
   }
-  if (cached_has_bits & 0x00000300u) {
+  if (cached_has_bits & 0x0000ff00u) {
     anchor_offset_x_ = 0.5f;
     anchor_offset_y_ = 0.5f;
+    interpolated_scale_aspect_ratio_ = 1;
+    min_level_ = 3;
+    max_level_ = 7;
+    anchor_scale_ = 4;
+    scales_per_octave_ = 2;
+    normalize_coordinates_ = true;
   }
   _has_bits_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
@@ -389,6 +439,54 @@ const char* SsdAnchorsCalculatorOptions::_InternalParse(const char* ptr, ::PROTO
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
+      // optional bool multiscale_anchor_generation = 15 [default = false];
+      case 15:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 120)) {
+          _Internal::set_has_multiscale_anchor_generation(&has_bits);
+          multiscale_anchor_generation_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // optional int32 min_level = 16 [default = 3];
+      case 16:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 128)) {
+          _Internal::set_has_min_level(&has_bits);
+          min_level_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // optional int32 max_level = 17 [default = 7];
+      case 17:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 136)) {
+          _Internal::set_has_max_level(&has_bits);
+          max_level_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // optional float anchor_scale = 18 [default = 4];
+      case 18:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 149)) {
+          _Internal::set_has_anchor_scale(&has_bits);
+          anchor_scale_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // optional int32 scales_per_octave = 19 [default = 2];
+      case 19:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 152)) {
+          _Internal::set_has_scales_per_octave(&has_bits);
+          scales_per_octave_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // optional bool normalize_coordinates = 20 [default = true];
+      case 20:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 160)) {
+          _Internal::set_has_normalize_coordinates(&has_bits);
+          normalize_coordinates_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag == 0) || ((tag & 7) == 4)) {
@@ -493,7 +591,7 @@ failure:
   }
 
   // optional float interpolated_scale_aspect_ratio = 13 [default = 1];
-  if (cached_has_bits & 0x00000080u) {
+  if (cached_has_bits & 0x00000400u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(13, this->_internal_interpolated_scale_aspect_ratio(), target);
   }
@@ -502,6 +600,42 @@ failure:
   if (cached_has_bits & 0x00000040u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(14, this->_internal_fixed_anchor_size(), target);
+  }
+
+  // optional bool multiscale_anchor_generation = 15 [default = false];
+  if (cached_has_bits & 0x00000080u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(15, this->_internal_multiscale_anchor_generation(), target);
+  }
+
+  // optional int32 min_level = 16 [default = 3];
+  if (cached_has_bits & 0x00000800u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(16, this->_internal_min_level(), target);
+  }
+
+  // optional int32 max_level = 17 [default = 7];
+  if (cached_has_bits & 0x00001000u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(17, this->_internal_max_level(), target);
+  }
+
+  // optional float anchor_scale = 18 [default = 4];
+  if (cached_has_bits & 0x00002000u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(18, this->_internal_anchor_scale(), target);
+  }
+
+  // optional int32 scales_per_octave = 19 [default = 2];
+  if (cached_has_bits & 0x00004000u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(19, this->_internal_scales_per_octave(), target);
+  }
+
+  // optional bool normalize_coordinates = 20 [default = true];
+  if (cached_has_bits & 0x00008000u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(20, this->_internal_normalize_coordinates(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -599,13 +733,13 @@ size_t SsdAnchorsCalculatorOptions::ByteSizeLong() const {
       total_size += 1 + 1;
     }
 
-    // optional float interpolated_scale_aspect_ratio = 13 [default = 1];
+    // optional bool multiscale_anchor_generation = 15 [default = false];
     if (cached_has_bits & 0x00000080u) {
-      total_size += 1 + 4;
+      total_size += 1 + 1;
     }
 
   }
-  if (cached_has_bits & 0x00000300u) {
+  if (cached_has_bits & 0x0000ff00u) {
     // optional float anchor_offset_x = 5 [default = 0.5];
     if (cached_has_bits & 0x00000100u) {
       total_size += 1 + 4;
@@ -614,6 +748,42 @@ size_t SsdAnchorsCalculatorOptions::ByteSizeLong() const {
     // optional float anchor_offset_y = 6 [default = 0.5];
     if (cached_has_bits & 0x00000200u) {
       total_size += 1 + 4;
+    }
+
+    // optional float interpolated_scale_aspect_ratio = 13 [default = 1];
+    if (cached_has_bits & 0x00000400u) {
+      total_size += 1 + 4;
+    }
+
+    // optional int32 min_level = 16 [default = 3];
+    if (cached_has_bits & 0x00000800u) {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+          this->_internal_min_level());
+    }
+
+    // optional int32 max_level = 17 [default = 7];
+    if (cached_has_bits & 0x00001000u) {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+          this->_internal_max_level());
+    }
+
+    // optional float anchor_scale = 18 [default = 4];
+    if (cached_has_bits & 0x00002000u) {
+      total_size += 2 + 4;
+    }
+
+    // optional int32 scales_per_octave = 19 [default = 2];
+    if (cached_has_bits & 0x00004000u) {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+          this->_internal_scales_per_octave());
+    }
+
+    // optional bool normalize_coordinates = 20 [default = true];
+    if (cached_has_bits & 0x00008000u) {
+      total_size += 2 + 1;
     }
 
   }
@@ -676,16 +846,34 @@ void SsdAnchorsCalculatorOptions::MergeFrom(const SsdAnchorsCalculatorOptions& f
       fixed_anchor_size_ = from.fixed_anchor_size_;
     }
     if (cached_has_bits & 0x00000080u) {
-      interpolated_scale_aspect_ratio_ = from.interpolated_scale_aspect_ratio_;
+      multiscale_anchor_generation_ = from.multiscale_anchor_generation_;
     }
     _has_bits_[0] |= cached_has_bits;
   }
-  if (cached_has_bits & 0x00000300u) {
+  if (cached_has_bits & 0x0000ff00u) {
     if (cached_has_bits & 0x00000100u) {
       anchor_offset_x_ = from.anchor_offset_x_;
     }
     if (cached_has_bits & 0x00000200u) {
       anchor_offset_y_ = from.anchor_offset_y_;
+    }
+    if (cached_has_bits & 0x00000400u) {
+      interpolated_scale_aspect_ratio_ = from.interpolated_scale_aspect_ratio_;
+    }
+    if (cached_has_bits & 0x00000800u) {
+      min_level_ = from.min_level_;
+    }
+    if (cached_has_bits & 0x00001000u) {
+      max_level_ = from.max_level_;
+    }
+    if (cached_has_bits & 0x00002000u) {
+      anchor_scale_ = from.anchor_scale_;
+    }
+    if (cached_has_bits & 0x00004000u) {
+      scales_per_octave_ = from.scales_per_octave_;
+    }
+    if (cached_has_bits & 0x00008000u) {
+      normalize_coordinates_ = from.normalize_coordinates_;
     }
     _has_bits_[0] |= cached_has_bits;
   }
@@ -718,14 +906,19 @@ void SsdAnchorsCalculatorOptions::InternalSwap(SsdAnchorsCalculatorOptions* othe
   strides_.InternalSwap(&other->strides_);
   aspect_ratios_.InternalSwap(&other->aspect_ratios_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(SsdAnchorsCalculatorOptions, fixed_anchor_size_)
-      + sizeof(SsdAnchorsCalculatorOptions::fixed_anchor_size_)
+      PROTOBUF_FIELD_OFFSET(SsdAnchorsCalculatorOptions, multiscale_anchor_generation_)
+      + sizeof(SsdAnchorsCalculatorOptions::multiscale_anchor_generation_)
       - PROTOBUF_FIELD_OFFSET(SsdAnchorsCalculatorOptions, input_size_width_)>(
           reinterpret_cast<char*>(&input_size_width_),
           reinterpret_cast<char*>(&other->input_size_width_));
-  swap(interpolated_scale_aspect_ratio_, other->interpolated_scale_aspect_ratio_);
   swap(anchor_offset_x_, other->anchor_offset_x_);
   swap(anchor_offset_y_, other->anchor_offset_y_);
+  swap(interpolated_scale_aspect_ratio_, other->interpolated_scale_aspect_ratio_);
+  swap(min_level_, other->min_level_);
+  swap(max_level_, other->max_level_);
+  swap(anchor_scale_, other->anchor_scale_);
+  swap(scales_per_octave_, other->scales_per_octave_);
+  swap(normalize_coordinates_, other->normalize_coordinates_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata SsdAnchorsCalculatorOptions::GetMetadata() const {

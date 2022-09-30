@@ -191,9 +191,15 @@ class SsdAnchorsCalculatorOptions PROTOBUF_FINAL :
     kNumLayersFieldNumber = 7,
     kReduceBoxesInLowestLayerFieldNumber = 12,
     kFixedAnchorSizeFieldNumber = 14,
-    kInterpolatedScaleAspectRatioFieldNumber = 13,
+    kMultiscaleAnchorGenerationFieldNumber = 15,
     kAnchorOffsetXFieldNumber = 5,
     kAnchorOffsetYFieldNumber = 6,
+    kInterpolatedScaleAspectRatioFieldNumber = 13,
+    kMinLevelFieldNumber = 16,
+    kMaxLevelFieldNumber = 17,
+    kAnchorScaleFieldNumber = 18,
+    kScalesPerOctaveFieldNumber = 19,
+    kNormalizeCoordinatesFieldNumber = 20,
   };
   // repeated int32 feature_map_width = 8;
   int feature_map_width_size() const;
@@ -374,17 +380,17 @@ class SsdAnchorsCalculatorOptions PROTOBUF_FINAL :
   void _internal_set_fixed_anchor_size(bool value);
   public:
 
-  // optional float interpolated_scale_aspect_ratio = 13 [default = 1];
-  bool has_interpolated_scale_aspect_ratio() const;
+  // optional bool multiscale_anchor_generation = 15 [default = false];
+  bool has_multiscale_anchor_generation() const;
   private:
-  bool _internal_has_interpolated_scale_aspect_ratio() const;
+  bool _internal_has_multiscale_anchor_generation() const;
   public:
-  void clear_interpolated_scale_aspect_ratio();
-  float interpolated_scale_aspect_ratio() const;
-  void set_interpolated_scale_aspect_ratio(float value);
+  void clear_multiscale_anchor_generation();
+  bool multiscale_anchor_generation() const;
+  void set_multiscale_anchor_generation(bool value);
   private:
-  float _internal_interpolated_scale_aspect_ratio() const;
-  void _internal_set_interpolated_scale_aspect_ratio(float value);
+  bool _internal_multiscale_anchor_generation() const;
+  void _internal_set_multiscale_anchor_generation(bool value);
   public:
 
   // optional float anchor_offset_x = 5 [default = 0.5];
@@ -413,6 +419,84 @@ class SsdAnchorsCalculatorOptions PROTOBUF_FINAL :
   void _internal_set_anchor_offset_y(float value);
   public:
 
+  // optional float interpolated_scale_aspect_ratio = 13 [default = 1];
+  bool has_interpolated_scale_aspect_ratio() const;
+  private:
+  bool _internal_has_interpolated_scale_aspect_ratio() const;
+  public:
+  void clear_interpolated_scale_aspect_ratio();
+  float interpolated_scale_aspect_ratio() const;
+  void set_interpolated_scale_aspect_ratio(float value);
+  private:
+  float _internal_interpolated_scale_aspect_ratio() const;
+  void _internal_set_interpolated_scale_aspect_ratio(float value);
+  public:
+
+  // optional int32 min_level = 16 [default = 3];
+  bool has_min_level() const;
+  private:
+  bool _internal_has_min_level() const;
+  public:
+  void clear_min_level();
+  ::PROTOBUF_NAMESPACE_ID::int32 min_level() const;
+  void set_min_level(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_min_level() const;
+  void _internal_set_min_level(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional int32 max_level = 17 [default = 7];
+  bool has_max_level() const;
+  private:
+  bool _internal_has_max_level() const;
+  public:
+  void clear_max_level();
+  ::PROTOBUF_NAMESPACE_ID::int32 max_level() const;
+  void set_max_level(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_max_level() const;
+  void _internal_set_max_level(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional float anchor_scale = 18 [default = 4];
+  bool has_anchor_scale() const;
+  private:
+  bool _internal_has_anchor_scale() const;
+  public:
+  void clear_anchor_scale();
+  float anchor_scale() const;
+  void set_anchor_scale(float value);
+  private:
+  float _internal_anchor_scale() const;
+  void _internal_set_anchor_scale(float value);
+  public:
+
+  // optional int32 scales_per_octave = 19 [default = 2];
+  bool has_scales_per_octave() const;
+  private:
+  bool _internal_has_scales_per_octave() const;
+  public:
+  void clear_scales_per_octave();
+  ::PROTOBUF_NAMESPACE_ID::int32 scales_per_octave() const;
+  void set_scales_per_octave(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_scales_per_octave() const;
+  void _internal_set_scales_per_octave(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional bool normalize_coordinates = 20 [default = true];
+  bool has_normalize_coordinates() const;
+  private:
+  bool _internal_has_normalize_coordinates() const;
+  public:
+  void clear_normalize_coordinates();
+  bool normalize_coordinates() const;
+  void set_normalize_coordinates(bool value);
+  private:
+  bool _internal_normalize_coordinates() const;
+  void _internal_set_normalize_coordinates(bool value);
+  public:
+
   static const int kExtFieldNumber = 247258239;
   static ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier< ::mediapipe::CalculatorOptions,
       ::PROTOBUF_NAMESPACE_ID::internal::MessageTypeTraits< ::mediapipe::SsdAnchorsCalculatorOptions >, 11, false >
@@ -437,9 +521,15 @@ class SsdAnchorsCalculatorOptions PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::int32 num_layers_;
   bool reduce_boxes_in_lowest_layer_;
   bool fixed_anchor_size_;
-  float interpolated_scale_aspect_ratio_;
+  bool multiscale_anchor_generation_;
   float anchor_offset_x_;
   float anchor_offset_y_;
+  float interpolated_scale_aspect_ratio_;
+  ::PROTOBUF_NAMESPACE_ID::int32 min_level_;
+  ::PROTOBUF_NAMESPACE_ID::int32 max_level_;
+  float anchor_scale_;
+  ::PROTOBUF_NAMESPACE_ID::int32 scales_per_octave_;
+  bool normalize_coordinates_;
   friend struct ::TableStruct_mediapipe_2fcalculators_2ftflite_2fssd_5fanchors_5fcalculator_2eproto;
 };
 // ===================================================================
@@ -867,7 +957,7 @@ inline void SsdAnchorsCalculatorOptions::set_reduce_boxes_in_lowest_layer(bool v
 
 // optional float interpolated_scale_aspect_ratio = 13 [default = 1];
 inline bool SsdAnchorsCalculatorOptions::_internal_has_interpolated_scale_aspect_ratio() const {
-  bool value = (_has_bits_[0] & 0x00000080u) != 0;
+  bool value = (_has_bits_[0] & 0x00000400u) != 0;
   return value;
 }
 inline bool SsdAnchorsCalculatorOptions::has_interpolated_scale_aspect_ratio() const {
@@ -875,7 +965,7 @@ inline bool SsdAnchorsCalculatorOptions::has_interpolated_scale_aspect_ratio() c
 }
 inline void SsdAnchorsCalculatorOptions::clear_interpolated_scale_aspect_ratio() {
   interpolated_scale_aspect_ratio_ = 1;
-  _has_bits_[0] &= ~0x00000080u;
+  _has_bits_[0] &= ~0x00000400u;
 }
 inline float SsdAnchorsCalculatorOptions::_internal_interpolated_scale_aspect_ratio() const {
   return interpolated_scale_aspect_ratio_;
@@ -885,7 +975,7 @@ inline float SsdAnchorsCalculatorOptions::interpolated_scale_aspect_ratio() cons
   return _internal_interpolated_scale_aspect_ratio();
 }
 inline void SsdAnchorsCalculatorOptions::_internal_set_interpolated_scale_aspect_ratio(float value) {
-  _has_bits_[0] |= 0x00000080u;
+  _has_bits_[0] |= 0x00000400u;
   interpolated_scale_aspect_ratio_ = value;
 }
 inline void SsdAnchorsCalculatorOptions::set_interpolated_scale_aspect_ratio(float value) {
@@ -919,6 +1009,174 @@ inline void SsdAnchorsCalculatorOptions::_internal_set_fixed_anchor_size(bool va
 inline void SsdAnchorsCalculatorOptions::set_fixed_anchor_size(bool value) {
   _internal_set_fixed_anchor_size(value);
   // @@protoc_insertion_point(field_set:mediapipe.SsdAnchorsCalculatorOptions.fixed_anchor_size)
+}
+
+// optional bool multiscale_anchor_generation = 15 [default = false];
+inline bool SsdAnchorsCalculatorOptions::_internal_has_multiscale_anchor_generation() const {
+  bool value = (_has_bits_[0] & 0x00000080u) != 0;
+  return value;
+}
+inline bool SsdAnchorsCalculatorOptions::has_multiscale_anchor_generation() const {
+  return _internal_has_multiscale_anchor_generation();
+}
+inline void SsdAnchorsCalculatorOptions::clear_multiscale_anchor_generation() {
+  multiscale_anchor_generation_ = false;
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline bool SsdAnchorsCalculatorOptions::_internal_multiscale_anchor_generation() const {
+  return multiscale_anchor_generation_;
+}
+inline bool SsdAnchorsCalculatorOptions::multiscale_anchor_generation() const {
+  // @@protoc_insertion_point(field_get:mediapipe.SsdAnchorsCalculatorOptions.multiscale_anchor_generation)
+  return _internal_multiscale_anchor_generation();
+}
+inline void SsdAnchorsCalculatorOptions::_internal_set_multiscale_anchor_generation(bool value) {
+  _has_bits_[0] |= 0x00000080u;
+  multiscale_anchor_generation_ = value;
+}
+inline void SsdAnchorsCalculatorOptions::set_multiscale_anchor_generation(bool value) {
+  _internal_set_multiscale_anchor_generation(value);
+  // @@protoc_insertion_point(field_set:mediapipe.SsdAnchorsCalculatorOptions.multiscale_anchor_generation)
+}
+
+// optional int32 min_level = 16 [default = 3];
+inline bool SsdAnchorsCalculatorOptions::_internal_has_min_level() const {
+  bool value = (_has_bits_[0] & 0x00000800u) != 0;
+  return value;
+}
+inline bool SsdAnchorsCalculatorOptions::has_min_level() const {
+  return _internal_has_min_level();
+}
+inline void SsdAnchorsCalculatorOptions::clear_min_level() {
+  min_level_ = 3;
+  _has_bits_[0] &= ~0x00000800u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 SsdAnchorsCalculatorOptions::_internal_min_level() const {
+  return min_level_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 SsdAnchorsCalculatorOptions::min_level() const {
+  // @@protoc_insertion_point(field_get:mediapipe.SsdAnchorsCalculatorOptions.min_level)
+  return _internal_min_level();
+}
+inline void SsdAnchorsCalculatorOptions::_internal_set_min_level(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00000800u;
+  min_level_ = value;
+}
+inline void SsdAnchorsCalculatorOptions::set_min_level(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_min_level(value);
+  // @@protoc_insertion_point(field_set:mediapipe.SsdAnchorsCalculatorOptions.min_level)
+}
+
+// optional int32 max_level = 17 [default = 7];
+inline bool SsdAnchorsCalculatorOptions::_internal_has_max_level() const {
+  bool value = (_has_bits_[0] & 0x00001000u) != 0;
+  return value;
+}
+inline bool SsdAnchorsCalculatorOptions::has_max_level() const {
+  return _internal_has_max_level();
+}
+inline void SsdAnchorsCalculatorOptions::clear_max_level() {
+  max_level_ = 7;
+  _has_bits_[0] &= ~0x00001000u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 SsdAnchorsCalculatorOptions::_internal_max_level() const {
+  return max_level_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 SsdAnchorsCalculatorOptions::max_level() const {
+  // @@protoc_insertion_point(field_get:mediapipe.SsdAnchorsCalculatorOptions.max_level)
+  return _internal_max_level();
+}
+inline void SsdAnchorsCalculatorOptions::_internal_set_max_level(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00001000u;
+  max_level_ = value;
+}
+inline void SsdAnchorsCalculatorOptions::set_max_level(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_max_level(value);
+  // @@protoc_insertion_point(field_set:mediapipe.SsdAnchorsCalculatorOptions.max_level)
+}
+
+// optional float anchor_scale = 18 [default = 4];
+inline bool SsdAnchorsCalculatorOptions::_internal_has_anchor_scale() const {
+  bool value = (_has_bits_[0] & 0x00002000u) != 0;
+  return value;
+}
+inline bool SsdAnchorsCalculatorOptions::has_anchor_scale() const {
+  return _internal_has_anchor_scale();
+}
+inline void SsdAnchorsCalculatorOptions::clear_anchor_scale() {
+  anchor_scale_ = 4;
+  _has_bits_[0] &= ~0x00002000u;
+}
+inline float SsdAnchorsCalculatorOptions::_internal_anchor_scale() const {
+  return anchor_scale_;
+}
+inline float SsdAnchorsCalculatorOptions::anchor_scale() const {
+  // @@protoc_insertion_point(field_get:mediapipe.SsdAnchorsCalculatorOptions.anchor_scale)
+  return _internal_anchor_scale();
+}
+inline void SsdAnchorsCalculatorOptions::_internal_set_anchor_scale(float value) {
+  _has_bits_[0] |= 0x00002000u;
+  anchor_scale_ = value;
+}
+inline void SsdAnchorsCalculatorOptions::set_anchor_scale(float value) {
+  _internal_set_anchor_scale(value);
+  // @@protoc_insertion_point(field_set:mediapipe.SsdAnchorsCalculatorOptions.anchor_scale)
+}
+
+// optional int32 scales_per_octave = 19 [default = 2];
+inline bool SsdAnchorsCalculatorOptions::_internal_has_scales_per_octave() const {
+  bool value = (_has_bits_[0] & 0x00004000u) != 0;
+  return value;
+}
+inline bool SsdAnchorsCalculatorOptions::has_scales_per_octave() const {
+  return _internal_has_scales_per_octave();
+}
+inline void SsdAnchorsCalculatorOptions::clear_scales_per_octave() {
+  scales_per_octave_ = 2;
+  _has_bits_[0] &= ~0x00004000u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 SsdAnchorsCalculatorOptions::_internal_scales_per_octave() const {
+  return scales_per_octave_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 SsdAnchorsCalculatorOptions::scales_per_octave() const {
+  // @@protoc_insertion_point(field_get:mediapipe.SsdAnchorsCalculatorOptions.scales_per_octave)
+  return _internal_scales_per_octave();
+}
+inline void SsdAnchorsCalculatorOptions::_internal_set_scales_per_octave(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00004000u;
+  scales_per_octave_ = value;
+}
+inline void SsdAnchorsCalculatorOptions::set_scales_per_octave(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_scales_per_octave(value);
+  // @@protoc_insertion_point(field_set:mediapipe.SsdAnchorsCalculatorOptions.scales_per_octave)
+}
+
+// optional bool normalize_coordinates = 20 [default = true];
+inline bool SsdAnchorsCalculatorOptions::_internal_has_normalize_coordinates() const {
+  bool value = (_has_bits_[0] & 0x00008000u) != 0;
+  return value;
+}
+inline bool SsdAnchorsCalculatorOptions::has_normalize_coordinates() const {
+  return _internal_has_normalize_coordinates();
+}
+inline void SsdAnchorsCalculatorOptions::clear_normalize_coordinates() {
+  normalize_coordinates_ = true;
+  _has_bits_[0] &= ~0x00008000u;
+}
+inline bool SsdAnchorsCalculatorOptions::_internal_normalize_coordinates() const {
+  return normalize_coordinates_;
+}
+inline bool SsdAnchorsCalculatorOptions::normalize_coordinates() const {
+  // @@protoc_insertion_point(field_get:mediapipe.SsdAnchorsCalculatorOptions.normalize_coordinates)
+  return _internal_normalize_coordinates();
+}
+inline void SsdAnchorsCalculatorOptions::_internal_set_normalize_coordinates(bool value) {
+  _has_bits_[0] |= 0x00008000u;
+  normalize_coordinates_ = value;
+}
+inline void SsdAnchorsCalculatorOptions::set_normalize_coordinates(bool value) {
+  _internal_set_normalize_coordinates(value);
+  // @@protoc_insertion_point(field_set:mediapipe.SsdAnchorsCalculatorOptions.normalize_coordinates)
 }
 
 #ifdef __GNUC__

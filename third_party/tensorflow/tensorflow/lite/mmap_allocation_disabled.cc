@@ -26,6 +26,15 @@ MMAPAllocation::MMAPAllocation(const char* filename,
 MMAPAllocation::MMAPAllocation(int fd, ErrorReporter* error_reporter)
     : MMAPAllocation(error_reporter, -1) {}
 
+//
+// [workaround] by andre 2022/09/30
+MMAPAllocation::MMAPAllocation(int fd, size_t offset, size_t length,
+                               ErrorReporter* error_reporter)
+    : MMAPAllocation(error_reporter, -1) {
+  assert(false);
+}
+// [workaround]
+
 MMAPAllocation::MMAPAllocation(ErrorReporter* error_reporter, int owned_fd)
     : Allocation(error_reporter, Allocation::Type::kMMap),
       mmapped_buffer_(nullptr) {

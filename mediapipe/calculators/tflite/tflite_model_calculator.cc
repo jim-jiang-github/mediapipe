@@ -81,6 +81,9 @@ class TfLiteModelCalculator : public CalculatorBase {
     }
 
     if (cc->InputSidePackets().HasTag("MODEL_FD")) {
+      // from tensorflow/tensorflow/lite/allocation.h line 59
+      RET_CHECK(tflite::MMAPAllocation::IsSupported()) << "[Platform not support] Failed to load TfLite model from MODEL_FD";
+
       model_packet = cc->InputSidePackets().Tag("MODEL_FD");
       const auto& model_fd =
           model_packet.Get<std::tuple<int, size_t, size_t>>();

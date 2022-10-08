@@ -2378,12 +2378,14 @@ class RenderAnnotation_Text PROTOBUF_FINAL :
 
   enum : int {
     kDisplayTextFieldNumber = 1,
+    kOutlineColorFieldNumber = 12,
     kLeftFieldNumber = 2,
     kBaselineFieldNumber = 3,
     kFontFaceFieldNumber = 6,
     kNormalizedFieldNumber = 5,
     kCenterHorizontallyFieldNumber = 7,
     kCenterVerticallyFieldNumber = 8,
+    kOutlineThicknessFieldNumber = 11,
     kFontHeightFieldNumber = 4,
   };
   // optional string display_text = 1;
@@ -2403,6 +2405,24 @@ class RenderAnnotation_Text PROTOBUF_FINAL :
   void _internal_set_display_text(const std::string& value);
   std::string* _internal_mutable_display_text();
   public:
+
+  // optional .mediapipe.Color outline_color = 12;
+  bool has_outline_color() const;
+  private:
+  bool _internal_has_outline_color() const;
+  public:
+  void clear_outline_color();
+  const ::mediapipe::Color& outline_color() const;
+  PROTOBUF_FUTURE_MUST_USE_RESULT ::mediapipe::Color* release_outline_color();
+  ::mediapipe::Color* mutable_outline_color();
+  void set_allocated_outline_color(::mediapipe::Color* outline_color);
+  private:
+  const ::mediapipe::Color& _internal_outline_color() const;
+  ::mediapipe::Color* _internal_mutable_outline_color();
+  public:
+  void unsafe_arena_set_allocated_outline_color(
+      ::mediapipe::Color* outline_color);
+  ::mediapipe::Color* unsafe_arena_release_outline_color();
 
   // optional double left = 2;
   bool has_left() const;
@@ -2482,6 +2502,19 @@ class RenderAnnotation_Text PROTOBUF_FINAL :
   void _internal_set_center_vertically(bool value);
   public:
 
+  // optional double outline_thickness = 11 [default = 0];
+  bool has_outline_thickness() const;
+  private:
+  bool _internal_has_outline_thickness() const;
+  public:
+  void clear_outline_thickness();
+  double outline_thickness() const;
+  void set_outline_thickness(double value);
+  private:
+  double _internal_outline_thickness() const;
+  void _internal_set_outline_thickness(double value);
+  public:
+
   // optional double font_height = 4 [default = 8];
   bool has_font_height() const;
   private:
@@ -2505,12 +2538,14 @@ class RenderAnnotation_Text PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr display_text_;
+  ::mediapipe::Color* outline_color_;
   double left_;
   double baseline_;
   ::PROTOBUF_NAMESPACE_ID::int32 font_face_;
   bool normalized_;
   bool center_horizontally_;
   bool center_vertically_;
+  double outline_thickness_;
   double font_height_;
   friend struct ::TableStruct_mediapipe_2futil_2frender_5fdata_2eproto;
 };
@@ -5047,7 +5082,7 @@ inline void RenderAnnotation_Text::set_allocated_display_text(std::string* displ
 
 // optional double left = 2;
 inline bool RenderAnnotation_Text::_internal_has_left() const {
-  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
   return value;
 }
 inline bool RenderAnnotation_Text::has_left() const {
@@ -5055,7 +5090,7 @@ inline bool RenderAnnotation_Text::has_left() const {
 }
 inline void RenderAnnotation_Text::clear_left() {
   left_ = 0;
-  _has_bits_[0] &= ~0x00000002u;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline double RenderAnnotation_Text::_internal_left() const {
   return left_;
@@ -5065,7 +5100,7 @@ inline double RenderAnnotation_Text::left() const {
   return _internal_left();
 }
 inline void RenderAnnotation_Text::_internal_set_left(double value) {
-  _has_bits_[0] |= 0x00000002u;
+  _has_bits_[0] |= 0x00000004u;
   left_ = value;
 }
 inline void RenderAnnotation_Text::set_left(double value) {
@@ -5075,7 +5110,7 @@ inline void RenderAnnotation_Text::set_left(double value) {
 
 // optional double baseline = 3;
 inline bool RenderAnnotation_Text::_internal_has_baseline() const {
-  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
   return value;
 }
 inline bool RenderAnnotation_Text::has_baseline() const {
@@ -5083,7 +5118,7 @@ inline bool RenderAnnotation_Text::has_baseline() const {
 }
 inline void RenderAnnotation_Text::clear_baseline() {
   baseline_ = 0;
-  _has_bits_[0] &= ~0x00000004u;
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline double RenderAnnotation_Text::_internal_baseline() const {
   return baseline_;
@@ -5093,7 +5128,7 @@ inline double RenderAnnotation_Text::baseline() const {
   return _internal_baseline();
 }
 inline void RenderAnnotation_Text::_internal_set_baseline(double value) {
-  _has_bits_[0] |= 0x00000004u;
+  _has_bits_[0] |= 0x00000008u;
   baseline_ = value;
 }
 inline void RenderAnnotation_Text::set_baseline(double value) {
@@ -5103,7 +5138,7 @@ inline void RenderAnnotation_Text::set_baseline(double value) {
 
 // optional double font_height = 4 [default = 8];
 inline bool RenderAnnotation_Text::_internal_has_font_height() const {
-  bool value = (_has_bits_[0] & 0x00000080u) != 0;
+  bool value = (_has_bits_[0] & 0x00000200u) != 0;
   return value;
 }
 inline bool RenderAnnotation_Text::has_font_height() const {
@@ -5111,7 +5146,7 @@ inline bool RenderAnnotation_Text::has_font_height() const {
 }
 inline void RenderAnnotation_Text::clear_font_height() {
   font_height_ = 8;
-  _has_bits_[0] &= ~0x00000080u;
+  _has_bits_[0] &= ~0x00000200u;
 }
 inline double RenderAnnotation_Text::_internal_font_height() const {
   return font_height_;
@@ -5121,7 +5156,7 @@ inline double RenderAnnotation_Text::font_height() const {
   return _internal_font_height();
 }
 inline void RenderAnnotation_Text::_internal_set_font_height(double value) {
-  _has_bits_[0] |= 0x00000080u;
+  _has_bits_[0] |= 0x00000200u;
   font_height_ = value;
 }
 inline void RenderAnnotation_Text::set_font_height(double value) {
@@ -5131,7 +5166,7 @@ inline void RenderAnnotation_Text::set_font_height(double value) {
 
 // optional bool normalized = 5 [default = false];
 inline bool RenderAnnotation_Text::_internal_has_normalized() const {
-  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  bool value = (_has_bits_[0] & 0x00000020u) != 0;
   return value;
 }
 inline bool RenderAnnotation_Text::has_normalized() const {
@@ -5139,7 +5174,7 @@ inline bool RenderAnnotation_Text::has_normalized() const {
 }
 inline void RenderAnnotation_Text::clear_normalized() {
   normalized_ = false;
-  _has_bits_[0] &= ~0x00000010u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline bool RenderAnnotation_Text::_internal_normalized() const {
   return normalized_;
@@ -5149,7 +5184,7 @@ inline bool RenderAnnotation_Text::normalized() const {
   return _internal_normalized();
 }
 inline void RenderAnnotation_Text::_internal_set_normalized(bool value) {
-  _has_bits_[0] |= 0x00000010u;
+  _has_bits_[0] |= 0x00000020u;
   normalized_ = value;
 }
 inline void RenderAnnotation_Text::set_normalized(bool value) {
@@ -5159,7 +5194,7 @@ inline void RenderAnnotation_Text::set_normalized(bool value) {
 
 // optional int32 font_face = 6 [default = 0];
 inline bool RenderAnnotation_Text::_internal_has_font_face() const {
-  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
   return value;
 }
 inline bool RenderAnnotation_Text::has_font_face() const {
@@ -5167,7 +5202,7 @@ inline bool RenderAnnotation_Text::has_font_face() const {
 }
 inline void RenderAnnotation_Text::clear_font_face() {
   font_face_ = 0;
-  _has_bits_[0] &= ~0x00000008u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 RenderAnnotation_Text::_internal_font_face() const {
   return font_face_;
@@ -5177,7 +5212,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 RenderAnnotation_Text::font_face() const {
   return _internal_font_face();
 }
 inline void RenderAnnotation_Text::_internal_set_font_face(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _has_bits_[0] |= 0x00000008u;
+  _has_bits_[0] |= 0x00000010u;
   font_face_ = value;
 }
 inline void RenderAnnotation_Text::set_font_face(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -5187,7 +5222,7 @@ inline void RenderAnnotation_Text::set_font_face(::PROTOBUF_NAMESPACE_ID::int32 
 
 // optional bool center_horizontally = 7 [default = false];
 inline bool RenderAnnotation_Text::_internal_has_center_horizontally() const {
-  bool value = (_has_bits_[0] & 0x00000020u) != 0;
+  bool value = (_has_bits_[0] & 0x00000040u) != 0;
   return value;
 }
 inline bool RenderAnnotation_Text::has_center_horizontally() const {
@@ -5195,7 +5230,7 @@ inline bool RenderAnnotation_Text::has_center_horizontally() const {
 }
 inline void RenderAnnotation_Text::clear_center_horizontally() {
   center_horizontally_ = false;
-  _has_bits_[0] &= ~0x00000020u;
+  _has_bits_[0] &= ~0x00000040u;
 }
 inline bool RenderAnnotation_Text::_internal_center_horizontally() const {
   return center_horizontally_;
@@ -5205,7 +5240,7 @@ inline bool RenderAnnotation_Text::center_horizontally() const {
   return _internal_center_horizontally();
 }
 inline void RenderAnnotation_Text::_internal_set_center_horizontally(bool value) {
-  _has_bits_[0] |= 0x00000020u;
+  _has_bits_[0] |= 0x00000040u;
   center_horizontally_ = value;
 }
 inline void RenderAnnotation_Text::set_center_horizontally(bool value) {
@@ -5215,7 +5250,7 @@ inline void RenderAnnotation_Text::set_center_horizontally(bool value) {
 
 // optional bool center_vertically = 8 [default = false];
 inline bool RenderAnnotation_Text::_internal_has_center_vertically() const {
-  bool value = (_has_bits_[0] & 0x00000040u) != 0;
+  bool value = (_has_bits_[0] & 0x00000080u) != 0;
   return value;
 }
 inline bool RenderAnnotation_Text::has_center_vertically() const {
@@ -5223,7 +5258,7 @@ inline bool RenderAnnotation_Text::has_center_vertically() const {
 }
 inline void RenderAnnotation_Text::clear_center_vertically() {
   center_vertically_ = false;
-  _has_bits_[0] &= ~0x00000040u;
+  _has_bits_[0] &= ~0x00000080u;
 }
 inline bool RenderAnnotation_Text::_internal_center_vertically() const {
   return center_vertically_;
@@ -5233,12 +5268,119 @@ inline bool RenderAnnotation_Text::center_vertically() const {
   return _internal_center_vertically();
 }
 inline void RenderAnnotation_Text::_internal_set_center_vertically(bool value) {
-  _has_bits_[0] |= 0x00000040u;
+  _has_bits_[0] |= 0x00000080u;
   center_vertically_ = value;
 }
 inline void RenderAnnotation_Text::set_center_vertically(bool value) {
   _internal_set_center_vertically(value);
   // @@protoc_insertion_point(field_set:mediapipe.RenderAnnotation.Text.center_vertically)
+}
+
+// optional double outline_thickness = 11 [default = 0];
+inline bool RenderAnnotation_Text::_internal_has_outline_thickness() const {
+  bool value = (_has_bits_[0] & 0x00000100u) != 0;
+  return value;
+}
+inline bool RenderAnnotation_Text::has_outline_thickness() const {
+  return _internal_has_outline_thickness();
+}
+inline void RenderAnnotation_Text::clear_outline_thickness() {
+  outline_thickness_ = 0;
+  _has_bits_[0] &= ~0x00000100u;
+}
+inline double RenderAnnotation_Text::_internal_outline_thickness() const {
+  return outline_thickness_;
+}
+inline double RenderAnnotation_Text::outline_thickness() const {
+  // @@protoc_insertion_point(field_get:mediapipe.RenderAnnotation.Text.outline_thickness)
+  return _internal_outline_thickness();
+}
+inline void RenderAnnotation_Text::_internal_set_outline_thickness(double value) {
+  _has_bits_[0] |= 0x00000100u;
+  outline_thickness_ = value;
+}
+inline void RenderAnnotation_Text::set_outline_thickness(double value) {
+  _internal_set_outline_thickness(value);
+  // @@protoc_insertion_point(field_set:mediapipe.RenderAnnotation.Text.outline_thickness)
+}
+
+// optional .mediapipe.Color outline_color = 12;
+inline bool RenderAnnotation_Text::_internal_has_outline_color() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  PROTOBUF_ASSUME(!value || outline_color_ != nullptr);
+  return value;
+}
+inline bool RenderAnnotation_Text::has_outline_color() const {
+  return _internal_has_outline_color();
+}
+inline const ::mediapipe::Color& RenderAnnotation_Text::_internal_outline_color() const {
+  const ::mediapipe::Color* p = outline_color_;
+  return p != nullptr ? *p : reinterpret_cast<const ::mediapipe::Color&>(
+      ::mediapipe::_Color_default_instance_);
+}
+inline const ::mediapipe::Color& RenderAnnotation_Text::outline_color() const {
+  // @@protoc_insertion_point(field_get:mediapipe.RenderAnnotation.Text.outline_color)
+  return _internal_outline_color();
+}
+inline void RenderAnnotation_Text::unsafe_arena_set_allocated_outline_color(
+    ::mediapipe::Color* outline_color) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(outline_color_);
+  }
+  outline_color_ = outline_color;
+  if (outline_color) {
+    _has_bits_[0] |= 0x00000002u;
+  } else {
+    _has_bits_[0] &= ~0x00000002u;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:mediapipe.RenderAnnotation.Text.outline_color)
+}
+inline ::mediapipe::Color* RenderAnnotation_Text::release_outline_color() {
+  _has_bits_[0] &= ~0x00000002u;
+  ::mediapipe::Color* temp = outline_color_;
+  outline_color_ = nullptr;
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::mediapipe::Color* RenderAnnotation_Text::unsafe_arena_release_outline_color() {
+  // @@protoc_insertion_point(field_release:mediapipe.RenderAnnotation.Text.outline_color)
+  _has_bits_[0] &= ~0x00000002u;
+  ::mediapipe::Color* temp = outline_color_;
+  outline_color_ = nullptr;
+  return temp;
+}
+inline ::mediapipe::Color* RenderAnnotation_Text::_internal_mutable_outline_color() {
+  _has_bits_[0] |= 0x00000002u;
+  if (outline_color_ == nullptr) {
+    auto* p = CreateMaybeMessage<::mediapipe::Color>(GetArena());
+    outline_color_ = p;
+  }
+  return outline_color_;
+}
+inline ::mediapipe::Color* RenderAnnotation_Text::mutable_outline_color() {
+  // @@protoc_insertion_point(field_mutable:mediapipe.RenderAnnotation.Text.outline_color)
+  return _internal_mutable_outline_color();
+}
+inline void RenderAnnotation_Text::set_allocated_outline_color(::mediapipe::Color* outline_color) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(outline_color_);
+  }
+  if (outline_color) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(outline_color)->GetArena();
+    if (message_arena != submessage_arena) {
+      outline_color = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, outline_color, submessage_arena);
+    }
+    _has_bits_[0] |= 0x00000002u;
+  } else {
+    _has_bits_[0] &= ~0x00000002u;
+  }
+  outline_color_ = outline_color;
+  // @@protoc_insertion_point(field_set_allocated:mediapipe.RenderAnnotation.Text.outline_color)
 }
 
 // -------------------------------------------------------------------

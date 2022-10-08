@@ -19,7 +19,9 @@ DEFINE_SUBGRAPH(PoseLandmarkCpu, "../../mediapipe/modules/pose_landmark/pose_lan
   DEFINE_SUBGRAPH(PoseLandmarkFiltering, "../../mediapipe/modules/pose_landmark/pose_landmark_filtering.pbtxt");
   DEFINE_SUBGRAPH(PoseLandmarksToRoi, "../../mediapipe/modules/pose_landmark/pose_landmarks_to_roi.pbtxt");
   DEFINE_SUBGRAPH(PoseSegmentationFiltering, "../../mediapipe/modules/pose_landmark/pose_segmentation_filtering.pbtxt");
+
 DEFINE_SUBGRAPH(PoseRendererCpu, "../../mediapipe/graphs/pose_tracking/subgraphs/pose_renderer_cpu.pbtxt");
+  DEFINE_SUBGRAPH(PoseLandmarksToRenderData, "../../mediapipe/graphs/pose_tracking/subgraphs/pose_landmarks_to_render_data.pbtxt");
 }
 
 absl::Status init_calculator_graph(mediapipe::CalculatorGraph& graph) {

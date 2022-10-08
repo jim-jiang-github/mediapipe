@@ -20,11 +20,13 @@ namespace mediapipe {
 constexpr LabelsToRenderDataCalculatorOptions::LabelsToRenderDataCalculatorOptions(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : color_()
+  , outline_color_()
   , font_face_(0)
   , location_(0)
 
   , horizontal_offset_px_(0)
   , vertical_offset_px_(0)
+  , outline_thickness_(0)
   , use_display_name_(false)
   , display_classification_score_(false)
   , thickness_(2)
@@ -52,6 +54,8 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fcalculators_2futil
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::mediapipe::LabelsToRenderDataCalculatorOptions, color_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::LabelsToRenderDataCalculatorOptions, thickness_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::LabelsToRenderDataCalculatorOptions, outline_color_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::LabelsToRenderDataCalculatorOptions, outline_thickness_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::LabelsToRenderDataCalculatorOptions, font_height_px_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::LabelsToRenderDataCalculatorOptions, horizontal_offset_px_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::LabelsToRenderDataCalculatorOptions, vertical_offset_px_),
@@ -61,18 +65,20 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fcalculators_2futil
   PROTOBUF_FIELD_OFFSET(::mediapipe::LabelsToRenderDataCalculatorOptions, use_display_name_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::LabelsToRenderDataCalculatorOptions, display_classification_score_),
   ~0u,
-  6,
   7,
+  ~0u,
+  4,
+  8,
   2,
   3,
-  8,
+  9,
   0,
   1,
-  4,
   5,
+  6,
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 15, sizeof(::mediapipe::LabelsToRenderDataCalculatorOptions)},
+  { 0, 17, sizeof(::mediapipe::LabelsToRenderDataCalculatorOptions)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -83,21 +89,22 @@ const char descriptor_table_protodef_mediapipe_2fcalculators_2futil_2flabels_5ft
   "\nAmediapipe/calculators/util/labels_to_r"
   "ender_data_calculator.proto\022\tmediapipe\032$"
   "mediapipe/framework/calculator.proto\032\032me"
-  "diapipe/util/color.proto\"\226\004\n#LabelsToRen"
+  "diapipe/util/color.proto\"\332\004\n#LabelsToRen"
   "derDataCalculatorOptions\022\037\n\005color\030\001 \003(\0132"
   "\020.mediapipe.Color\022\024\n\tthickness\030\002 \001(\001:\0012\022"
-  "\032\n\016font_height_px\030\003 \001(\005:\00250\022\037\n\024horizonta"
-  "l_offset_px\030\007 \001(\005:\0010\022\035\n\022vertical_offset_"
-  "px\030\010 \001(\005:\0010\022\031\n\016max_num_labels\030\004 \001(\005:\0011\022\024"
-  "\n\tfont_face\030\005 \001(\005:\0010\022S\n\010location\030\006 \001(\01627"
-  ".mediapipe.LabelsToRenderDataCalculatorO"
-  "ptions.Location:\010TOP_LEFT\022\037\n\020use_display"
-  "_name\030\t \001(\010:\005false\022+\n\034display_classifica"
-  "tion_score\030\n \001(\010:\005false\")\n\010Location\022\014\n\010T"
-  "OP_LEFT\020\000\022\017\n\013BOTTOM_LEFT\020\0012]\n\003ext\022\034.medi"
-  "apipe.CalculatorOptions\030\314\352\304\201\001 \001(\0132..medi"
-  "apipe.LabelsToRenderDataCalculatorOption"
-  "s"
+  "\'\n\routline_color\030\014 \003(\0132\020.mediapipe.Color"
+  "\022\031\n\021outline_thickness\030\013 \001(\001\022\032\n\016font_heig"
+  "ht_px\030\003 \001(\005:\00250\022\037\n\024horizontal_offset_px\030"
+  "\007 \001(\005:\0010\022\035\n\022vertical_offset_px\030\010 \001(\005:\0010\022"
+  "\031\n\016max_num_labels\030\004 \001(\005:\0011\022\024\n\tfont_face\030"
+  "\005 \001(\005:\0010\022S\n\010location\030\006 \001(\01627.mediapipe.L"
+  "abelsToRenderDataCalculatorOptions.Locat"
+  "ion:\010TOP_LEFT\022\037\n\020use_display_name\030\t \001(\010:"
+  "\005false\022+\n\034display_classification_score\030\n"
+  " \001(\010:\005false\")\n\010Location\022\014\n\010TOP_LEFT\020\000\022\017\n"
+  "\013BOTTOM_LEFT\020\0012]\n\003ext\022\034.mediapipe.Calcul"
+  "atorOptions\030\314\352\304\201\001 \001(\0132..mediapipe.Labels"
+  "ToRenderDataCalculatorOptions"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fcalculators_2futil_2flabels_5fto_5frender_5fdata_5fcalculator_2eproto_deps[2] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
@@ -105,7 +112,7 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fcalculators_2futil_2flabels_5fto_5frender_5fdata_5fcalculator_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fcalculators_2futil_2flabels_5fto_5frender_5fdata_5fcalculator_2eproto = {
-  false, false, 681, descriptor_table_protodef_mediapipe_2fcalculators_2futil_2flabels_5fto_5frender_5fdata_5fcalculator_2eproto, "mediapipe/calculators/util/labels_to_render_data_calculator.proto", 
+  false, false, 749, descriptor_table_protodef_mediapipe_2fcalculators_2futil_2flabels_5fto_5frender_5fdata_5fcalculator_2eproto, "mediapipe/calculators/util/labels_to_render_data_calculator.proto", 
   &descriptor_table_mediapipe_2fcalculators_2futil_2flabels_5fto_5frender_5fdata_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2futil_2flabels_5fto_5frender_5fdata_5fcalculator_2eproto_deps, 2, 1,
   schemas, file_default_instances, TableStruct_mediapipe_2fcalculators_2futil_2flabels_5fto_5frender_5fdata_5fcalculator_2eproto::offsets,
   file_level_metadata_mediapipe_2fcalculators_2futil_2flabels_5fto_5frender_5fdata_5fcalculator_2eproto, file_level_enum_descriptors_mediapipe_2fcalculators_2futil_2flabels_5fto_5frender_5fdata_5fcalculator_2eproto, file_level_service_descriptors_mediapipe_2fcalculators_2futil_2flabels_5fto_5frender_5fdata_5fcalculator_2eproto,
@@ -145,10 +152,13 @@ class LabelsToRenderDataCalculatorOptions::_Internal {
  public:
   using HasBits = decltype(std::declval<LabelsToRenderDataCalculatorOptions>()._has_bits_);
   static void set_has_thickness(HasBits* has_bits) {
-    (*has_bits)[0] |= 64u;
+    (*has_bits)[0] |= 128u;
+  }
+  static void set_has_outline_thickness(HasBits* has_bits) {
+    (*has_bits)[0] |= 16u;
   }
   static void set_has_font_height_px(HasBits* has_bits) {
-    (*has_bits)[0] |= 128u;
+    (*has_bits)[0] |= 256u;
   }
   static void set_has_horizontal_offset_px(HasBits* has_bits) {
     (*has_bits)[0] |= 4u;
@@ -157,7 +167,7 @@ class LabelsToRenderDataCalculatorOptions::_Internal {
     (*has_bits)[0] |= 8u;
   }
   static void set_has_max_num_labels(HasBits* has_bits) {
-    (*has_bits)[0] |= 256u;
+    (*has_bits)[0] |= 512u;
   }
   static void set_has_font_face(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
@@ -166,19 +176,23 @@ class LabelsToRenderDataCalculatorOptions::_Internal {
     (*has_bits)[0] |= 2u;
   }
   static void set_has_use_display_name(HasBits* has_bits) {
-    (*has_bits)[0] |= 16u;
+    (*has_bits)[0] |= 32u;
   }
   static void set_has_display_classification_score(HasBits* has_bits) {
-    (*has_bits)[0] |= 32u;
+    (*has_bits)[0] |= 64u;
   }
 };
 
 void LabelsToRenderDataCalculatorOptions::clear_color() {
   color_.Clear();
 }
+void LabelsToRenderDataCalculatorOptions::clear_outline_color() {
+  outline_color_.Clear();
+}
 LabelsToRenderDataCalculatorOptions::LabelsToRenderDataCalculatorOptions(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
-  color_(arena) {
+  color_(arena),
+  outline_color_(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
   // @@protoc_insertion_point(arena_constructor:mediapipe.LabelsToRenderDataCalculatorOptions)
@@ -186,7 +200,8 @@ LabelsToRenderDataCalculatorOptions::LabelsToRenderDataCalculatorOptions(::PROTO
 LabelsToRenderDataCalculatorOptions::LabelsToRenderDataCalculatorOptions(const LabelsToRenderDataCalculatorOptions& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       _has_bits_(from._has_bits_),
-      color_(from.color_) {
+      color_(from.color_),
+      outline_color_(from.outline_color_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::memcpy(&font_face_, &from.font_face_,
     static_cast<size_t>(reinterpret_cast<char*>(&max_num_labels_) -
@@ -231,15 +246,18 @@ void LabelsToRenderDataCalculatorOptions::Clear() {
   (void) cached_has_bits;
 
   color_.Clear();
+  outline_color_.Clear();
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x000000ffu) {
     ::memset(&font_face_, 0, static_cast<size_t>(
         reinterpret_cast<char*>(&display_classification_score_) -
         reinterpret_cast<char*>(&font_face_)) + sizeof(display_classification_score_));
     thickness_ = 2;
-    font_height_px_ = 50;
   }
-  max_num_labels_ = 1;
+  if (cached_has_bits & 0x00000300u) {
+    font_height_px_ = 50;
+    max_num_labels_ = 1;
+  }
   _has_bits_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
@@ -339,6 +357,26 @@ const char* LabelsToRenderDataCalculatorOptions::_InternalParse(const char* ptr,
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
+      // optional double outline_thickness = 11;
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 89)) {
+          _Internal::set_has_outline_thickness(&has_bits);
+          outline_thickness_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr);
+          ptr += sizeof(double);
+        } else goto handle_unusual;
+        continue;
+      // repeated .mediapipe.Color outline_color = 12;
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 98)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_outline_color(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<98>(ptr));
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag == 0) || ((tag & 7) == 4)) {
@@ -379,19 +417,19 @@ failure:
 
   cached_has_bits = _has_bits_[0];
   // optional double thickness = 2 [default = 2];
-  if (cached_has_bits & 0x00000040u) {
+  if (cached_has_bits & 0x00000080u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(2, this->_internal_thickness(), target);
   }
 
   // optional int32 font_height_px = 3 [default = 50];
-  if (cached_has_bits & 0x00000080u) {
+  if (cached_has_bits & 0x00000100u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(3, this->_internal_font_height_px(), target);
   }
 
   // optional int32 max_num_labels = 4 [default = 1];
-  if (cached_has_bits & 0x00000100u) {
+  if (cached_has_bits & 0x00000200u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(4, this->_internal_max_num_labels(), target);
   }
@@ -422,15 +460,29 @@ failure:
   }
 
   // optional bool use_display_name = 9 [default = false];
-  if (cached_has_bits & 0x00000010u) {
+  if (cached_has_bits & 0x00000020u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(9, this->_internal_use_display_name(), target);
   }
 
   // optional bool display_classification_score = 10 [default = false];
-  if (cached_has_bits & 0x00000020u) {
+  if (cached_has_bits & 0x00000040u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(10, this->_internal_display_classification_score(), target);
+  }
+
+  // optional double outline_thickness = 11;
+  if (cached_has_bits & 0x00000010u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(11, this->_internal_outline_thickness(), target);
+  }
+
+  // repeated .mediapipe.Color outline_color = 12;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_outline_color_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(12, this->_internal_outline_color(i), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -452,6 +504,13 @@ size_t LabelsToRenderDataCalculatorOptions::ByteSizeLong() const {
   // repeated .mediapipe.Color color = 1;
   total_size += 1UL * this->_internal_color_size();
   for (const auto& msg : this->color_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // repeated .mediapipe.Color outline_color = 12;
+  total_size += 1UL * this->_internal_outline_color_size();
+  for (const auto& msg : this->outline_color_) {
     total_size +=
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
@@ -485,36 +544,43 @@ size_t LabelsToRenderDataCalculatorOptions::ByteSizeLong() const {
           this->_internal_vertical_offset_px());
     }
 
-    // optional bool use_display_name = 9 [default = false];
+    // optional double outline_thickness = 11;
     if (cached_has_bits & 0x00000010u) {
-      total_size += 1 + 1;
+      total_size += 1 + 8;
     }
 
-    // optional bool display_classification_score = 10 [default = false];
+    // optional bool use_display_name = 9 [default = false];
     if (cached_has_bits & 0x00000020u) {
       total_size += 1 + 1;
     }
 
-    // optional double thickness = 2 [default = 2];
+    // optional bool display_classification_score = 10 [default = false];
     if (cached_has_bits & 0x00000040u) {
+      total_size += 1 + 1;
+    }
+
+    // optional double thickness = 2 [default = 2];
+    if (cached_has_bits & 0x00000080u) {
       total_size += 1 + 8;
     }
 
+  }
+  if (cached_has_bits & 0x00000300u) {
     // optional int32 font_height_px = 3 [default = 50];
-    if (cached_has_bits & 0x00000080u) {
+    if (cached_has_bits & 0x00000100u) {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
           this->_internal_font_height_px());
     }
 
-  }
-  // optional int32 max_num_labels = 4 [default = 1];
-  if (cached_has_bits & 0x00000100u) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-        this->_internal_max_num_labels());
-  }
+    // optional int32 max_num_labels = 4 [default = 1];
+    if (cached_has_bits & 0x00000200u) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+          this->_internal_max_num_labels());
+    }
 
+  }
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
         _internal_metadata_, total_size, &_cached_size_);
@@ -547,6 +613,7 @@ void LabelsToRenderDataCalculatorOptions::MergeFrom(const LabelsToRenderDataCalc
   (void) cached_has_bits;
 
   color_.MergeFrom(from.color_);
+  outline_color_.MergeFrom(from.outline_color_);
   cached_has_bits = from._has_bits_[0];
   if (cached_has_bits & 0x000000ffu) {
     if (cached_has_bits & 0x00000001u) {
@@ -562,21 +629,27 @@ void LabelsToRenderDataCalculatorOptions::MergeFrom(const LabelsToRenderDataCalc
       vertical_offset_px_ = from.vertical_offset_px_;
     }
     if (cached_has_bits & 0x00000010u) {
-      use_display_name_ = from.use_display_name_;
+      outline_thickness_ = from.outline_thickness_;
     }
     if (cached_has_bits & 0x00000020u) {
-      display_classification_score_ = from.display_classification_score_;
+      use_display_name_ = from.use_display_name_;
     }
     if (cached_has_bits & 0x00000040u) {
-      thickness_ = from.thickness_;
+      display_classification_score_ = from.display_classification_score_;
     }
     if (cached_has_bits & 0x00000080u) {
-      font_height_px_ = from.font_height_px_;
+      thickness_ = from.thickness_;
     }
     _has_bits_[0] |= cached_has_bits;
   }
-  if (cached_has_bits & 0x00000100u) {
-    _internal_set_max_num_labels(from._internal_max_num_labels());
+  if (cached_has_bits & 0x00000300u) {
+    if (cached_has_bits & 0x00000100u) {
+      font_height_px_ = from.font_height_px_;
+    }
+    if (cached_has_bits & 0x00000200u) {
+      max_num_labels_ = from.max_num_labels_;
+    }
+    _has_bits_[0] |= cached_has_bits;
   }
 }
 
@@ -603,6 +676,7 @@ void LabelsToRenderDataCalculatorOptions::InternalSwap(LabelsToRenderDataCalcula
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   color_.InternalSwap(&other->color_);
+  outline_color_.InternalSwap(&other->outline_color_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(LabelsToRenderDataCalculatorOptions, display_classification_score_)
       + sizeof(LabelsToRenderDataCalculatorOptions::display_classification_score_)

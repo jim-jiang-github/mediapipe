@@ -183,12 +183,14 @@ PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT RenderAnnotation_ArrowDefaultTy
 constexpr RenderAnnotation_Text::RenderAnnotation_Text(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : display_text_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , outline_color_(nullptr)
   , left_(0)
   , baseline_(0)
   , font_face_(0)
   , normalized_(false)
   , center_horizontally_(false)
   , center_vertically_(false)
+  , outline_thickness_(0)
   , font_height_(8){}
 struct RenderAnnotation_TextDefaultTypeInternal {
   constexpr RenderAnnotation_TextDefaultTypeInternal()
@@ -385,14 +387,18 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2futil_2frender_5fda
   PROTOBUF_FIELD_OFFSET(::mediapipe::RenderAnnotation_Text, font_face_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::RenderAnnotation_Text, center_horizontally_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::RenderAnnotation_Text, center_vertically_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::RenderAnnotation_Text, outline_thickness_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::RenderAnnotation_Text, outline_color_),
   0,
-  1,
   2,
-  7,
-  4,
   3,
+  9,
   5,
+  4,
   6,
+  7,
+  8,
+  1,
   PROTOBUF_FIELD_OFFSET(::mediapipe::RenderAnnotation, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::RenderAnnotation, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -453,9 +459,9 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 86, 97, sizeof(::mediapipe::RenderAnnotation_Line)},
   { 103, 115, sizeof(::mediapipe::RenderAnnotation_GradientLine)},
   { 122, 132, sizeof(::mediapipe::RenderAnnotation_Arrow)},
-  { 137, 150, sizeof(::mediapipe::RenderAnnotation_Text)},
-  { 158, 178, sizeof(::mediapipe::RenderAnnotation)},
-  { 192, 201, sizeof(::mediapipe::RenderViewport)},
+  { 137, 152, sizeof(::mediapipe::RenderAnnotation_Text)},
+  { 162, 182, sizeof(::mediapipe::RenderAnnotation)},
+  { 196, 205, sizeof(::mediapipe::RenderViewport)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -481,7 +487,7 @@ const char descriptor_table_protodef_mediapipe_2futil_2frender_5fdata_2eproto[] 
   "nderData\0227\n\022render_annotations\030\001 \003(\0132\033.m"
   "ediapipe.RenderAnnotation\022\023\n\013scene_class"
   "\030\002 \001(\t\0221\n\016scene_viewport\030\003 \001(\0132\031.mediapi"
-  "pe.RenderViewport\"\263\021\n\020RenderAnnotation\022:"
+  "pe.RenderViewport\"\372\021\n\020RenderAnnotation\022:"
   "\n\trectangle\030\001 \001(\0132%.mediapipe.RenderAnno"
   "tation.RectangleH\000\022G\n\020filled_rectangle\030\002"
   " \001(\0132+.mediapipe.RenderAnnotation.Filled"
@@ -531,22 +537,24 @@ const char descriptor_table_protodef_mediapipe_2futil_2frender_5fdata_2eproto[] 
   "\0132\020.mediapipe.Color\022 \n\006color2\030\007 \001(\0132\020.me"
   "diapipe.Color\032b\n\005Arrow\022\017\n\007x_start\030\001 \001(\001\022"
   "\017\n\007y_start\030\002 \001(\001\022\r\n\005x_end\030\003 \001(\001\022\r\n\005y_end"
-  "\030\004 \001(\001\022\031\n\nnormalized\030\005 \001(\010:\005false\032\313\001\n\004Te"
+  "\030\004 \001(\001\022\031\n\nnormalized\030\005 \001(\010:\005false\032\222\002\n\004Te"
   "xt\022\024\n\014display_text\030\001 \001(\t\022\014\n\004left\030\002 \001(\001\022\020"
   "\n\010baseline\030\003 \001(\001\022\026\n\013font_height\030\004 \001(\001:\0018"
   "\022\031\n\nnormalized\030\005 \001(\010:\005false\022\024\n\tfont_face"
   "\030\006 \001(\005:\0010\022\"\n\023center_horizontally\030\007 \001(\010:\005"
-  "false\022 \n\021center_vertically\030\010 \001(\010:\005falseB"
-  "\006\n\004data\"[\n\016RenderViewport\022\n\n\002id\030\001 \001(\t\022\020\n"
-  "\010width_px\030\002 \001(\005\022\021\n\theight_px\030\003 \001(\005\022\030\n\020co"
-  "mpose_on_video\030\004 \001(\010"
+  "false\022 \n\021center_vertically\030\010 \001(\010:\005false\022"
+  "\034\n\021outline_thickness\030\013 \001(\001:\0010\022\'\n\routline"
+  "_color\030\014 \001(\0132\020.mediapipe.ColorB\006\n\004data\"["
+  "\n\016RenderViewport\022\n\n\002id\030\001 \001(\t\022\020\n\010width_px"
+  "\030\002 \001(\005\022\021\n\theight_px\030\003 \001(\005\022\030\n\020compose_on_"
+  "video\030\004 \001(\010"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2futil_2frender_5fdata_2eproto_deps[1] = {
   &::descriptor_table_mediapipe_2futil_2fcolor_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2futil_2frender_5fdata_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2futil_2frender_5fdata_2eproto = {
-  false, false, 2540, descriptor_table_protodef_mediapipe_2futil_2frender_5fdata_2eproto, "mediapipe/util/render_data.proto", 
+  false, false, 2611, descriptor_table_protodef_mediapipe_2futil_2frender_5fdata_2eproto, "mediapipe/util/render_data.proto", 
   &descriptor_table_mediapipe_2futil_2frender_5fdata_2eproto_once, descriptor_table_mediapipe_2futil_2frender_5fdata_2eproto_deps, 1, 14,
   schemas, file_default_instances, TableStruct_mediapipe_2futil_2frender_5fdata_2eproto::offsets,
   file_level_metadata_mediapipe_2futil_2frender_5fdata_2eproto, file_level_enum_descriptors_mediapipe_2futil_2frender_5fdata_2eproto, file_level_service_descriptors_mediapipe_2futil_2frender_5fdata_2eproto,
@@ -3975,28 +3983,43 @@ class RenderAnnotation_Text::_Internal {
     (*has_bits)[0] |= 1u;
   }
   static void set_has_left(HasBits* has_bits) {
-    (*has_bits)[0] |= 2u;
-  }
-  static void set_has_baseline(HasBits* has_bits) {
     (*has_bits)[0] |= 4u;
   }
-  static void set_has_font_height(HasBits* has_bits) {
-    (*has_bits)[0] |= 128u;
-  }
-  static void set_has_normalized(HasBits* has_bits) {
-    (*has_bits)[0] |= 16u;
-  }
-  static void set_has_font_face(HasBits* has_bits) {
+  static void set_has_baseline(HasBits* has_bits) {
     (*has_bits)[0] |= 8u;
   }
-  static void set_has_center_horizontally(HasBits* has_bits) {
+  static void set_has_font_height(HasBits* has_bits) {
+    (*has_bits)[0] |= 512u;
+  }
+  static void set_has_normalized(HasBits* has_bits) {
     (*has_bits)[0] |= 32u;
   }
-  static void set_has_center_vertically(HasBits* has_bits) {
+  static void set_has_font_face(HasBits* has_bits) {
+    (*has_bits)[0] |= 16u;
+  }
+  static void set_has_center_horizontally(HasBits* has_bits) {
     (*has_bits)[0] |= 64u;
+  }
+  static void set_has_center_vertically(HasBits* has_bits) {
+    (*has_bits)[0] |= 128u;
+  }
+  static void set_has_outline_thickness(HasBits* has_bits) {
+    (*has_bits)[0] |= 256u;
+  }
+  static const ::mediapipe::Color& outline_color(const RenderAnnotation_Text* msg);
+  static void set_has_outline_color(HasBits* has_bits) {
+    (*has_bits)[0] |= 2u;
   }
 };
 
+const ::mediapipe::Color&
+RenderAnnotation_Text::_Internal::outline_color(const RenderAnnotation_Text* msg) {
+  return *msg->outline_color_;
+}
+void RenderAnnotation_Text::clear_outline_color() {
+  if (outline_color_ != nullptr) outline_color_->Clear();
+  _has_bits_[0] &= ~0x00000002u;
+}
 RenderAnnotation_Text::RenderAnnotation_Text(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
@@ -4012,6 +4035,11 @@ RenderAnnotation_Text::RenderAnnotation_Text(const RenderAnnotation_Text& from)
     display_text_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_display_text(), 
       GetArena());
   }
+  if (from._internal_has_outline_color()) {
+    outline_color_ = new ::mediapipe::Color(*from.outline_color_);
+  } else {
+    outline_color_ = nullptr;
+  }
   ::memcpy(&left_, &from.left_,
     static_cast<size_t>(reinterpret_cast<char*>(&font_height_) -
     reinterpret_cast<char*>(&left_)) + sizeof(font_height_));
@@ -4021,9 +4049,9 @@ RenderAnnotation_Text::RenderAnnotation_Text(const RenderAnnotation_Text& from)
 void RenderAnnotation_Text::SharedCtor() {
 display_text_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
-    reinterpret_cast<char*>(&left_) - reinterpret_cast<char*>(this)),
-    0, static_cast<size_t>(reinterpret_cast<char*>(&center_vertically_) -
-    reinterpret_cast<char*>(&left_)) + sizeof(center_vertically_));
+    reinterpret_cast<char*>(&outline_color_) - reinterpret_cast<char*>(this)),
+    0, static_cast<size_t>(reinterpret_cast<char*>(&outline_thickness_) -
+    reinterpret_cast<char*>(&outline_color_)) + sizeof(outline_thickness_));
 font_height_ = 8;
 }
 
@@ -4036,6 +4064,7 @@ RenderAnnotation_Text::~RenderAnnotation_Text() {
 void RenderAnnotation_Text::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
   display_text_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (this != internal_default_instance()) delete outline_color_;
 }
 
 void RenderAnnotation_Text::ArenaDtor(void* object) {
@@ -4055,13 +4084,22 @@ void RenderAnnotation_Text::Clear() {
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000001u) {
-    display_text_.ClearNonDefaultToEmpty();
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      display_text_.ClearNonDefaultToEmpty();
+    }
+    if (cached_has_bits & 0x00000002u) {
+      GOOGLE_DCHECK(outline_color_ != nullptr);
+      outline_color_->Clear();
+    }
   }
-  if (cached_has_bits & 0x000000feu) {
+  if (cached_has_bits & 0x000000fcu) {
     ::memset(&left_, 0, static_cast<size_t>(
         reinterpret_cast<char*>(&center_vertically_) -
         reinterpret_cast<char*>(&left_)) + sizeof(center_vertically_));
+  }
+  if (cached_has_bits & 0x00000300u) {
+    outline_thickness_ = 0;
     font_height_ = 8;
   }
   _has_bits_.Clear();
@@ -4142,6 +4180,21 @@ const char* RenderAnnotation_Text::_InternalParse(const char* ptr, ::PROTOBUF_NA
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
+      // optional double outline_thickness = 11 [default = 0];
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 89)) {
+          _Internal::set_has_outline_thickness(&has_bits);
+          outline_thickness_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr);
+          ptr += sizeof(double);
+        } else goto handle_unusual;
+        continue;
+      // optional .mediapipe.Color outline_color = 12;
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 98)) {
+          ptr = ctx->ParseMessage(_internal_mutable_outline_color(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag == 0) || ((tag & 7) == 4)) {
@@ -4184,45 +4237,59 @@ failure:
   }
 
   // optional double left = 2;
-  if (cached_has_bits & 0x00000002u) {
+  if (cached_has_bits & 0x00000004u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(2, this->_internal_left(), target);
   }
 
   // optional double baseline = 3;
-  if (cached_has_bits & 0x00000004u) {
+  if (cached_has_bits & 0x00000008u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(3, this->_internal_baseline(), target);
   }
 
   // optional double font_height = 4 [default = 8];
-  if (cached_has_bits & 0x00000080u) {
+  if (cached_has_bits & 0x00000200u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(4, this->_internal_font_height(), target);
   }
 
   // optional bool normalized = 5 [default = false];
-  if (cached_has_bits & 0x00000010u) {
+  if (cached_has_bits & 0x00000020u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(5, this->_internal_normalized(), target);
   }
 
   // optional int32 font_face = 6 [default = 0];
-  if (cached_has_bits & 0x00000008u) {
+  if (cached_has_bits & 0x00000010u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(6, this->_internal_font_face(), target);
   }
 
   // optional bool center_horizontally = 7 [default = false];
-  if (cached_has_bits & 0x00000020u) {
+  if (cached_has_bits & 0x00000040u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(7, this->_internal_center_horizontally(), target);
   }
 
   // optional bool center_vertically = 8 [default = false];
-  if (cached_has_bits & 0x00000040u) {
+  if (cached_has_bits & 0x00000080u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(8, this->_internal_center_vertically(), target);
+  }
+
+  // optional double outline_thickness = 11 [default = 0];
+  if (cached_has_bits & 0x00000100u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(11, this->_internal_outline_thickness(), target);
+  }
+
+  // optional .mediapipe.Color outline_color = 12;
+  if (cached_has_bits & 0x00000002u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        12, _Internal::outline_color(this), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -4250,40 +4317,54 @@ size_t RenderAnnotation_Text::ByteSizeLong() const {
           this->_internal_display_text());
     }
 
-    // optional double left = 2;
+    // optional .mediapipe.Color outline_color = 12;
     if (cached_has_bits & 0x00000002u) {
-      total_size += 1 + 8;
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *outline_color_);
     }
 
-    // optional double baseline = 3;
+    // optional double left = 2;
     if (cached_has_bits & 0x00000004u) {
       total_size += 1 + 8;
     }
 
-    // optional int32 font_face = 6 [default = 0];
+    // optional double baseline = 3;
     if (cached_has_bits & 0x00000008u) {
+      total_size += 1 + 8;
+    }
+
+    // optional int32 font_face = 6 [default = 0];
+    if (cached_has_bits & 0x00000010u) {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
           this->_internal_font_face());
     }
 
     // optional bool normalized = 5 [default = false];
-    if (cached_has_bits & 0x00000010u) {
-      total_size += 1 + 1;
-    }
-
-    // optional bool center_horizontally = 7 [default = false];
     if (cached_has_bits & 0x00000020u) {
       total_size += 1 + 1;
     }
 
-    // optional bool center_vertically = 8 [default = false];
+    // optional bool center_horizontally = 7 [default = false];
     if (cached_has_bits & 0x00000040u) {
       total_size += 1 + 1;
     }
 
-    // optional double font_height = 4 [default = 8];
+    // optional bool center_vertically = 8 [default = false];
     if (cached_has_bits & 0x00000080u) {
+      total_size += 1 + 1;
+    }
+
+  }
+  if (cached_has_bits & 0x00000300u) {
+    // optional double outline_thickness = 11 [default = 0];
+    if (cached_has_bits & 0x00000100u) {
+      total_size += 1 + 8;
+    }
+
+    // optional double font_height = 4 [default = 8];
+    if (cached_has_bits & 0x00000200u) {
       total_size += 1 + 8;
     }
 
@@ -4325,24 +4406,33 @@ void RenderAnnotation_Text::MergeFrom(const RenderAnnotation_Text& from) {
       _internal_set_display_text(from._internal_display_text());
     }
     if (cached_has_bits & 0x00000002u) {
-      left_ = from.left_;
+      _internal_mutable_outline_color()->::mediapipe::Color::MergeFrom(from._internal_outline_color());
     }
     if (cached_has_bits & 0x00000004u) {
-      baseline_ = from.baseline_;
+      left_ = from.left_;
     }
     if (cached_has_bits & 0x00000008u) {
-      font_face_ = from.font_face_;
+      baseline_ = from.baseline_;
     }
     if (cached_has_bits & 0x00000010u) {
-      normalized_ = from.normalized_;
+      font_face_ = from.font_face_;
     }
     if (cached_has_bits & 0x00000020u) {
-      center_horizontally_ = from.center_horizontally_;
+      normalized_ = from.normalized_;
     }
     if (cached_has_bits & 0x00000040u) {
-      center_vertically_ = from.center_vertically_;
+      center_horizontally_ = from.center_horizontally_;
     }
     if (cached_has_bits & 0x00000080u) {
+      center_vertically_ = from.center_vertically_;
+    }
+    _has_bits_[0] |= cached_has_bits;
+  }
+  if (cached_has_bits & 0x00000300u) {
+    if (cached_has_bits & 0x00000100u) {
+      outline_thickness_ = from.outline_thickness_;
+    }
+    if (cached_has_bits & 0x00000200u) {
       font_height_ = from.font_height_;
     }
     _has_bits_[0] |= cached_has_bits;
@@ -4373,11 +4463,11 @@ void RenderAnnotation_Text::InternalSwap(RenderAnnotation_Text* other) {
   swap(_has_bits_[0], other->_has_bits_[0]);
   display_text_.Swap(&other->display_text_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(RenderAnnotation_Text, center_vertically_)
-      + sizeof(RenderAnnotation_Text::center_vertically_)
-      - PROTOBUF_FIELD_OFFSET(RenderAnnotation_Text, left_)>(
-          reinterpret_cast<char*>(&left_),
-          reinterpret_cast<char*>(&other->left_));
+      PROTOBUF_FIELD_OFFSET(RenderAnnotation_Text, outline_thickness_)
+      + sizeof(RenderAnnotation_Text::outline_thickness_)
+      - PROTOBUF_FIELD_OFFSET(RenderAnnotation_Text, outline_color_)>(
+          reinterpret_cast<char*>(&outline_color_),
+          reinterpret_cast<char*>(&other->outline_color_));
   swap(font_height_, other->font_height_);
 }
 

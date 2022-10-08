@@ -236,10 +236,12 @@ class LabelsToRenderDataCalculatorOptions PROTOBUF_FINAL :
 
   enum : int {
     kColorFieldNumber = 1,
+    kOutlineColorFieldNumber = 12,
     kFontFaceFieldNumber = 5,
     kLocationFieldNumber = 6,
     kHorizontalOffsetPxFieldNumber = 7,
     kVerticalOffsetPxFieldNumber = 8,
+    kOutlineThicknessFieldNumber = 11,
     kUseDisplayNameFieldNumber = 9,
     kDisplayClassificationScoreFieldNumber = 10,
     kThicknessFieldNumber = 2,
@@ -263,6 +265,24 @@ class LabelsToRenderDataCalculatorOptions PROTOBUF_FINAL :
   ::mediapipe::Color* add_color();
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::mediapipe::Color >&
       color() const;
+
+  // repeated .mediapipe.Color outline_color = 12;
+  int outline_color_size() const;
+  private:
+  int _internal_outline_color_size() const;
+  public:
+  void clear_outline_color();
+  ::mediapipe::Color* mutable_outline_color(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::mediapipe::Color >*
+      mutable_outline_color();
+  private:
+  const ::mediapipe::Color& _internal_outline_color(int index) const;
+  ::mediapipe::Color* _internal_add_outline_color();
+  public:
+  const ::mediapipe::Color& outline_color(int index) const;
+  ::mediapipe::Color* add_outline_color();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::mediapipe::Color >&
+      outline_color() const;
 
   // optional int32 font_face = 5 [default = 0];
   bool has_font_face() const;
@@ -314,6 +334,19 @@ class LabelsToRenderDataCalculatorOptions PROTOBUF_FINAL :
   private:
   ::PROTOBUF_NAMESPACE_ID::int32 _internal_vertical_offset_px() const;
   void _internal_set_vertical_offset_px(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // optional double outline_thickness = 11;
+  bool has_outline_thickness() const;
+  private:
+  bool _internal_has_outline_thickness() const;
+  public:
+  void clear_outline_thickness();
+  double outline_thickness() const;
+  void set_outline_thickness(double value);
+  private:
+  double _internal_outline_thickness() const;
+  void _internal_set_outline_thickness(double value);
   public:
 
   // optional bool use_display_name = 9 [default = false];
@@ -395,10 +428,12 @@ class LabelsToRenderDataCalculatorOptions PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::mediapipe::Color > color_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::mediapipe::Color > outline_color_;
   ::PROTOBUF_NAMESPACE_ID::int32 font_face_;
   int location_;
   ::PROTOBUF_NAMESPACE_ID::int32 horizontal_offset_px_;
   ::PROTOBUF_NAMESPACE_ID::int32 vertical_offset_px_;
+  double outline_thickness_;
   bool use_display_name_;
   bool display_classification_score_;
   double thickness_;
@@ -455,7 +490,7 @@ LabelsToRenderDataCalculatorOptions::color() const {
 
 // optional double thickness = 2 [default = 2];
 inline bool LabelsToRenderDataCalculatorOptions::_internal_has_thickness() const {
-  bool value = (_has_bits_[0] & 0x00000040u) != 0;
+  bool value = (_has_bits_[0] & 0x00000080u) != 0;
   return value;
 }
 inline bool LabelsToRenderDataCalculatorOptions::has_thickness() const {
@@ -463,7 +498,7 @@ inline bool LabelsToRenderDataCalculatorOptions::has_thickness() const {
 }
 inline void LabelsToRenderDataCalculatorOptions::clear_thickness() {
   thickness_ = 2;
-  _has_bits_[0] &= ~0x00000040u;
+  _has_bits_[0] &= ~0x00000080u;
 }
 inline double LabelsToRenderDataCalculatorOptions::_internal_thickness() const {
   return thickness_;
@@ -473,7 +508,7 @@ inline double LabelsToRenderDataCalculatorOptions::thickness() const {
   return _internal_thickness();
 }
 inline void LabelsToRenderDataCalculatorOptions::_internal_set_thickness(double value) {
-  _has_bits_[0] |= 0x00000040u;
+  _has_bits_[0] |= 0x00000080u;
   thickness_ = value;
 }
 inline void LabelsToRenderDataCalculatorOptions::set_thickness(double value) {
@@ -481,9 +516,73 @@ inline void LabelsToRenderDataCalculatorOptions::set_thickness(double value) {
   // @@protoc_insertion_point(field_set:mediapipe.LabelsToRenderDataCalculatorOptions.thickness)
 }
 
+// repeated .mediapipe.Color outline_color = 12;
+inline int LabelsToRenderDataCalculatorOptions::_internal_outline_color_size() const {
+  return outline_color_.size();
+}
+inline int LabelsToRenderDataCalculatorOptions::outline_color_size() const {
+  return _internal_outline_color_size();
+}
+inline ::mediapipe::Color* LabelsToRenderDataCalculatorOptions::mutable_outline_color(int index) {
+  // @@protoc_insertion_point(field_mutable:mediapipe.LabelsToRenderDataCalculatorOptions.outline_color)
+  return outline_color_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::mediapipe::Color >*
+LabelsToRenderDataCalculatorOptions::mutable_outline_color() {
+  // @@protoc_insertion_point(field_mutable_list:mediapipe.LabelsToRenderDataCalculatorOptions.outline_color)
+  return &outline_color_;
+}
+inline const ::mediapipe::Color& LabelsToRenderDataCalculatorOptions::_internal_outline_color(int index) const {
+  return outline_color_.Get(index);
+}
+inline const ::mediapipe::Color& LabelsToRenderDataCalculatorOptions::outline_color(int index) const {
+  // @@protoc_insertion_point(field_get:mediapipe.LabelsToRenderDataCalculatorOptions.outline_color)
+  return _internal_outline_color(index);
+}
+inline ::mediapipe::Color* LabelsToRenderDataCalculatorOptions::_internal_add_outline_color() {
+  return outline_color_.Add();
+}
+inline ::mediapipe::Color* LabelsToRenderDataCalculatorOptions::add_outline_color() {
+  // @@protoc_insertion_point(field_add:mediapipe.LabelsToRenderDataCalculatorOptions.outline_color)
+  return _internal_add_outline_color();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::mediapipe::Color >&
+LabelsToRenderDataCalculatorOptions::outline_color() const {
+  // @@protoc_insertion_point(field_list:mediapipe.LabelsToRenderDataCalculatorOptions.outline_color)
+  return outline_color_;
+}
+
+// optional double outline_thickness = 11;
+inline bool LabelsToRenderDataCalculatorOptions::_internal_has_outline_thickness() const {
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  return value;
+}
+inline bool LabelsToRenderDataCalculatorOptions::has_outline_thickness() const {
+  return _internal_has_outline_thickness();
+}
+inline void LabelsToRenderDataCalculatorOptions::clear_outline_thickness() {
+  outline_thickness_ = 0;
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline double LabelsToRenderDataCalculatorOptions::_internal_outline_thickness() const {
+  return outline_thickness_;
+}
+inline double LabelsToRenderDataCalculatorOptions::outline_thickness() const {
+  // @@protoc_insertion_point(field_get:mediapipe.LabelsToRenderDataCalculatorOptions.outline_thickness)
+  return _internal_outline_thickness();
+}
+inline void LabelsToRenderDataCalculatorOptions::_internal_set_outline_thickness(double value) {
+  _has_bits_[0] |= 0x00000010u;
+  outline_thickness_ = value;
+}
+inline void LabelsToRenderDataCalculatorOptions::set_outline_thickness(double value) {
+  _internal_set_outline_thickness(value);
+  // @@protoc_insertion_point(field_set:mediapipe.LabelsToRenderDataCalculatorOptions.outline_thickness)
+}
+
 // optional int32 font_height_px = 3 [default = 50];
 inline bool LabelsToRenderDataCalculatorOptions::_internal_has_font_height_px() const {
-  bool value = (_has_bits_[0] & 0x00000080u) != 0;
+  bool value = (_has_bits_[0] & 0x00000100u) != 0;
   return value;
 }
 inline bool LabelsToRenderDataCalculatorOptions::has_font_height_px() const {
@@ -491,7 +590,7 @@ inline bool LabelsToRenderDataCalculatorOptions::has_font_height_px() const {
 }
 inline void LabelsToRenderDataCalculatorOptions::clear_font_height_px() {
   font_height_px_ = 50;
-  _has_bits_[0] &= ~0x00000080u;
+  _has_bits_[0] &= ~0x00000100u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 LabelsToRenderDataCalculatorOptions::_internal_font_height_px() const {
   return font_height_px_;
@@ -501,7 +600,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 LabelsToRenderDataCalculatorOptions::font_
   return _internal_font_height_px();
 }
 inline void LabelsToRenderDataCalculatorOptions::_internal_set_font_height_px(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _has_bits_[0] |= 0x00000080u;
+  _has_bits_[0] |= 0x00000100u;
   font_height_px_ = value;
 }
 inline void LabelsToRenderDataCalculatorOptions::set_font_height_px(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -567,7 +666,7 @@ inline void LabelsToRenderDataCalculatorOptions::set_vertical_offset_px(::PROTOB
 
 // optional int32 max_num_labels = 4 [default = 1];
 inline bool LabelsToRenderDataCalculatorOptions::_internal_has_max_num_labels() const {
-  bool value = (_has_bits_[0] & 0x00000100u) != 0;
+  bool value = (_has_bits_[0] & 0x00000200u) != 0;
   return value;
 }
 inline bool LabelsToRenderDataCalculatorOptions::has_max_num_labels() const {
@@ -575,7 +674,7 @@ inline bool LabelsToRenderDataCalculatorOptions::has_max_num_labels() const {
 }
 inline void LabelsToRenderDataCalculatorOptions::clear_max_num_labels() {
   max_num_labels_ = 1;
-  _has_bits_[0] &= ~0x00000100u;
+  _has_bits_[0] &= ~0x00000200u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 LabelsToRenderDataCalculatorOptions::_internal_max_num_labels() const {
   return max_num_labels_;
@@ -585,7 +684,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 LabelsToRenderDataCalculatorOptions::max_n
   return _internal_max_num_labels();
 }
 inline void LabelsToRenderDataCalculatorOptions::_internal_set_max_num_labels(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _has_bits_[0] |= 0x00000100u;
+  _has_bits_[0] |= 0x00000200u;
   max_num_labels_ = value;
 }
 inline void LabelsToRenderDataCalculatorOptions::set_max_num_labels(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -652,7 +751,7 @@ inline void LabelsToRenderDataCalculatorOptions::set_location(::mediapipe::Label
 
 // optional bool use_display_name = 9 [default = false];
 inline bool LabelsToRenderDataCalculatorOptions::_internal_has_use_display_name() const {
-  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  bool value = (_has_bits_[0] & 0x00000020u) != 0;
   return value;
 }
 inline bool LabelsToRenderDataCalculatorOptions::has_use_display_name() const {
@@ -660,7 +759,7 @@ inline bool LabelsToRenderDataCalculatorOptions::has_use_display_name() const {
 }
 inline void LabelsToRenderDataCalculatorOptions::clear_use_display_name() {
   use_display_name_ = false;
-  _has_bits_[0] &= ~0x00000010u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline bool LabelsToRenderDataCalculatorOptions::_internal_use_display_name() const {
   return use_display_name_;
@@ -670,7 +769,7 @@ inline bool LabelsToRenderDataCalculatorOptions::use_display_name() const {
   return _internal_use_display_name();
 }
 inline void LabelsToRenderDataCalculatorOptions::_internal_set_use_display_name(bool value) {
-  _has_bits_[0] |= 0x00000010u;
+  _has_bits_[0] |= 0x00000020u;
   use_display_name_ = value;
 }
 inline void LabelsToRenderDataCalculatorOptions::set_use_display_name(bool value) {
@@ -680,7 +779,7 @@ inline void LabelsToRenderDataCalculatorOptions::set_use_display_name(bool value
 
 // optional bool display_classification_score = 10 [default = false];
 inline bool LabelsToRenderDataCalculatorOptions::_internal_has_display_classification_score() const {
-  bool value = (_has_bits_[0] & 0x00000020u) != 0;
+  bool value = (_has_bits_[0] & 0x00000040u) != 0;
   return value;
 }
 inline bool LabelsToRenderDataCalculatorOptions::has_display_classification_score() const {
@@ -688,7 +787,7 @@ inline bool LabelsToRenderDataCalculatorOptions::has_display_classification_scor
 }
 inline void LabelsToRenderDataCalculatorOptions::clear_display_classification_score() {
   display_classification_score_ = false;
-  _has_bits_[0] &= ~0x00000020u;
+  _has_bits_[0] &= ~0x00000040u;
 }
 inline bool LabelsToRenderDataCalculatorOptions::_internal_display_classification_score() const {
   return display_classification_score_;
@@ -698,7 +797,7 @@ inline bool LabelsToRenderDataCalculatorOptions::display_classification_score() 
   return _internal_display_classification_score();
 }
 inline void LabelsToRenderDataCalculatorOptions::_internal_set_display_classification_score(bool value) {
-  _has_bits_[0] |= 0x00000020u;
+  _has_bits_[0] |= 0x00000040u;
   display_classification_score_ = value;
 }
 inline void LabelsToRenderDataCalculatorOptions::set_display_classification_score(bool value) {

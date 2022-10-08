@@ -314,7 +314,7 @@ class FaceEffectRenderer : public CalculatorBase, private OpenGLRenderer {
 
       // key
       if (' '==input.wait_key) {
-        current_effect_ = (current_effect_+1)%3;
+        current_effect_ = (current_effect_+1)%num_effect_meshes;
         printf("[INFO] Effect= %d\n", (int) current_effect_);
       } else if ('1'<=input.wait_key && input.wait_key<='1'+num_effect_meshes) {
         current_effect_ = input.wait_key - '1';

@@ -34,3 +34,23 @@ android_library(
         "@maven//:com_google_guava_guava",
     ],
 )
+
+android_library(
+    name = "classification_entry",
+    srcs = ["ClassificationEntry.java"],
+    deps = [
+        ":category",
+        "//third_party:autovalue",
+        "@maven//:com_google_guava_guava",
+    ],
+)
+
+android_library(
+    name = "classifications",
+    srcs = ["Classifications.java"],
+    deps = [
+        ":classification_entry",
+        "//third_party:autovalue",
+        "@maven//:com_google_guava_guava",
+    ],
+)

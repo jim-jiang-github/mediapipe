@@ -312,6 +312,7 @@
     <ClCompile Include="calculators\image\opencv_encoded_image_to_image_frame_calculator.pb.cc" />
     <ClCompile Include="calculators\image\opencv_image_encoder_calculator.pb.cc" />
     <ClCompile Include="calculators\image\recolor_calculator.pb.cc" />
+    <ClCompile Include="calculators\image\rotation_mode.pb.cc" />
     <ClCompile Include="calculators\image\segmentation_smoothing_calculator.pb.cc" />
     <ClCompile Include="calculators\image\set_alpha_calculator.pb.cc" />
     <ClCompile Include="calculators\image\warp_affine_calculator.pb.cc" />
@@ -547,6 +548,7 @@
     <ClInclude Include="calculators\image\opencv_encoded_image_to_image_frame_calculator.pb.h" />
     <ClInclude Include="calculators\image\opencv_image_encoder_calculator.pb.h" />
     <ClInclude Include="calculators\image\recolor_calculator.pb.h" />
+    <ClInclude Include="calculators\image\rotation_mode.pb.h" />
     <ClInclude Include="calculators\image\segmentation_smoothing_calculator.pb.h" />
     <ClInclude Include="calculators\image\set_alpha_calculator.pb.h" />
     <ClInclude Include="calculators\image\warp_affine_calculator.pb.h" />

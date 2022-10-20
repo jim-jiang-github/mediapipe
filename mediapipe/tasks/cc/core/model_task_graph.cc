@@ -32,6 +32,7 @@ limitations under the License.
 #include "mediapipe/framework/calculator.pb.h"
 #include "mediapipe/framework/port/logging.h"
 #include "mediapipe/tasks/cc/common.h"
+#include "mediapipe/tasks/cc/core/model_asset_bundle_resources.h"
 #include "mediapipe/tasks/cc/core/model_resources.h"
 #include "mediapipe/tasks/cc/core/model_resources_cache.h"
 #include "mediapipe/tasks/cc/core/proto/acceleration.pb.h"
@@ -66,6 +67,17 @@ std::string CreateModelResourcesTag(const CalculatorGraphConfig::Node& node) {
   std::replace(node_type.begin(), node_type.end(), '.', '_');
   absl::AsciiStrToLower(&node_type);
   return absl::StrFormat("%s_%s_model_resources",
+                         names.back().empty() ? "unnamed" : names.back(),
+                         node_type);
+}
+
+std::string CreateModelAssetBundleResourcesTag(
+    const CalculatorGraphConfig::Node& node) {
+  std::vector<std::string> names = absl::StrSplit(node.name(), "__");
+  std::string node_type = node.calculator();
+  std::replace(node_type.begin(), node_type.end(), '.', '_');
+  absl::AsciiStrToLower(&node_type);
+  return absl::StrFormat("%s_%s_model_asset_bundle_resources",
                          names.back().empty() ? "unnamed" : names.back(),
                          node_type);
 }
@@ -122,6 +134,9 @@ class InferenceSubgraph : public Subgraph {
       case Acceleration::kGpu:
         delegate.mutable_gpu()->CopyFrom(acceleration.gpu());
         break;
+      case Acceleration::kTflite:
+        delegate.mutable_tflite()->CopyFrom(acceleration.tflite());
+        break;
       case Acceleration::DELEGATE_NOT_SET:
         // Deafult inference calculator setting.
         break;
@@ -165,6 +180,38 @@ absl::StatusOr<const ModelResources*> ModelTaskGraph::CreateModelResources(
   return model_resources_cache_service.GetObject().GetModelResources(tag);
 }
 
+absl::StatusOr<const ModelAssetBundleResources*>
+ModelTaskGraph::CreateModelAssetBundleResources(
+    SubgraphContext* sc, std::unique_ptr<proto::ExternalFile> external_file) {
+  auto model_resources_cache_service = sc->Service(kModelResourcesCacheService);
+  bool has_file_pointer_meta = external_file->has_file_pointer_meta();
+  // if external file is set by file pointer, no need to add the model asset
+  // bundle resources into the model resources service since the memory is
+  // not owned by this model asset bundle resources.
+  if (!model_resources_cache_service.IsAvailable() || has_file_pointer_meta) {
+    ASSIGN_OR_RETURN(
+        local_model_asset_bundle_resources_,
+        ModelAssetBundleResources::Create("", std::move(external_file)));
+    if (!has_file_pointer_meta) {
+      LOG(WARNING)
+          << "A local ModelResources object is created. Please consider using "
+             "ModelResourcesCacheService to cache the created ModelResources "
+             "object in the CalculatorGraph.";
+    }
+    return local_model_asset_bundle_resources_.get();
+  }
+  const std::string tag =
+      CreateModelAssetBundleResourcesTag(sc->OriginalNode());
+  ASSIGN_OR_RETURN(
+      auto model_bundle_resources,
+      ModelAssetBundleResources::Create(tag, std::move(external_file)));
+  MP_RETURN_IF_ERROR(
+      model_resources_cache_service.GetObject().AddModelAssetBundleResources(
+          std::move(model_bundle_resources)));
+  return model_resources_cache_service.GetObject().GetModelAssetBundleResources(
+      tag);
+}
+
 GenericNode& ModelTaskGraph::AddInference(
     const ModelResources& model_resources,
     const proto::Acceleration& acceleration, Graph& graph) const {
@@ -177,9 +224,9 @@ GenericNode& ModelTaskGraph::AddInference(
       ->CopyFrom(acceleration);
   // When the model resources tag is available, the ModelResourcesCalculator
   // will retrieve the cached model resources from the graph service by tag.
-  // Otherwise, provides the exteranal file and asks the
+  // Otherwise, provides the external file and asks the
   // ModelResourcesCalculator to create a local model resources in its
-  // Calcualtor::Open().
+  // Calculator::Open().
   if (!model_resources.GetTag().empty()) {
     inference_subgraph_opts.set_model_resources_tag(model_resources.GetTag());
   } else {

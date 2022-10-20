@@ -1299,6 +1299,9 @@
     <ClCompile Include="gpu\gl_animation_overlay_calculator.pb.cc">
       <Filter>gpu</Filter>
     </ClCompile>
+    <ClCompile Include="calculators\image\rotation_mode.pb.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\mediapipe\framework\tool\options_util.h">
@@ -2005,6 +2008,9 @@
     </ClInclude>
     <ClInclude Include="gpu\gl_animation_overlay_calculator.pb.h">
       <Filter>gpu</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\image\rotation_mode.pb.h">
+      <Filter>calculators\image</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -25,7 +25,7 @@ import com.google.mediapipe.framework.Packet;
 import com.google.mediapipe.framework.PacketGetter;
 import com.google.mediapipe.framework.ProtoUtil;
 import com.google.mediapipe.framework.image.BitmapImageBuilder;
-import com.google.mediapipe.framework.image.Image;
+import com.google.mediapipe.framework.image.MPImage;
 import com.google.mediapipe.tasks.components.container.proto.ClassificationsProto;
 import com.google.mediapipe.tasks.components.processors.ClassifierOptions;
 import com.google.mediapipe.tasks.core.BaseOptions;
@@ -39,7 +39,6 @@ import com.google.mediapipe.tasks.core.proto.BaseOptionsProto;
 import com.google.mediapipe.tasks.vision.core.BaseVisionTaskApi;
 import com.google.mediapipe.tasks.vision.core.RunningMode;
 import com.google.mediapipe.tasks.vision.imageclassifier.proto.ImageClassifierGraphOptionsProto;
-import com.google.protobuf.InvalidProtocolBufferException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -165,9 +164,9 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    * @throws MediaPipeException if there is an error during {@link ImageClassifier} creation.
    */
   public static ImageClassifier createFromOptions(Context context, ImageClassifierOptions options) {
-    OutputHandler<ImageClassificationResult, Image> handler = new OutputHandler<>();
+    OutputHandler<ImageClassificationResult, MPImage> handler = new OutputHandler<>();
     handler.setOutputPacketConverter(
-        new OutputHandler.OutputPacketConverter<ImageClassificationResult, Image>() {
+        new OutputHandler.OutputPacketConverter<ImageClassificationResult, MPImage>() {
           @Override
           public ImageClassificationResult convertToTaskResult(List<Packet> packets) {
             try {
@@ -176,14 +175,14 @@ public final class ImageClassifier extends BaseVisionTaskApi {
                       packets.get(CLASSIFICATION_RESULT_OUT_STREAM_INDEX),
                       ClassificationsProto.ClassificationResult.getDefaultInstance()),
                   packets.get(CLASSIFICATION_RESULT_OUT_STREAM_INDEX).getTimestamp());
-            } catch (InvalidProtocolBufferException e) {
+            } catch (IOException e) {
               throw new MediaPipeException(
                   MediaPipeException.StatusCode.INTERNAL.ordinal(), e.getMessage());
             }
           }
 
           @Override
-          public Image convertToTaskInput(List<Packet> packets) {
+          public MPImage convertToTaskInput(List<Packet> packets) {
             return new BitmapImageBuilder(
                     AndroidPacketGetter.getBitmapFromRgb(packets.get(IMAGE_OUT_STREAM_INDEX)))
                 .build();
@@ -226,10 +225,10 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *   <li>{@link Bitmap.Config.ARGB_8888}
    * </ul>
    *
-   * @param inputImage a MediaPipe {@link Image} object for processing.
+   * @param inputImage a MediaPipe {@link MPImage} object for processing.
    * @throws MediaPipeException if there is an internal error.
    */
-  public ImageClassificationResult classify(Image inputImage) {
+  public ImageClassificationResult classify(MPImage inputImage) {
     return (ImageClassificationResult) processImageData(inputImage, buildFullImageRectF());
   }
 
@@ -243,12 +242,12 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *   <li>{@link Bitmap.Config.ARGB_8888}
    * </ul>
    *
-   * @param inputImage a MediaPipe {@link Image} object for processing.
+   * @param inputImage a MediaPipe {@link MPImage} object for processing.
    * @param roi a {@link RectF} specifying the region of interest on which to perform
    *     classification. Coordinates are expected to be specified as normalized values in [0,1].
    * @throws MediaPipeException if there is an internal error.
    */
-  public ImageClassificationResult classify(Image inputImage, RectF roi) {
+  public ImageClassificationResult classify(MPImage inputImage, RectF roi) {
     return (ImageClassificationResult) processImageData(inputImage, roi);
   }
 
@@ -265,11 +264,11 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *   <li>{@link Bitmap.Config.ARGB_8888}
    * </ul>
    *
-   * @param inputImage a MediaPipe {@link Image} object for processing.
+   * @param inputImage a MediaPipe {@link MPImage} object for processing.
    * @param inputTimestampMs the input timestamp (in milliseconds).
    * @throws MediaPipeException if there is an internal error.
    */
-  public ImageClassificationResult classifyForVideo(Image inputImage, long inputTimestampMs) {
+  public ImageClassificationResult classifyForVideo(MPImage inputImage, long inputTimestampMs) {
     return (ImageClassificationResult)
         processVideoData(inputImage, buildFullImageRectF(), inputTimestampMs);
   }
@@ -287,14 +286,14 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *   <li>{@link Bitmap.Config.ARGB_8888}
    * </ul>
    *
-   * @param inputImage a MediaPipe {@link Image} object for processing.
+   * @param inputImage a MediaPipe {@link MPImage} object for processing.
    * @param roi a {@link RectF} specifying the region of interest on which to perform
    *     classification. Coordinates are expected to be specified as normalized values in [0,1].
    * @param inputTimestampMs the input timestamp (in milliseconds).
    * @throws MediaPipeException if there is an internal error.
    */
   public ImageClassificationResult classifyForVideo(
-      Image inputImage, RectF roi, long inputTimestampMs) {
+      MPImage inputImage, RectF roi, long inputTimestampMs) {
     return (ImageClassificationResult) processVideoData(inputImage, roi, inputTimestampMs);
   }
 
@@ -312,11 +311,11 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *   <li>{@link Bitmap.Config.ARGB_8888}
    * </ul>
    *
-   * @param inputImage a MediaPipe {@link Image} object for processing.
+   * @param inputImage a MediaPipe {@link MPImage} object for processing.
    * @param inputTimestampMs the input timestamp (in milliseconds).
    * @throws MediaPipeException if there is an internal error.
    */
-  public void classifyAsync(Image inputImage, long inputTimestampMs) {
+  public void classifyAsync(MPImage inputImage, long inputTimestampMs) {
     sendLiveStreamData(inputImage, buildFullImageRectF(), inputTimestampMs);
   }
 
@@ -335,13 +334,13 @@ public final class ImageClassifier extends BaseVisionTaskApi {
    *   <li>{@link Bitmap.Config.ARGB_8888}
    * </ul>
    *
-   * @param inputImage a MediaPipe {@link Image} object for processing.
+   * @param inputImage a MediaPipe {@link MPImage} object for processing.
    * @param roi a {@link RectF} specifying the region of interest on which to perform
    *     classification. Coordinates are expected to be specified as normalized values in [0,1].
    * @param inputTimestampMs the input timestamp (in milliseconds).
    * @throws MediaPipeException if there is an internal error.
    */
-  public void classifyAsync(Image inputImage, RectF roi, long inputTimestampMs) {
+  public void classifyAsync(MPImage inputImage, RectF roi, long inputTimestampMs) {
     sendLiveStreamData(inputImage, roi, inputTimestampMs);
   }
 
@@ -380,7 +379,7 @@ public final class ImageClassifier extends BaseVisionTaskApi {
        * the image classifier is in the live stream mode.
        */
       public abstract Builder setResultListener(
-          ResultListener<ImageClassificationResult, Image> resultListener);
+          ResultListener<ImageClassificationResult, MPImage> resultListener);
 
       /** Sets an optional {@link ErrorListener}. */
       public abstract Builder setErrorListener(ErrorListener errorListener);
@@ -417,7 +416,7 @@ public final class ImageClassifier extends BaseVisionTaskApi {
 
     abstract Optional<ClassifierOptions> classifierOptions();
 
-    abstract Optional<ResultListener<ImageClassificationResult, Image>> resultListener();
+    abstract Optional<ResultListener<ImageClassificationResult, MPImage>> resultListener();
 
     abstract Optional<ErrorListener> errorListener();
 

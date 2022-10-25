@@ -61,11 +61,13 @@ constexpr TensorsToClassificationCalculatorOptions::TensorsToClassificationCalcu
   , allow_classes_()
   , _allow_classes_cached_byte_size_()
   , label_map_path_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , tensor_name_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , label_map_(nullptr)
   , min_score_threshold_(0)
   , top_k_(0)
   , sort_by_descending_score_(false)
-  , binary_classification_(false){}
+  , binary_classification_(false)
+  , tensor_index_(0){}
 struct TensorsToClassificationCalculatorOptionsDefaultTypeInternal {
   constexpr TensorsToClassificationCalculatorOptionsDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -119,21 +121,25 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fcalculators_2ftens
   PROTOBUF_FIELD_OFFSET(::mediapipe::TensorsToClassificationCalculatorOptions, binary_classification_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::TensorsToClassificationCalculatorOptions, ignore_classes_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::TensorsToClassificationCalculatorOptions, allow_classes_),
-  2,
+  PROTOBUF_FIELD_OFFSET(::mediapipe::TensorsToClassificationCalculatorOptions, tensor_index_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::TensorsToClassificationCalculatorOptions, tensor_name_),
   3,
   4,
-  0,
-  1,
-  ~0u,
   5,
+  0,
+  2,
+  ~0u,
+  6,
   ~0u,
   ~0u,
+  7,
+  1,
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, 7, sizeof(::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap_Entry)},
   { 9, -1, sizeof(::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap)},
   { 15, 22, sizeof(::mediapipe::TensorsToClassificationCalculatorOptions_LabelItemsEntry_DoNotUse)},
-  { 24, 38, sizeof(::mediapipe::TensorsToClassificationCalculatorOptions)},
+  { 24, 40, sizeof(::mediapipe::TensorsToClassificationCalculatorOptions)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -147,7 +153,7 @@ const char descriptor_table_protodef_mediapipe_2fcalculators_2ftensor_2ftensors_
   "\nGmediapipe/calculators/tensor/tensors_t"
   "o_classification_calculator.proto\022\tmedia"
   "pipe\032$mediapipe/framework/calculator.pro"
-  "to\032\036mediapipe/util/label_map.proto\"\307\005\n(T"
+  "to\032\036mediapipe/util/label_map.proto\"\362\005\n(T"
   "ensorsToClassificationCalculatorOptions\022"
   "\033\n\023min_score_threshold\030\001 \001(\002\022\r\n\005top_k\030\002 "
   "\001(\005\022 \n\030sort_by_descending_score\030\t \001(\010\022\026\n"
@@ -157,15 +163,16 @@ const char descriptor_table_protodef_mediapipe_2fcalculators_2ftensor_2ftensors_
   "\003(\0132C.mediapipe.TensorsToClassificationC"
   "alculatorOptions.LabelItemsEntry\022\035\n\025bina"
   "ry_classification\030\004 \001(\010\022\032\n\016ignore_classe"
-  "s\030\007 \003(\005B\002\020\001\022\031\n\rallow_classes\030\010 \003(\005B\002\020\001\032\203"
-  "\001\n\010LabelMap\022S\n\007entries\030\001 \003(\0132B.mediapipe"
-  ".TensorsToClassificationCalculatorOption"
-  "s.LabelMap.Entry\032\"\n\005Entry\022\n\n\002id\030\001 \001(\005\022\r\n"
-  "\005label\030\002 \001(\t\032J\n\017LabelItemsEntry\022\013\n\003key\030\001"
-  " \001(\003\022&\n\005value\030\002 \001(\0132\027.mediapipe.LabelMap"
-  "Item:\0028\0012b\n\003ext\022\034.mediapipe.CalculatorOp"
-  "tions\030\256\215\214\240\001 \001(\01323.mediapipe.TensorsToCla"
-  "ssificationCalculatorOptions"
+  "s\030\007 \003(\005B\002\020\001\022\031\n\rallow_classes\030\010 \003(\005B\002\020\001\022\024"
+  "\n\014tensor_index\030\n \001(\005\022\023\n\013tensor_name\030\013 \001("
+  "\t\032\203\001\n\010LabelMap\022S\n\007entries\030\001 \003(\0132B.mediap"
+  "ipe.TensorsToClassificationCalculatorOpt"
+  "ions.LabelMap.Entry\032\"\n\005Entry\022\n\n\002id\030\001 \001(\005"
+  "\022\r\n\005label\030\002 \001(\t\032J\n\017LabelItemsEntry\022\013\n\003ke"
+  "y\030\001 \001(\003\022&\n\005value\030\002 \001(\0132\027.mediapipe.Label"
+  "MapItem:\0028\0012b\n\003ext\022\034.mediapipe.Calculato"
+  "rOptions\030\256\215\214\240\001 \001(\01323.mediapipe.TensorsTo"
+  "ClassificationCalculatorOptions"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fclassification_5fcalculator_2eproto_deps[2] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
@@ -173,7 +180,7 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fclassification_5fcalculator_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fclassification_5fcalculator_2eproto = {
-  false, false, 868, descriptor_table_protodef_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fclassification_5fcalculator_2eproto, "mediapipe/calculators/tensor/tensors_to_classification_calculator.proto", 
+  false, false, 911, descriptor_table_protodef_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fclassification_5fcalculator_2eproto, "mediapipe/calculators/tensor/tensors_to_classification_calculator.proto", 
   &descriptor_table_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fclassification_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fclassification_5fcalculator_2eproto_deps, 2, 4,
   schemas, file_default_instances, TableStruct_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fclassification_5fcalculator_2eproto::offsets,
   file_level_metadata_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fclassification_5fcalculator_2eproto, file_level_enum_descriptors_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fclassification_5fcalculator_2eproto, file_level_service_descriptors_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fclassification_5fcalculator_2eproto,
@@ -660,23 +667,29 @@ class TensorsToClassificationCalculatorOptions::_Internal {
  public:
   using HasBits = decltype(std::declval<TensorsToClassificationCalculatorOptions>()._has_bits_);
   static void set_has_min_score_threshold(HasBits* has_bits) {
-    (*has_bits)[0] |= 4u;
-  }
-  static void set_has_top_k(HasBits* has_bits) {
     (*has_bits)[0] |= 8u;
   }
-  static void set_has_sort_by_descending_score(HasBits* has_bits) {
+  static void set_has_top_k(HasBits* has_bits) {
     (*has_bits)[0] |= 16u;
+  }
+  static void set_has_sort_by_descending_score(HasBits* has_bits) {
+    (*has_bits)[0] |= 32u;
   }
   static void set_has_label_map_path(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
   static const ::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap& label_map(const TensorsToClassificationCalculatorOptions* msg);
   static void set_has_label_map(HasBits* has_bits) {
-    (*has_bits)[0] |= 2u;
+    (*has_bits)[0] |= 4u;
   }
   static void set_has_binary_classification(HasBits* has_bits) {
-    (*has_bits)[0] |= 32u;
+    (*has_bits)[0] |= 64u;
+  }
+  static void set_has_tensor_index(HasBits* has_bits) {
+    (*has_bits)[0] |= 128u;
+  }
+  static void set_has_tensor_name(HasBits* has_bits) {
+    (*has_bits)[0] |= 2u;
   }
 };
 
@@ -708,23 +721,29 @@ TensorsToClassificationCalculatorOptions::TensorsToClassificationCalculatorOptio
     label_map_path_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_label_map_path(), 
       GetArena());
   }
+  tensor_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (from._internal_has_tensor_name()) {
+    tensor_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_tensor_name(), 
+      GetArena());
+  }
   if (from._internal_has_label_map()) {
     label_map_ = new ::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap(*from.label_map_);
   } else {
     label_map_ = nullptr;
   }
   ::memcpy(&min_score_threshold_, &from.min_score_threshold_,
-    static_cast<size_t>(reinterpret_cast<char*>(&binary_classification_) -
-    reinterpret_cast<char*>(&min_score_threshold_)) + sizeof(binary_classification_));
+    static_cast<size_t>(reinterpret_cast<char*>(&tensor_index_) -
+    reinterpret_cast<char*>(&min_score_threshold_)) + sizeof(tensor_index_));
   // @@protoc_insertion_point(copy_constructor:mediapipe.TensorsToClassificationCalculatorOptions)
 }
 
 void TensorsToClassificationCalculatorOptions::SharedCtor() {
 label_map_path_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+tensor_name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&label_map_) - reinterpret_cast<char*>(this)),
-    0, static_cast<size_t>(reinterpret_cast<char*>(&binary_classification_) -
-    reinterpret_cast<char*>(&label_map_)) + sizeof(binary_classification_));
+    0, static_cast<size_t>(reinterpret_cast<char*>(&tensor_index_) -
+    reinterpret_cast<char*>(&label_map_)) + sizeof(tensor_index_));
 }
 
 TensorsToClassificationCalculatorOptions::~TensorsToClassificationCalculatorOptions() {
@@ -736,6 +755,7 @@ TensorsToClassificationCalculatorOptions::~TensorsToClassificationCalculatorOpti
 void TensorsToClassificationCalculatorOptions::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
   label_map_path_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  tensor_name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete label_map_;
 }
 
@@ -759,19 +779,22 @@ void TensorsToClassificationCalculatorOptions::Clear() {
   ignore_classes_.Clear();
   allow_classes_.Clear();
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000003u) {
+  if (cached_has_bits & 0x00000007u) {
     if (cached_has_bits & 0x00000001u) {
       label_map_path_.ClearNonDefaultToEmpty();
     }
     if (cached_has_bits & 0x00000002u) {
+      tensor_name_.ClearNonDefaultToEmpty();
+    }
+    if (cached_has_bits & 0x00000004u) {
       GOOGLE_DCHECK(label_map_ != nullptr);
       label_map_->Clear();
     }
   }
-  if (cached_has_bits & 0x0000003cu) {
+  if (cached_has_bits & 0x000000f8u) {
     ::memset(&min_score_threshold_, 0, static_cast<size_t>(
-        reinterpret_cast<char*>(&binary_classification_) -
-        reinterpret_cast<char*>(&min_score_threshold_)) + sizeof(binary_classification_));
+        reinterpret_cast<char*>(&tensor_index_) -
+        reinterpret_cast<char*>(&min_score_threshold_)) + sizeof(tensor_index_));
   }
   _has_bits_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
@@ -866,6 +889,25 @@ const char* TensorsToClassificationCalculatorOptions::_InternalParse(const char*
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
+      // optional int32 tensor_index = 10;
+      case 10:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 80)) {
+          _Internal::set_has_tensor_index(&has_bits);
+          tensor_index_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // optional string tensor_name = 11;
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 90)) {
+          auto str = _internal_mutable_tensor_name();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          #ifndef NDEBUG
+          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "mediapipe.TensorsToClassificationCalculatorOptions.tensor_name");
+          #endif  // !NDEBUG
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
       default: {
       handle_unusual:
         if ((tag == 0) || ((tag & 7) == 4)) {
@@ -898,13 +940,13 @@ failure:
 
   cached_has_bits = _has_bits_[0];
   // optional float min_score_threshold = 1;
-  if (cached_has_bits & 0x00000004u) {
+  if (cached_has_bits & 0x00000008u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(1, this->_internal_min_score_threshold(), target);
   }
 
   // optional int32 top_k = 2;
-  if (cached_has_bits & 0x00000008u) {
+  if (cached_has_bits & 0x00000010u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_top_k(), target);
   }
@@ -920,13 +962,13 @@ failure:
   }
 
   // optional bool binary_classification = 4;
-  if (cached_has_bits & 0x00000020u) {
+  if (cached_has_bits & 0x00000040u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(4, this->_internal_binary_classification(), target);
   }
 
   // optional .mediapipe.TensorsToClassificationCalculatorOptions.LabelMap label_map = 5;
-  if (cached_has_bits & 0x00000002u) {
+  if (cached_has_bits & 0x00000004u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
       InternalWriteMessage(
@@ -983,9 +1025,25 @@ failure:
   }
 
   // optional bool sort_by_descending_score = 9;
-  if (cached_has_bits & 0x00000010u) {
+  if (cached_has_bits & 0x00000020u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(9, this->_internal_sort_by_descending_score(), target);
+  }
+
+  // optional int32 tensor_index = 10;
+  if (cached_has_bits & 0x00000080u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(10, this->_internal_tensor_index(), target);
+  }
+
+  // optional string tensor_name = 11;
+  if (cached_has_bits & 0x00000002u) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->_internal_tensor_name().data(), static_cast<int>(this->_internal_tensor_name().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
+      "mediapipe.TensorsToClassificationCalculatorOptions.tensor_name");
+    target = stream->WriteStringMaybeAliased(
+        11, this->_internal_tensor_name(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1044,7 +1102,7 @@ size_t TensorsToClassificationCalculatorOptions::ByteSizeLong() const {
   }
 
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x0000003fu) {
+  if (cached_has_bits & 0x000000ffu) {
     // optional string label_map_path = 3;
     if (cached_has_bits & 0x00000001u) {
       total_size += 1 +
@@ -1052,33 +1110,47 @@ size_t TensorsToClassificationCalculatorOptions::ByteSizeLong() const {
           this->_internal_label_map_path());
     }
 
-    // optional .mediapipe.TensorsToClassificationCalculatorOptions.LabelMap label_map = 5;
+    // optional string tensor_name = 11;
     if (cached_has_bits & 0x00000002u) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+          this->_internal_tensor_name());
+    }
+
+    // optional .mediapipe.TensorsToClassificationCalculatorOptions.LabelMap label_map = 5;
+    if (cached_has_bits & 0x00000004u) {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
           *label_map_);
     }
 
     // optional float min_score_threshold = 1;
-    if (cached_has_bits & 0x00000004u) {
+    if (cached_has_bits & 0x00000008u) {
       total_size += 1 + 4;
     }
 
     // optional int32 top_k = 2;
-    if (cached_has_bits & 0x00000008u) {
+    if (cached_has_bits & 0x00000010u) {
       total_size += 1 +
         ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
           this->_internal_top_k());
     }
 
     // optional bool sort_by_descending_score = 9;
-    if (cached_has_bits & 0x00000010u) {
+    if (cached_has_bits & 0x00000020u) {
       total_size += 1 + 1;
     }
 
     // optional bool binary_classification = 4;
-    if (cached_has_bits & 0x00000020u) {
+    if (cached_has_bits & 0x00000040u) {
       total_size += 1 + 1;
+    }
+
+    // optional int32 tensor_index = 10;
+    if (cached_has_bits & 0x00000080u) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+          this->_internal_tensor_index());
     }
 
   }
@@ -1117,24 +1189,30 @@ void TensorsToClassificationCalculatorOptions::MergeFrom(const TensorsToClassifi
   ignore_classes_.MergeFrom(from.ignore_classes_);
   allow_classes_.MergeFrom(from.allow_classes_);
   cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 0x0000003fu) {
+  if (cached_has_bits & 0x000000ffu) {
     if (cached_has_bits & 0x00000001u) {
       _internal_set_label_map_path(from._internal_label_map_path());
     }
     if (cached_has_bits & 0x00000002u) {
-      _internal_mutable_label_map()->::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap::MergeFrom(from._internal_label_map());
+      _internal_set_tensor_name(from._internal_tensor_name());
     }
     if (cached_has_bits & 0x00000004u) {
-      min_score_threshold_ = from.min_score_threshold_;
+      _internal_mutable_label_map()->::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap::MergeFrom(from._internal_label_map());
     }
     if (cached_has_bits & 0x00000008u) {
-      top_k_ = from.top_k_;
+      min_score_threshold_ = from.min_score_threshold_;
     }
     if (cached_has_bits & 0x00000010u) {
-      sort_by_descending_score_ = from.sort_by_descending_score_;
+      top_k_ = from.top_k_;
     }
     if (cached_has_bits & 0x00000020u) {
+      sort_by_descending_score_ = from.sort_by_descending_score_;
+    }
+    if (cached_has_bits & 0x00000040u) {
       binary_classification_ = from.binary_classification_;
+    }
+    if (cached_has_bits & 0x00000080u) {
+      tensor_index_ = from.tensor_index_;
     }
     _has_bits_[0] |= cached_has_bits;
   }
@@ -1166,9 +1244,10 @@ void TensorsToClassificationCalculatorOptions::InternalSwap(TensorsToClassificat
   ignore_classes_.InternalSwap(&other->ignore_classes_);
   allow_classes_.InternalSwap(&other->allow_classes_);
   label_map_path_.Swap(&other->label_map_path_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  tensor_name_.Swap(&other->tensor_name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(TensorsToClassificationCalculatorOptions, binary_classification_)
-      + sizeof(TensorsToClassificationCalculatorOptions::binary_classification_)
+      PROTOBUF_FIELD_OFFSET(TensorsToClassificationCalculatorOptions, tensor_index_)
+      + sizeof(TensorsToClassificationCalculatorOptions::tensor_index_)
       - PROTOBUF_FIELD_OFFSET(TensorsToClassificationCalculatorOptions, label_map_)>(
           reinterpret_cast<char*>(&label_map_),
           reinterpret_cast<char*>(&other->label_map_));

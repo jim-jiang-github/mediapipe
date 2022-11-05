@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """APIs to train image classifier model."""
+import os
 
-from typing import Any, List, Optional
+from typing import List, Optional
 
 import tensorflow as tf
 import tensorflow_hub as hub
@@ -26,23 +27,25 @@ from mediapipe.model_maker.python.vision.core import image_preprocessing
 from mediapipe.model_maker.python.vision.image_classifier import hyperparameters as hp
 from mediapipe.model_maker.python.vision.image_classifier import model_spec as ms
 from mediapipe.model_maker.python.vision.image_classifier import train_image_classifier_lib
+from mediapipe.tasks.python.metadata.metadata_writers import image_classifier as image_classifier_writer
+from mediapipe.tasks.python.metadata.metadata_writers import metadata_writer
 
 
 class ImageClassifier(classifier.Classifier):
   """ImageClassifier for building image classification model."""
 
-  def __init__(self, model_spec: ms.ModelSpec, index_by_label: List[Any],
+  def __init__(self, model_spec: ms.ModelSpec, label_names: List[str],
                hparams: hp.HParams):
     """Initializes ImageClassifier class.
 
     Args:
       model_spec: Specification for the model.
-      index_by_label: A list that maps from index to label class name.
+      label_names: A list of label names for the classes.
       hparams: The hyperparameters for training image classifier.
     """
     super().__init__(
         model_spec=model_spec,
-        index_by_label=index_by_label,
+        label_names=label_names,
         shuffle=hparams.shuffle,
         full_train=hparams.do_fine_tuning)
     self._hparams = hparams
@@ -80,9 +83,7 @@ class ImageClassifier(classifier.Classifier):
 
     spec = ms.SupportedModels.get(model_spec)
     image_classifier = cls(
-        model_spec=spec,
-        index_by_label=train_data.index_by_label,
-        hparams=hparams)
+        model_spec=spec, label_names=train_data.label_names, hparams=hparams)
 
     image_classifier._create_model()
 
@@ -158,15 +159,32 @@ class ImageClassifier(classifier.Classifier):
       self,
       model_name: str = 'model.tflite',
       quantization_config: Optional[quantization.QuantizationConfig] = None):
-    """Converts the model to the requested formats and exports to a file.
+    """Converts and saves the model to a TFLite file with metadata included.
+
+    Note that only the TFLite file is needed for deployment. This function also
+    saves a metadata.json file to the same directory as the TFLite file which
+    can be used to interpret the metadata content in the TFLite file.
 
     Args:
-      model_name: File name to save tflite model. The full export path is
-        {export_dir}/{tflite_filename}.
+      model_name: File name to save TFLite model with metadata. The full export
+        path is {self._hparams.model_dir}/{model_name}.
       quantization_config: The configuration for model quantization.
     """
-    super().export_tflite(
-        self._hparams.model_dir,
-        model_name,
-        quantization_config,
+    if not tf.io.gfile.exists(self._hparams.model_dir):
+      tf.io.gfile.makedirs(self._hparams.model_dir)
+    tflite_file = os.path.join(self._hparams.model_dir, model_name)
+    metadata_file = os.path.join(self._hparams.model_dir, 'metadata.json')
+
+    tflite_model = model_util.convert_to_tflite(
+        model=self._model,
+        quantization_config=quantization_config,
         preprocess=self._preprocess)
+    writer = image_classifier_writer.MetadataWriter.create(
+        tflite_model,
+        self._model_spec.mean_rgb,
+        self._model_spec.stddev_rgb,
+        labels=metadata_writer.Labels().add(self._label_names))
+    tflite_model_with_metadata, metadata_json = writer.populate()
+    model_util.save_tflite(tflite_model_with_metadata, tflite_file)
+    with open(metadata_file, 'w') as f:
+      f.write(metadata_json)

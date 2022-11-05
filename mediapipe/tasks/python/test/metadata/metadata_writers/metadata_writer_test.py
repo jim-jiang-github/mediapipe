@@ -21,9 +21,12 @@ from absl.testing import absltest
 from mediapipe.tasks.python.metadata.metadata_writers import metadata_writer
 from mediapipe.tasks.python.test import test_utils
 
+_TEST_DATA_DIR = 'mediapipe/tasks/testdata/metadata'
+
 _IMAGE_CLASSIFIER_MODEL = test_utils.get_test_data_path(
-    'mobilenet_v1_0.25_224_1_default_1.tflite')
-_SCORE_CALIBRATION_FILE = test_utils.get_test_data_path('score_calibration.txt')
+    os.path.join(_TEST_DATA_DIR, 'mobilenet_v1_0.25_224_1_default_1.tflite'))
+_SCORE_CALIBRATION_FILE = test_utils.get_test_data_path(
+    os.path.join(_TEST_DATA_DIR, 'score_calibration.txt'))
 
 
 class LabelsTest(absltest.TestCase):
@@ -85,8 +88,7 @@ class ScoreCalibrationTest(absltest.TestCase):
       with self.assertRaisesRegex(
           ValueError,
           'Expected empty lines or 3 or 4 parameters per line in score '
-          'calibration file, but got 2.'
-      ):
+          'calibration file, but got 2.'):
         metadata_writer.ScoreCalibration.create_from_file(
             metadata_writer.ScoreCalibration.transformation_types.LOG,
             test_file)
@@ -404,6 +406,64 @@ class MetadataWriterForTaskTest(absltest.TestCase):
           "min_parser_version": "1.0.0"
         }
         """)
+
+  def test_add_classification_output_with_score_thresholding(self):
+    writer = metadata_writer.MetadataWriter.create(
+        self.image_classifier_model_buffer)
+    writer.add_classification_output(
+        labels=metadata_writer.Labels().add(['a', 'b', 'c']),
+        score_thresholding=metadata_writer.ScoreThresholding(
+            global_score_threshold=0.5))
+    _, metadata_json = writer.populate()
+    print(metadata_json)
+    self.assertJsonEqual(
+        metadata_json, """{
+        "subgraph_metadata": [
+          {
+            "input_tensor_metadata": [
+              {
+                "name": "input"
+              }
+            ],
+            "output_tensor_metadata": [
+              {
+                "name": "score",
+                "description": "Score of the labels respectively.",
+                "content": {
+                  "content_properties_type": "FeatureProperties",
+                  "content_properties": {
+                  }
+                },
+                "process_units": [
+                  {
+                    "options_type": "ScoreThresholdingOptions",
+                    "options": {
+                      "global_score_threshold": 0.5
+                    }
+                  }
+                ],
+                "stats": {
+                  "max": [
+                    1.0
+                  ],
+                  "min": [
+                    0.0
+                  ]
+                },
+                "associated_files": [
+                  {
+                    "name": "labels.txt",
+                    "description": "Labels for categories that the model can recognize.",
+                    "type": "TENSOR_AXIS_LABELS"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "min_parser_version": "1.0.0"
+      }
+      """)
 
 
 if __name__ == '__main__':

@@ -24,8 +24,11 @@ py_library(
     srcs = ["test_utils.py"],
     srcs_version = "PY3",
     visibility = [
-        "//mediapipe/model_maker/python/vision/gesture_recognizer:__pkg__",
+        "//mediapipe/model_maker/python:__subpackages__",
         "//mediapipe/tasks:internal",
     ],
-    deps = ["//mediapipe/python:_framework_bindings"],
+    deps = [
+        "//mediapipe/python:_framework_bindings",
+        "@com_google_protobuf//:protobuf_python",
+    ],
 )

@@ -37,6 +37,7 @@ mediapipe_files(srcs = [
     "coco_ssd_mobilenet_v1_1.0_quant_2018_06_29.tflite",
     "coco_ssd_mobilenet_v1_1.0_quant_2018_06_29_with_dummy_score_calibration.tflite",
     "deeplabv3.tflite",
+    "fist.jpg",
     "hand_landmark_full.tflite",
     "hand_landmark_lite.tflite",
     "left_hands.jpg",
@@ -64,6 +65,7 @@ mediapipe_files(srcs = [
     "selfie_segm_144_256_3.tflite",
     "selfie_segm_144_256_3_expected_mask.jpg",
     "thumb_up.jpg",
+    "victory.jpg",
 ])
 
 exports_files(
@@ -91,6 +93,7 @@ filegroup(
         "cats_and_dogs.jpg",
         "cats_and_dogs_no_resizing.jpg",
         "cats_and_dogs_rotated.jpg",
+        "fist.jpg",
         "hand_landmark_full.tflite",
         "hand_landmark_lite.tflite",
         "left_hands.jpg",
@@ -107,6 +110,7 @@ filegroup(
         "selfie_segm_128_128_3_expected_mask.jpg",
         "selfie_segm_144_256_3_expected_mask.jpg",
         "thumb_up.jpg",
+        "victory.jpg",
     ],
     visibility = [
         "//mediapipe/python:__subpackages__",
@@ -139,6 +143,15 @@ filegroup(
     ],
 )
 
+# Gestures related models. Visible to model_maker.
+filegroup(
+    name = "test_gesture_models",
+    visibility = [
+        "//mediapipe/model_maker:__subpackages__",
+        "//mediapipe/tasks:internal",
+    ],
+)
+
 filegroup(
     name = "test_protos",
     srcs = [
@@ -148,6 +161,7 @@ filegroup(
         "expected_left_up_hand_rotated_landmarks.prototxt",
         "expected_right_down_hand_landmarks.prototxt",
         "expected_right_up_hand_landmarks.prototxt",
+        "fist_landmarks.pbtxt",
         "hand_detector_result_one_hand.pbtxt",
         "hand_detector_result_one_hand_rotated.pbtxt",
         "hand_detector_result_two_hands.pbtxt",
@@ -155,5 +169,6 @@ filegroup(
         "pointing_up_rotated_landmarks.pbtxt",
         "thumb_up_landmarks.pbtxt",
         "thumb_up_rotated_landmarks.pbtxt",
+        "victory_landmarks.pbtxt",
     ],
 )

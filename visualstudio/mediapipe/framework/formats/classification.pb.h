@@ -386,6 +386,8 @@ class ClassificationList PROTOBUF_FINAL :
 
   enum : int {
     kClassificationFieldNumber = 1,
+    kTensorNameFieldNumber = 3,
+    kTensorIndexFieldNumber = 2,
   };
   // repeated .mediapipe.Classification classification = 1;
   int classification_size() const;
@@ -405,6 +407,37 @@ class ClassificationList PROTOBUF_FINAL :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::mediapipe::Classification >&
       classification() const;
 
+  // optional string tensor_name = 3;
+  bool has_tensor_name() const;
+  private:
+  bool _internal_has_tensor_name() const;
+  public:
+  void clear_tensor_name();
+  const std::string& tensor_name() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_tensor_name(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_tensor_name();
+  std::string* release_tensor_name();
+  void set_allocated_tensor_name(std::string* tensor_name);
+  private:
+  const std::string& _internal_tensor_name() const;
+  void _internal_set_tensor_name(const std::string& value);
+  std::string* _internal_mutable_tensor_name();
+  public:
+
+  // optional int32 tensor_index = 2;
+  bool has_tensor_index() const;
+  private:
+  bool _internal_has_tensor_index() const;
+  public:
+  void clear_tensor_index();
+  ::PROTOBUF_NAMESPACE_ID::int32 tensor_index() const;
+  void set_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_tensor_index() const;
+  void _internal_set_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
   // @@protoc_insertion_point(class_scope:mediapipe.ClassificationList)
  private:
   class _Internal;
@@ -412,8 +445,11 @@ class ClassificationList PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::mediapipe::Classification > classification_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::mediapipe::Classification > classification_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr tensor_name_;
+  ::PROTOBUF_NAMESPACE_ID::int32 tensor_index_;
   friend struct ::TableStruct_mediapipe_2fframework_2fformats_2fclassification_2eproto;
 };
 // -------------------------------------------------------------------
@@ -785,6 +821,91 @@ inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::mediapipe::Classificat
 ClassificationList::classification() const {
   // @@protoc_insertion_point(field_list:mediapipe.ClassificationList.classification)
   return classification_;
+}
+
+// optional int32 tensor_index = 2;
+inline bool ClassificationList::_internal_has_tensor_index() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool ClassificationList::has_tensor_index() const {
+  return _internal_has_tensor_index();
+}
+inline void ClassificationList::clear_tensor_index() {
+  tensor_index_ = 0;
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 ClassificationList::_internal_tensor_index() const {
+  return tensor_index_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 ClassificationList::tensor_index() const {
+  // @@protoc_insertion_point(field_get:mediapipe.ClassificationList.tensor_index)
+  return _internal_tensor_index();
+}
+inline void ClassificationList::_internal_set_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00000002u;
+  tensor_index_ = value;
+}
+inline void ClassificationList::set_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_tensor_index(value);
+  // @@protoc_insertion_point(field_set:mediapipe.ClassificationList.tensor_index)
+}
+
+// optional string tensor_name = 3;
+inline bool ClassificationList::_internal_has_tensor_name() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool ClassificationList::has_tensor_name() const {
+  return _internal_has_tensor_name();
+}
+inline void ClassificationList::clear_tensor_name() {
+  tensor_name_.ClearToEmpty();
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline const std::string& ClassificationList::tensor_name() const {
+  // @@protoc_insertion_point(field_get:mediapipe.ClassificationList.tensor_name)
+  return _internal_tensor_name();
+}
+template <typename ArgT0, typename... ArgT>
+PROTOBUF_ALWAYS_INLINE
+inline void ClassificationList::set_tensor_name(ArgT0&& arg0, ArgT... args) {
+ _has_bits_[0] |= 0x00000001u;
+ tensor_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArena());
+  // @@protoc_insertion_point(field_set:mediapipe.ClassificationList.tensor_name)
+}
+inline std::string* ClassificationList::mutable_tensor_name() {
+  // @@protoc_insertion_point(field_mutable:mediapipe.ClassificationList.tensor_name)
+  return _internal_mutable_tensor_name();
+}
+inline const std::string& ClassificationList::_internal_tensor_name() const {
+  return tensor_name_.Get();
+}
+inline void ClassificationList::_internal_set_tensor_name(const std::string& value) {
+  _has_bits_[0] |= 0x00000001u;
+  tensor_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
+}
+inline std::string* ClassificationList::_internal_mutable_tensor_name() {
+  _has_bits_[0] |= 0x00000001u;
+  return tensor_name_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
+}
+inline std::string* ClassificationList::release_tensor_name() {
+  // @@protoc_insertion_point(field_release:mediapipe.ClassificationList.tensor_name)
+  if (!_internal_has_tensor_name()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  return tensor_name_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void ClassificationList::set_allocated_tensor_name(std::string* tensor_name) {
+  if (tensor_name != nullptr) {
+    _has_bits_[0] |= 0x00000001u;
+  } else {
+    _has_bits_[0] &= ~0x00000001u;
+  }
+  tensor_name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), tensor_name,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:mediapipe.ClassificationList.tensor_name)
 }
 
 // -------------------------------------------------------------------

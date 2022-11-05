@@ -28,6 +28,7 @@ android_library(
         "//mediapipe/java/com/google/mediapipe/framework:android_framework_no_mff",
         "//mediapipe/java/com/google/mediapipe/framework/image",
         "//mediapipe/tasks/java/com/google/mediapipe/tasks/core",
+        "//third_party:autovalue",
         "@maven//:com_google_guava_guava",
     ],
 )
@@ -140,4 +141,12 @@ android_library(
         "//third_party:autovalue",
         "@maven//:com_google_guava_guava",
     ],
+)
+
+load("//mediapipe/tasks/java/com/google/mediapipe/tasks:mediapipe_tasks_aar.bzl", "mediapipe_tasks_vision_aar")
+
+mediapipe_tasks_vision_aar(
+    name = "tasks_vision",
+    srcs = glob(["**/*.java"]),
+    native_library = ":libmediapipe_tasks_vision_jni_lib",
 )

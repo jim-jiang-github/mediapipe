@@ -203,6 +203,7 @@ class TemplateExpression PROTOBUF_FINAL :
 
   enum : int {
     kArgFieldNumber = 3,
+    kKeyTypeFieldNumber = 6,
     kParamFieldNumber = 1,
     kOpFieldNumber = 2,
     kPathFieldNumber = 4,
@@ -226,6 +227,23 @@ class TemplateExpression PROTOBUF_FINAL :
   ::mediapipe::TemplateExpression* add_arg();
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::mediapipe::TemplateExpression >&
       arg() const;
+
+  // repeated .mediapipe.FieldDescriptorProto.Type key_type = 6;
+  int key_type_size() const;
+  private:
+  int _internal_key_type_size() const;
+  public:
+  void clear_key_type();
+  private:
+  ::mediapipe::FieldDescriptorProto_Type _internal_key_type(int index) const;
+  void _internal_add_key_type(::mediapipe::FieldDescriptorProto_Type value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* _internal_mutable_key_type();
+  public:
+  ::mediapipe::FieldDescriptorProto_Type key_type(int index) const;
+  void set_key_type(int index, ::mediapipe::FieldDescriptorProto_Type value);
+  void add_key_type(::mediapipe::FieldDescriptorProto_Type value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>& key_type() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* mutable_key_type();
 
   // optional string param = 1;
   bool has_param() const;
@@ -322,6 +340,7 @@ class TemplateExpression PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::mediapipe::TemplateExpression > arg_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int> key_type_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr param_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr op_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr path_;
@@ -1437,6 +1456,51 @@ inline void TemplateExpression::_internal_set_field_type(::mediapipe::FieldDescr
 inline void TemplateExpression::set_field_type(::mediapipe::FieldDescriptorProto_Type value) {
   _internal_set_field_type(value);
   // @@protoc_insertion_point(field_set:mediapipe.TemplateExpression.field_type)
+}
+
+// repeated .mediapipe.FieldDescriptorProto.Type key_type = 6;
+inline int TemplateExpression::_internal_key_type_size() const {
+  return key_type_.size();
+}
+inline int TemplateExpression::key_type_size() const {
+  return _internal_key_type_size();
+}
+inline void TemplateExpression::clear_key_type() {
+  key_type_.Clear();
+}
+inline ::mediapipe::FieldDescriptorProto_Type TemplateExpression::_internal_key_type(int index) const {
+  return static_cast< ::mediapipe::FieldDescriptorProto_Type >(key_type_.Get(index));
+}
+inline ::mediapipe::FieldDescriptorProto_Type TemplateExpression::key_type(int index) const {
+  // @@protoc_insertion_point(field_get:mediapipe.TemplateExpression.key_type)
+  return _internal_key_type(index);
+}
+inline void TemplateExpression::set_key_type(int index, ::mediapipe::FieldDescriptorProto_Type value) {
+  assert(::mediapipe::FieldDescriptorProto_Type_IsValid(value));
+  key_type_.Set(index, value);
+  // @@protoc_insertion_point(field_set:mediapipe.TemplateExpression.key_type)
+}
+inline void TemplateExpression::_internal_add_key_type(::mediapipe::FieldDescriptorProto_Type value) {
+  assert(::mediapipe::FieldDescriptorProto_Type_IsValid(value));
+  key_type_.Add(value);
+}
+inline void TemplateExpression::add_key_type(::mediapipe::FieldDescriptorProto_Type value) {
+  // @@protoc_insertion_point(field_add:mediapipe.TemplateExpression.key_type)
+  _internal_add_key_type(value);
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>&
+TemplateExpression::key_type() const {
+  // @@protoc_insertion_point(field_list:mediapipe.TemplateExpression.key_type)
+  return key_type_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
+TemplateExpression::_internal_mutable_key_type() {
+  return &key_type_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
+TemplateExpression::mutable_key_type() {
+  // @@protoc_insertion_point(field_mutable_list:mediapipe.TemplateExpression.key_type)
+  return _internal_mutable_key_type();
 }
 
 // optional string field_value = 7;

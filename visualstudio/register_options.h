@@ -102,21 +102,35 @@ void register_option_data(mediapipe::FieldData const& result) {
 //
 // See below for details data you need to register 'options'....
 //
+//
+// refer mediapipe/mediapipe/framework/tool/options_lib_template.cc
+//
+//   mediapipe::FieldData ReadFileDescriptorSet(const std::string& pb) {
+//     mediapipe::FieldData result;
+//     *result.mutable_message_value()->mutable_type_url() = "google::protobuf.FileDescriptorSet";
+//     *result.mutable_message_value()->mutable_value() = pb;
+//   
+//     // Force linking of the generated options protobuf.
+//     mediapipe::proto_ns::LinkMessageReflection<MP_OPTION_TYPE_NS::MP_OPTION_TYPE_NAME>();
+//     return result;
+//   }
+//
 inline void register_face_detection_options() {
   FileDescriptorSetBuilder fds_builder;
   fds_builder.Add<mediapipe::FaceDetectionOptions>(true);
 
-//fds_builder.Add<mediapipe::GateCalculatorOptions>(false);
+  // fds_builder.Add<mediapipe::GateCalculatorOptions>(false);
   fds_builder.Add<mediapipe::ImageToTensorCalculatorOptions>(false);
-//fds_builder.Add<mediapipe::InferenceCalculatorOptions>(false);
+  // fds_builder.Add<mediapipe::InferenceCalculatorOptions>(false);
   fds_builder.Add<mediapipe::TensorsToDetectionsCalculatorOptions>(false);
   fds_builder.Add<mediapipe::SsdAnchorsCalculatorOptions>(false);
-//fds_builder.Add<mediapipe::GpuOrigin>(false);
+  // fds_builder.Add<mediapipe::GpuOrigin>(false);
 
   mediapipe::FieldData data;
   auto* message = data.mutable_message_value();
   if (fds_builder.SerializeAsString(message->mutable_value())) {
-    *(message->mutable_type_url()) = "proto2.FileDescriptorSet";
+ // *(message->mutable_type_url()) = "proto2.FileDescriptorSet"; // v0.8.10.2
+    *(message->mutable_type_url()) = "google::protobuf.FileDescriptorSet"; // v0.9.1
     register_option_data<mediapipe::FaceDetectionOptions>(data);
   }
 }

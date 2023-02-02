@@ -21,8 +21,8 @@ from mediapipe.python import packet_creator
 from mediapipe.python import packet_getter
 from mediapipe.python._framework_bindings import image as image_module
 from mediapipe.python._framework_bindings import packet
-from mediapipe.tasks.cc.components.proto import segmenter_options_pb2
-from mediapipe.tasks.cc.vision.image_segmenter.proto import image_segmenter_options_pb2
+from mediapipe.tasks.cc.vision.image_segmenter.proto import image_segmenter_graph_options_pb2
+from mediapipe.tasks.cc.vision.image_segmenter.proto import segmenter_options_pb2
 from mediapipe.tasks.python.core import base_options as base_options_module
 from mediapipe.tasks.python.core import task_info as task_info_module
 from mediapipe.tasks.python.core.optional_dependencies import doc_controls
@@ -31,7 +31,7 @@ from mediapipe.tasks.python.vision.core import vision_task_running_mode
 
 _BaseOptions = base_options_module.BaseOptions
 _SegmenterOptionsProto = segmenter_options_pb2.SegmenterOptions
-_ImageSegmenterOptionsProto = image_segmenter_options_pb2.ImageSegmenterOptions
+_ImageSegmenterGraphOptionsProto = image_segmenter_graph_options_pb2.ImageSegmenterGraphOptions
 _RunningMode = vision_task_running_mode.VisionTaskRunningMode
 _TaskInfo = task_info_module.TaskInfo
 
@@ -40,7 +40,7 @@ _SEGMENTATION_TAG = 'GROUPED_SEGMENTATION'
 _IMAGE_IN_STREAM_NAME = 'image_in'
 _IMAGE_OUT_STREAM_NAME = 'image_out'
 _IMAGE_TAG = 'IMAGE'
-_TASK_GRAPH_NAME = 'mediapipe.tasks.vision.ImageSegmenterGraph'
+_TASK_GRAPH_NAME = 'mediapipe.tasks.vision.image_segmenter.ImageSegmenterGraph'
 _MICRO_SECONDS_PER_MILLISECOND = 1000
 
 
@@ -81,19 +81,41 @@ class ImageSegmenterOptions:
       [List[image_module.Image], image_module.Image, int], None]] = None
 
   @doc_controls.do_not_generate_docs
-  def to_pb2(self) -> _ImageSegmenterOptionsProto:
+  def to_pb2(self) -> _ImageSegmenterGraphOptionsProto:
     """Generates an ImageSegmenterOptions protobuf object."""
     base_options_proto = self.base_options.to_pb2()
     base_options_proto.use_stream_mode = False if self.running_mode == _RunningMode.IMAGE else True
     segmenter_options_proto = _SegmenterOptionsProto(
         output_type=self.output_type.value, activation=self.activation.value)
-    return _ImageSegmenterOptionsProto(
+    return _ImageSegmenterGraphOptionsProto(
         base_options=base_options_proto,
         segmenter_options=segmenter_options_proto)
 
 
 class ImageSegmenter(base_vision_task_api.BaseVisionTaskApi):
-  """Class that performs image segmentation on images."""
+  """Class that performs image segmentation on images.
+
+  The API expects a TFLite model with mandatory TFLite Model Metadata.
+
+  Input tensor:
+    (kTfLiteUInt8/kTfLiteFloat32)
+    - image input of size `[batch x height x width x channels]`.
+    - batch inference is not supported (`batch` is required to be 1).
+    - RGB and greyscale inputs are supported (`channels` is required to be
+      1 or 3).
+    - if type is kTfLiteFloat32, NormalizationOptions are required to be
+      attached to the metadata for input normalization.
+  Output tensors:
+    (kTfLiteUInt8/kTfLiteFloat32)
+    - list of segmented masks.
+    - if `output_type` is CATEGORY_MASK, uint8 Image, Image vector of size 1.
+    - if `output_type` is CONFIDENCE_MASK, float32 Image list of size
+      `channels`.
+    - batch is always 1
+
+  An example of such model can be found at:
+  https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/2
+  """
 
   @classmethod
   def create_from_model_path(cls, model_path: str) -> 'ImageSegmenter':

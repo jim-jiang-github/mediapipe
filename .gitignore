@@ -7,5 +7,6 @@ node_modules/
 .user.bazelrc
 visualstudio/.vs/
 visualstudio/bin/
+visualstudio/build_protos_no_commit.bat
 *.vcxproj.user
 *.cache

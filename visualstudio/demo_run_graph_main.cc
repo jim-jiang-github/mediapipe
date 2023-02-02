@@ -25,6 +25,7 @@
 #include "mediapipe/framework/calculator_framework.h"
 #include "mediapipe/framework/formats/image_frame.h"
 #include "mediapipe/framework/formats/image_frame_opencv.h"
+//#include "mediapipe/framework/formats/landmark.pb.h"
 #include "mediapipe/framework/port/file_helpers.h"
 #include "mediapipe/framework/port/opencv_highgui_inc.h"
 #include "mediapipe/framework/port/opencv_imgproc_inc.h"
@@ -145,34 +146,34 @@ absl::Status RunMPPGraph() {
 
     // Get the graph result packet, or stop if that fails.
     mediapipe::Packet packet;
-    if (!poller.Next(&packet)) {
-      break;
-    }
+    if (poller.Next(&packet)) {
+      auto& output_frame = packet.Get<mediapipe::ImageFrame>();
 
-    auto& output_frame = packet.Get<mediapipe::ImageFrame>();
+      // Convert back to opencv for display or saving.
+      cv::Mat output_frame_mat = mediapipe::formats::MatView(&output_frame);
+      cv::cvtColor(output_frame_mat, output_frame_mat, cv::COLOR_RGB2BGR);
+      if (save_video) {
+        if (!writer.isOpened()) {
+          LOG(INFO) << "Prepare video writer.";
+          writer.open(absl::GetFlag(FLAGS_output_video_path),
+                      mediapipe::fourcc('a', 'v', 'c', '1'),  // .mp4
+                      capture.get(cv::CAP_PROP_FPS), output_frame_mat.size());
+          RET_CHECK(writer.isOpened());
+        }
+        writer.write(output_frame_mat);
+      } else {
+        if (0x03==user_input.wait_key) { // capture: Ctrl+C
+          cv::imwrite("screen_shot.jpg", output_frame_mat);
+        }
 
-    // Convert back to opencv for display or saving.
-    cv::Mat output_frame_mat = mediapipe::formats::MatView(&output_frame);
-    cv::cvtColor(output_frame_mat, output_frame_mat, cv::COLOR_RGB2BGR);
-    if (save_video) {
-      if (!writer.isOpened()) {
-        LOG(INFO) << "Prepare video writer.";
-        writer.open(absl::GetFlag(FLAGS_output_video_path),
-                    mediapipe::fourcc('a', 'v', 'c', '1'),  // .mp4
-                    capture.get(cv::CAP_PROP_FPS), output_frame_mat.size());
-        RET_CHECK(writer.isOpened());
+        cv::imshow(kWindowName, output_frame_mat);
       }
-      writer.write(output_frame_mat);
     } else {
-      if (0x03==user_input.wait_key) { // capture: Ctrl+C
-        cv::imwrite("screen_shot.jpg", output_frame_mat);
-      }
-
-      cv::imshow(kWindowName, output_frame_mat);
+      break;
     }
   }
 
-  LOG(INFO) << "Shutting down.";
+  LOG(INFO) << "Shutting down...";
   cv::destroyAllWindows();
   if (writer.isOpened()) writer.release();
   MP_RETURN_IF_ERROR(graph.CloseAllInputStreams());
@@ -183,29 +184,33 @@ int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
 
   // workaround tflite model path
-  {
+  if (resource_root) {
     std::vector<char*> argvv(argc);
     bool find_resource_root = false;
+    char resource_root_dir[128];
+    sprintf(resource_root_dir, "--resource_root_dir=%s", resource_root);
+    
     for (int i=0; i<argc; ++i) {
-      argvv[i] = argv[i];
+      char* c = argvv[i] = argv[i];
       if (!find_resource_root) {
-        char* c = argv[i];
-        if ('-'==*c) {
+        if ('-'==*c && '-'==*++c) {
           ++c;
-          if ('-'==*c) {
-            ++c;
-          }
         }
-        find_resource_root = 0==memcpy(c, "resource_root_dir=", 18);
+
+        if (0==memcmp(c, "resource_root_dir=", 18)) {
+          std::cout << "overwrite resource root: \"" << c+18 << "\" to \"" << resource_root << "\"\n";
+          argvv[i] = resource_root_dir;
+          find_resource_root = true;
+        }
       }
     }
 
-    char resource_root_dir[128];
     if (!find_resource_root) {
-      sprintf(resource_root_dir, "--resource_root_dir=%s", resource_root);
       argvv.push_back(resource_root_dir);
     }
     absl::ParseCommandLine((int)argvv.size(), argvv.data());
+  } else {
+    absl::ParseCommandLine(argc, argv);
   }
 
   absl::Status run_status = RunMPPGraph();

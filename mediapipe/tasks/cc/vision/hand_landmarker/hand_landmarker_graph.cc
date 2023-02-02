@@ -49,6 +49,7 @@ namespace hand_landmarker {
 
 namespace {
 
+using ::mediapipe::NormalizedRect;
 using ::mediapipe::api2::Input;
 using ::mediapipe::api2::Output;
 using ::mediapipe::api2::builder::Graph;
@@ -135,9 +136,10 @@ absl::Status SetSubTaskBaseOptions(const ModelAssetBundleResources& resources,
 // Inputs:
 //   IMAGE - Image
 //     Image to perform hand landmarks detection on.
-//   NORM_RECT - NormalizedRect
+//   NORM_RECT - NormalizedRect @Optional
 //     Describes image rotation and region of image to perform landmarks
-//     detection on.
+//     detection on. If not provided, whole image is used for hand landmarks
+//     detection.
 //
 // Outputs:
 //   LANDMARKS: - std::vector<NormalizedLandmarkList>
@@ -217,11 +219,12 @@ class HandLandmarkerGraph : public core::ModelTaskGraph {
           !sc->Service(::mediapipe::tasks::core::kModelResourcesCacheService)
                .IsAvailable()));
     }
-    ASSIGN_OR_RETURN(auto hand_landmarker_outputs,
-                     BuildHandLandmarkerGraph(
-                         sc->Options<HandLandmarkerGraphOptions>(),
-                         graph[Input<Image>(kImageTag)],
-                         graph[Input<NormalizedRect>(kNormRectTag)], graph));
+    ASSIGN_OR_RETURN(
+        auto hand_landmarker_outputs,
+        BuildHandLandmarkerGraph(
+            sc->Options<HandLandmarkerGraphOptions>(),
+            graph[Input<Image>(kImageTag)],
+            graph[Input<NormalizedRect>::Optional(kNormRectTag)], graph));
     hand_landmarker_outputs.landmark_lists >>
         graph[Output<std::vector<NormalizedLandmarkList>>(kLandmarksTag)];
     hand_landmarker_outputs.world_landmark_lists >>
@@ -276,33 +279,44 @@ class HandLandmarkerGraph : public core::ModelTaskGraph {
         .set_min_size(max_num_hands);
     auto has_enough_hands = min_size_node.Out("").Cast<bool>();
 
-    auto image_for_hand_detector =
-        DisallowIf(image_in, has_enough_hands, graph);
-    auto norm_rect_in_for_hand_detector =
-        DisallowIf(norm_rect_in, has_enough_hands, graph);
-
     auto& hand_detector =
         graph.AddNode("mediapipe.tasks.vision.hand_detector.HandDetectorGraph");
     hand_detector.GetOptions<HandDetectorGraphOptions>().CopyFrom(
         tasks_options.hand_detector_graph_options());
-    image_for_hand_detector >> hand_detector.In("IMAGE");
-    norm_rect_in_for_hand_detector >> hand_detector.In("NORM_RECT");
-    auto hand_rects_from_hand_detector = hand_detector.Out("HAND_RECTS");
-
-    auto& hand_association = graph.AddNode("HandAssociationCalculator");
-    hand_association.GetOptions<HandAssociationCalculatorOptions>()
-        .set_min_similarity_threshold(tasks_options.min_tracking_confidence());
-    prev_hand_rects_from_landmarks >>
-        hand_association[Input<std::vector<NormalizedRect>>::Multiple("")][0];
-    hand_rects_from_hand_detector >>
-        hand_association[Input<std::vector<NormalizedRect>>::Multiple("")][1];
-    auto hand_rects = hand_association.Out("");
-
     auto& clip_hand_rects =
         graph.AddNode("ClipNormalizedRectVectorSizeCalculator");
     clip_hand_rects.GetOptions<ClipVectorSizeCalculatorOptions>()
         .set_max_vec_size(max_num_hands);
-    hand_rects >> clip_hand_rects.In("");
+
+    if (tasks_options.base_options().use_stream_mode()) {
+      // While in stream mode, skip hand detector graph when we successfully
+      // track the hands from the last frame.
+      auto image_for_hand_detector =
+          DisallowIf(image_in, has_enough_hands, graph);
+      auto norm_rect_in_for_hand_detector =
+          DisallowIf(norm_rect_in, has_enough_hands, graph);
+      image_for_hand_detector >> hand_detector.In("IMAGE");
+      norm_rect_in_for_hand_detector >> hand_detector.In("NORM_RECT");
+      auto hand_rects_from_hand_detector = hand_detector.Out("HAND_RECTS");
+      auto& hand_association = graph.AddNode("HandAssociationCalculator");
+      hand_association.GetOptions<HandAssociationCalculatorOptions>()
+          .set_min_similarity_threshold(
+              tasks_options.min_tracking_confidence());
+      prev_hand_rects_from_landmarks >>
+          hand_association[Input<std::vector<NormalizedRect>>::Multiple("")][0];
+      hand_rects_from_hand_detector >>
+          hand_association[Input<std::vector<NormalizedRect>>::Multiple("")][1];
+      auto hand_rects = hand_association.Out("");
+      hand_rects >> clip_hand_rects.In("");
+    } else {
+      // While not in stream mode, the input images are not guaranteed to be in
+      // series, and we don't want to enable the tracking and hand associations
+      // between input images. Always use the hand detector graph.
+      image_in >> hand_detector.In("IMAGE");
+      norm_rect_in >> hand_detector.In("NORM_RECT");
+      auto hand_rects_from_hand_detector = hand_detector.Out("HAND_RECTS");
+      hand_rects_from_hand_detector >> clip_hand_rects.In("");
+    }
     auto clipped_hand_rects = clip_hand_rects.Out("");
 
     auto& hand_landmarks_detector_graph = graph.AddNode(

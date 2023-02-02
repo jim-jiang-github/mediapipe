@@ -20,6 +20,7 @@ namespace mediapipe {
 constexpr TemplateExpression::TemplateExpression(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : arg_()
+  , key_type_()
   , param_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , op_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , path_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
@@ -114,12 +115,14 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fframework_2ftool_2
   PROTOBUF_FIELD_OFFSET(::mediapipe::TemplateExpression, arg_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::TemplateExpression, path_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::TemplateExpression, field_type_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::TemplateExpression, key_type_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::TemplateExpression, field_value_),
   0,
   1,
   ~0u,
   2,
   4,
+  ~0u,
   3,
   PROTOBUF_FIELD_OFFSET(::mediapipe::CalculatorGraphTemplate, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::CalculatorGraphTemplate, _internal_metadata_),
@@ -164,12 +167,12 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fframework_2ftool_2
   0,
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 11, sizeof(::mediapipe::TemplateExpression)},
-  { 17, 24, sizeof(::mediapipe::CalculatorGraphTemplate)},
-  { 26, -1, sizeof(::mediapipe::TemplateArgument)},
-  { 36, 43, sizeof(::mediapipe::TemplateDict_Parameter)},
-  { 45, -1, sizeof(::mediapipe::TemplateDict)},
-  { 51, 57, sizeof(::mediapipe::TemplateSubgraphOptions)},
+  { 0, 12, sizeof(::mediapipe::TemplateExpression)},
+  { 19, 26, sizeof(::mediapipe::CalculatorGraphTemplate)},
+  { 28, -1, sizeof(::mediapipe::TemplateArgument)},
+  { 38, 45, sizeof(::mediapipe::TemplateDict_Parameter)},
+  { 47, -1, sizeof(::mediapipe::TemplateDict)},
+  { 53, 59, sizeof(::mediapipe::TemplateSubgraphOptions)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -187,26 +190,28 @@ const char descriptor_table_protodef_mediapipe_2fframework_2ftool_2fcalculator_5
   "/framework/calculator.proto\032,mediapipe/f"
   "ramework/calculator_options.proto\032/media"
   "pipe/framework/deps/proto_descriptor.pro"
-  "to\"\270\001\n\022TemplateExpression\022\r\n\005param\030\001 \001(\t"
+  "to\"\360\001\n\022TemplateExpression\022\r\n\005param\030\001 \001(\t"
   "\022\n\n\002op\030\002 \001(\t\022*\n\003arg\030\003 \003(\0132\035.mediapipe.Te"
   "mplateExpression\022\014\n\004path\030\004 \001(\t\0228\n\nfield_"
   "type\030\005 \001(\0162$.mediapipe.FieldDescriptorPr"
-  "oto.Type\022\023\n\013field_value\030\007 \001(\t\"x\n\027Calcula"
-  "torGraphTemplate\0220\n\006config\030\001 \001(\0132 .media"
-  "pipe.CalculatorGraphConfig\022+\n\004rule\030\002 \003(\013"
-  "2\035.mediapipe.TemplateExpression\"\226\001\n\020Temp"
-  "lateArgument\022\r\n\003str\030\001 \001(\tH\000\022\r\n\003num\030\002 \001(\001"
-  "H\000\022\'\n\004dict\030\003 \001(\0132\027.mediapipe.TemplateDic"
-  "tH\000\022,\n\007element\030\004 \003(\0132\033.mediapipe.Templat"
-  "eArgumentB\r\n\013param_value\"\204\001\n\014TemplateDic"
-  "t\022.\n\003arg\030\001 \003(\0132!.mediapipe.TemplateDict."
-  "Parameter\032D\n\tParameter\022\013\n\003key\030\001 \001(\t\022*\n\005v"
-  "alue\030\002 \001(\0132\033.mediapipe.TemplateArgument\""
-  "\222\001\n\027TemplateSubgraphOptions\022%\n\004dict\030\001 \001("
-  "\0132\027.mediapipe.TemplateDict2P\n\003ext\022\034.medi"
-  "apipe.CalculatorOptions\030\365\374\276R \001(\0132\".media"
-  "pipe.TemplateSubgraphOptionsB0\n\032com.goog"
-  "le.mediapipe.protoB\022GraphTemplateProto"
+  "oto.Type\0226\n\010key_type\030\006 \003(\0162$.mediapipe.F"
+  "ieldDescriptorProto.Type\022\023\n\013field_value\030"
+  "\007 \001(\t\"x\n\027CalculatorGraphTemplate\0220\n\006conf"
+  "ig\030\001 \001(\0132 .mediapipe.CalculatorGraphConf"
+  "ig\022+\n\004rule\030\002 \003(\0132\035.mediapipe.TemplateExp"
+  "ression\"\226\001\n\020TemplateArgument\022\r\n\003str\030\001 \001("
+  "\tH\000\022\r\n\003num\030\002 \001(\001H\000\022\'\n\004dict\030\003 \001(\0132\027.media"
+  "pipe.TemplateDictH\000\022,\n\007element\030\004 \003(\0132\033.m"
+  "ediapipe.TemplateArgumentB\r\n\013param_value"
+  "\"\204\001\n\014TemplateDict\022.\n\003arg\030\001 \003(\0132!.mediapi"
+  "pe.TemplateDict.Parameter\032D\n\tParameter\022\013"
+  "\n\003key\030\001 \001(\t\022*\n\005value\030\002 \001(\0132\033.mediapipe.T"
+  "emplateArgument\"\222\001\n\027TemplateSubgraphOpti"
+  "ons\022%\n\004dict\030\001 \001(\0132\027.mediapipe.TemplateDi"
+  "ct2P\n\003ext\022\034.mediapipe.CalculatorOptions\030"
+  "\365\374\276R \001(\0132\".mediapipe.TemplateSubgraphOpt"
+  "ionsB0\n\032com.google.mediapipe.protoB\022Grap"
+  "hTemplateProto"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto_deps[3] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
@@ -215,7 +220,7 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto = {
-  false, false, 998, descriptor_table_protodef_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto, "mediapipe/framework/tool/calculator_graph_template.proto", 
+  false, false, 1054, descriptor_table_protodef_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto, "mediapipe/framework/tool/calculator_graph_template.proto", 
   &descriptor_table_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto_once, descriptor_table_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto_deps, 3, 6,
   schemas, file_default_instances, TableStruct_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto::offsets,
   file_level_metadata_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto, file_level_enum_descriptors_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto, file_level_service_descriptors_mediapipe_2fframework_2ftool_2fcalculator_5fgraph_5ftemplate_2eproto,
@@ -252,7 +257,8 @@ class TemplateExpression::_Internal {
 
 TemplateExpression::TemplateExpression(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
-  arg_(arena) {
+  arg_(arena),
+  key_type_(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
   // @@protoc_insertion_point(arena_constructor:mediapipe.TemplateExpression)
@@ -260,7 +266,8 @@ TemplateExpression::TemplateExpression(::PROTOBUF_NAMESPACE_ID::Arena* arena)
 TemplateExpression::TemplateExpression(const TemplateExpression& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       _has_bits_(from._has_bits_),
-      arg_(from.arg_) {
+      arg_(from.arg_),
+      key_type_(from.key_type_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   param_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (from._internal_has_param()) {
@@ -325,6 +332,7 @@ void TemplateExpression::Clear() {
   (void) cached_has_bits;
 
   arg_.Clear();
+  key_type_.Clear();
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x0000000fu) {
     if (cached_has_bits & 0x00000001u) {
@@ -407,6 +415,26 @@ const char* TemplateExpression::_InternalParse(const char* ptr, ::PROTOBUF_NAMES
           } else {
             ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(5, val, mutable_unknown_fields());
           }
+        } else goto handle_unusual;
+        continue;
+      // repeated .mediapipe.FieldDescriptorProto.Type key_type = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+            CHK_(ptr);
+            if (PROTOBUF_PREDICT_TRUE(::mediapipe::FieldDescriptorProto_Type_IsValid(val))) {
+              _internal_add_key_type(static_cast<::mediapipe::FieldDescriptorProto_Type>(val));
+            } else {
+              ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(6, val, mutable_unknown_fields());
+            }
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<48>(ptr));
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedEnumParser<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(_internal_mutable_key_type(), ptr, ctx, ::mediapipe::FieldDescriptorProto_Type_IsValid, &_internal_metadata_, 6);
+          CHK_(ptr);
         } else goto handle_unusual;
         continue;
       // optional string field_value = 7;
@@ -496,6 +524,13 @@ failure:
       5, this->_internal_field_type(), target);
   }
 
+  // repeated .mediapipe.FieldDescriptorProto.Type key_type = 6;
+  for (int i = 0, n = this->_internal_key_type_size(); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
+        6, this->_internal_key_type(i), target);
+  }
+
   // optional string field_value = 7;
   if (cached_has_bits & 0x00000008u) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
@@ -527,6 +562,16 @@ size_t TemplateExpression::ByteSizeLong() const {
   for (const auto& msg : this->arg_) {
     total_size +=
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // repeated .mediapipe.FieldDescriptorProto.Type key_type = 6;
+  {
+    size_t data_size = 0;
+    unsigned int count = static_cast<unsigned int>(this->_internal_key_type_size());for (unsigned int i = 0; i < count; i++) {
+      data_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(
+        this->_internal_key_type(static_cast<int>(i)));
+    }
+    total_size += (1UL * count) + data_size;
   }
 
   cached_has_bits = _has_bits_[0];
@@ -598,6 +643,7 @@ void TemplateExpression::MergeFrom(const TemplateExpression& from) {
   (void) cached_has_bits;
 
   arg_.MergeFrom(from.arg_);
+  key_type_.MergeFrom(from.key_type_);
   cached_has_bits = from._has_bits_[0];
   if (cached_has_bits & 0x0000001fu) {
     if (cached_has_bits & 0x00000001u) {
@@ -642,6 +688,7 @@ void TemplateExpression::InternalSwap(TemplateExpression* other) {
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   arg_.InternalSwap(&other->arg_);
+  key_type_.InternalSwap(&other->key_type_);
   param_.Swap(&other->param_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   op_.Swap(&other->op_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   path_.Swap(&other->path_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());

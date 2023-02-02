@@ -197,46 +197,48 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 const char descriptor_table_protodef_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n7mediapipe/calculators/tensor/inference"
   "_calculator.proto\022\tmediapipe\032$mediapipe/"
-  "framework/calculator.proto\"\223\t\n\032Inference"
-  "CalculatorOptions\022\022\n\nmodel_path\030\001 \001(\t\022\032\n"
-  "\007use_gpu\030\002 \001(\010:\005falseB\002\030\001\022\034\n\tuse_nnapi\030\003"
-  " \001(\010:\005falseB\002\030\001\022\032\n\016cpu_num_thread\030\004 \001(\005:"
-  "\002-1\022@\n\010delegate\030\005 \001(\0132..mediapipe.Infere"
-  "nceCalculatorOptions.Delegate\032\362\006\n\010Delega"
-  "te\022G\n\006tflite\030\001 \001(\01325.mediapipe.Inference"
-  "CalculatorOptions.Delegate.TfLiteH\000\022A\n\003g"
-  "pu\030\002 \001(\01322.mediapipe.InferenceCalculator"
-  "Options.Delegate.GpuH\000\022E\n\005nnapi\030\003 \001(\01324."
-  "mediapipe.InferenceCalculatorOptions.Del"
-  "egate.NnapiH\000\022I\n\007xnnpack\030\004 \001(\01326.mediapi"
-  "pe.InferenceCalculatorOptions.Delegate.X"
-  "nnpackH\000\032\010\n\006TfLite\032\302\003\n\003Gpu\022#\n\024use_advanc"
-  "ed_gpu_api\030\001 \001(\010:\005false\022H\n\003api\030\004 \001(\01626.m"
+  "framework/calculator.proto\032,mediapipe/fr"
+  "amework/calculator_options.proto\"\223\t\n\032Inf"
+  "erenceCalculatorOptions\022\022\n\nmodel_path\030\001 "
+  "\001(\t\022\032\n\007use_gpu\030\002 \001(\010:\005falseB\002\030\001\022\034\n\tuse_n"
+  "napi\030\003 \001(\010:\005falseB\002\030\001\022\032\n\016cpu_num_thread\030"
+  "\004 \001(\005:\002-1\022@\n\010delegate\030\005 \001(\0132..mediapipe."
+  "InferenceCalculatorOptions.Delegate\032\362\006\n\010"
+  "Delegate\022G\n\006tflite\030\001 \001(\01325.mediapipe.Inf"
+  "erenceCalculatorOptions.Delegate.TfLiteH"
+  "\000\022A\n\003gpu\030\002 \001(\01322.mediapipe.InferenceCalc"
+  "ulatorOptions.Delegate.GpuH\000\022E\n\005nnapi\030\003 "
+  "\001(\01324.mediapipe.InferenceCalculatorOptio"
+  "ns.Delegate.NnapiH\000\022I\n\007xnnpack\030\004 \001(\01326.m"
   "ediapipe.InferenceCalculatorOptions.Dele"
-  "gate.Gpu.Api:\003ANY\022\"\n\024allow_precision_los"
-  "s\030\003 \001(\010:\004true\022\032\n\022cached_kernel_path\030\002 \001("
-  "\t\022\034\n\024serialized_model_dir\030\007 \001(\t\022\023\n\013model"
-  "_token\030\010 \001(\t\022a\n\005usage\030\005 \001(\0162A.mediapipe."
-  "InferenceCalculatorOptions.Delegate.Gpu."
-  "InferenceUsage:\017SUSTAINED_SPEED\"&\n\003Api\022\007"
-  "\n\003ANY\020\000\022\n\n\006OPENGL\020\001\022\n\n\006OPENCL\020\002\"N\n\016Infer"
-  "enceUsage\022\017\n\013UNSPECIFIED\020\000\022\026\n\022FAST_SINGL"
-  "E_ANSWER\020\001\022\023\n\017SUSTAINED_SPEED\020\002\032I\n\005Nnapi"
-  "\022\021\n\tcache_dir\030\001 \001(\t\022\023\n\013model_token\030\002 \001(\t"
-  "\022\030\n\020accelerator_name\030\003 \001(\t\032\"\n\007Xnnpack\022\027\n"
-  "\013num_threads\030\001 \001(\005:\002-1B\n\n\010delegate2T\n\003ex"
-  "t\022\034.mediapipe.CalculatorOptions\030\367\323\313\240\001 \001("
-  "\0132%.mediapipe.InferenceCalculatorOptions"
-  "BA\n%com.google.mediapipe.calculator.prot"
-  "oB\030InferenceCalculatorProto"
+  "gate.XnnpackH\000\032\010\n\006TfLite\032\302\003\n\003Gpu\022#\n\024use_"
+  "advanced_gpu_api\030\001 \001(\010:\005false\022H\n\003api\030\004 \001"
+  "(\01626.mediapipe.InferenceCalculatorOption"
+  "s.Delegate.Gpu.Api:\003ANY\022\"\n\024allow_precisi"
+  "on_loss\030\003 \001(\010:\004true\022\032\n\022cached_kernel_pat"
+  "h\030\002 \001(\t\022\034\n\024serialized_model_dir\030\007 \001(\t\022\023\n"
+  "\013model_token\030\010 \001(\t\022a\n\005usage\030\005 \001(\0162A.medi"
+  "apipe.InferenceCalculatorOptions.Delegat"
+  "e.Gpu.InferenceUsage:\017SUSTAINED_SPEED\"&\n"
+  "\003Api\022\007\n\003ANY\020\000\022\n\n\006OPENGL\020\001\022\n\n\006OPENCL\020\002\"N\n"
+  "\016InferenceUsage\022\017\n\013UNSPECIFIED\020\000\022\026\n\022FAST"
+  "_SINGLE_ANSWER\020\001\022\023\n\017SUSTAINED_SPEED\020\002\032I\n"
+  "\005Nnapi\022\021\n\tcache_dir\030\001 \001(\t\022\023\n\013model_token"
+  "\030\002 \001(\t\022\030\n\020accelerator_name\030\003 \001(\t\032\"\n\007Xnnp"
+  "ack\022\027\n\013num_threads\030\001 \001(\005:\002-1B\n\n\010delegate"
+  "2T\n\003ext\022\034.mediapipe.CalculatorOptions\030\367\323"
+  "\313\240\001 \001(\0132%.mediapipe.InferenceCalculatorO"
+  "ptionsBA\n%com.google.mediapipe.calculato"
+  "r.protoB\030InferenceCalculatorProto"
   ;
-static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto_deps[1] = {
+static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto_deps[2] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
+  &::descriptor_table_mediapipe_2fframework_2fcalculator_5foptions_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto = {
-  false, false, 1347, descriptor_table_protodef_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto, "mediapipe/calculators/tensor/inference_calculator.proto", 
-  &descriptor_table_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto_deps, 1, 6,
+  false, false, 1393, descriptor_table_protodef_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto, "mediapipe/calculators/tensor/inference_calculator.proto", 
+  &descriptor_table_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto_deps, 2, 6,
   schemas, file_default_instances, TableStruct_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto::offsets,
   file_level_metadata_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto, file_level_enum_descriptors_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto, file_level_service_descriptors_mediapipe_2fcalculators_2ftensor_2finference_5fcalculator_2eproto,
 };

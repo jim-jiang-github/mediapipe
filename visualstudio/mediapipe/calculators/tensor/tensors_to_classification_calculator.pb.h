@@ -537,13 +537,11 @@ class TensorsToClassificationCalculatorOptions PROTOBUF_FINAL :
     kIgnoreClassesFieldNumber = 7,
     kAllowClassesFieldNumber = 8,
     kLabelMapPathFieldNumber = 3,
-    kTensorNameFieldNumber = 11,
     kLabelMapFieldNumber = 5,
     kMinScoreThresholdFieldNumber = 1,
     kTopKFieldNumber = 2,
     kSortByDescendingScoreFieldNumber = 9,
     kBinaryClassificationFieldNumber = 4,
-    kTensorIndexFieldNumber = 10,
   };
   // map<int64, .mediapipe.LabelMapItem> label_items = 6;
   int label_items_size() const;
@@ -624,24 +622,6 @@ class TensorsToClassificationCalculatorOptions PROTOBUF_FINAL :
   std::string* _internal_mutable_label_map_path();
   public:
 
-  // optional string tensor_name = 11;
-  bool has_tensor_name() const;
-  private:
-  bool _internal_has_tensor_name() const;
-  public:
-  void clear_tensor_name();
-  const std::string& tensor_name() const;
-  template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_tensor_name(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_tensor_name();
-  std::string* release_tensor_name();
-  void set_allocated_tensor_name(std::string* tensor_name);
-  private:
-  const std::string& _internal_tensor_name() const;
-  void _internal_set_tensor_name(const std::string& value);
-  std::string* _internal_mutable_tensor_name();
-  public:
-
   // optional .mediapipe.TensorsToClassificationCalculatorOptions.LabelMap label_map = 5;
   bool has_label_map() const;
   private:
@@ -712,19 +692,6 @@ class TensorsToClassificationCalculatorOptions PROTOBUF_FINAL :
   void _internal_set_binary_classification(bool value);
   public:
 
-  // optional int32 tensor_index = 10;
-  bool has_tensor_index() const;
-  private:
-  bool _internal_has_tensor_index() const;
-  public:
-  void clear_tensor_index();
-  ::PROTOBUF_NAMESPACE_ID::int32 tensor_index() const;
-  void set_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_tensor_index() const;
-  void _internal_set_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value);
-  public:
-
   static const int kExtFieldNumber = 335742638;
   static ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier< ::mediapipe::CalculatorOptions,
       ::PROTOBUF_NAMESPACE_ID::internal::MessageTypeTraits< ::mediapipe::TensorsToClassificationCalculatorOptions >, 11, false >
@@ -748,13 +715,11 @@ class TensorsToClassificationCalculatorOptions PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 > allow_classes_;
   mutable std::atomic<int> _allow_classes_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr label_map_path_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr tensor_name_;
   ::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap* label_map_;
   float min_score_threshold_;
   ::PROTOBUF_NAMESPACE_ID::int32 top_k_;
   bool sort_by_descending_score_;
   bool binary_classification_;
-  ::PROTOBUF_NAMESPACE_ID::int32 tensor_index_;
   friend struct ::TableStruct_mediapipe_2fcalculators_2ftensor_2ftensors_5fto_5fclassification_5fcalculator_2eproto;
 };
 // ===================================================================
@@ -904,7 +869,7 @@ TensorsToClassificationCalculatorOptions_LabelMap::entries() const {
 
 // optional float min_score_threshold = 1;
 inline bool TensorsToClassificationCalculatorOptions::_internal_has_min_score_threshold() const {
-  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
   return value;
 }
 inline bool TensorsToClassificationCalculatorOptions::has_min_score_threshold() const {
@@ -912,7 +877,7 @@ inline bool TensorsToClassificationCalculatorOptions::has_min_score_threshold() 
 }
 inline void TensorsToClassificationCalculatorOptions::clear_min_score_threshold() {
   min_score_threshold_ = 0;
-  _has_bits_[0] &= ~0x00000008u;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline float TensorsToClassificationCalculatorOptions::_internal_min_score_threshold() const {
   return min_score_threshold_;
@@ -922,7 +887,7 @@ inline float TensorsToClassificationCalculatorOptions::min_score_threshold() con
   return _internal_min_score_threshold();
 }
 inline void TensorsToClassificationCalculatorOptions::_internal_set_min_score_threshold(float value) {
-  _has_bits_[0] |= 0x00000008u;
+  _has_bits_[0] |= 0x00000004u;
   min_score_threshold_ = value;
 }
 inline void TensorsToClassificationCalculatorOptions::set_min_score_threshold(float value) {
@@ -932,7 +897,7 @@ inline void TensorsToClassificationCalculatorOptions::set_min_score_threshold(fl
 
 // optional int32 top_k = 2;
 inline bool TensorsToClassificationCalculatorOptions::_internal_has_top_k() const {
-  bool value = (_has_bits_[0] & 0x00000010u) != 0;
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
   return value;
 }
 inline bool TensorsToClassificationCalculatorOptions::has_top_k() const {
@@ -940,7 +905,7 @@ inline bool TensorsToClassificationCalculatorOptions::has_top_k() const {
 }
 inline void TensorsToClassificationCalculatorOptions::clear_top_k() {
   top_k_ = 0;
-  _has_bits_[0] &= ~0x00000010u;
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToClassificationCalculatorOptions::_internal_top_k() const {
   return top_k_;
@@ -950,7 +915,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToClassificationCalculatorOptions::
   return _internal_top_k();
 }
 inline void TensorsToClassificationCalculatorOptions::_internal_set_top_k(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _has_bits_[0] |= 0x00000010u;
+  _has_bits_[0] |= 0x00000008u;
   top_k_ = value;
 }
 inline void TensorsToClassificationCalculatorOptions::set_top_k(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -960,7 +925,7 @@ inline void TensorsToClassificationCalculatorOptions::set_top_k(::PROTOBUF_NAMES
 
 // optional bool sort_by_descending_score = 9;
 inline bool TensorsToClassificationCalculatorOptions::_internal_has_sort_by_descending_score() const {
-  bool value = (_has_bits_[0] & 0x00000020u) != 0;
+  bool value = (_has_bits_[0] & 0x00000010u) != 0;
   return value;
 }
 inline bool TensorsToClassificationCalculatorOptions::has_sort_by_descending_score() const {
@@ -968,7 +933,7 @@ inline bool TensorsToClassificationCalculatorOptions::has_sort_by_descending_sco
 }
 inline void TensorsToClassificationCalculatorOptions::clear_sort_by_descending_score() {
   sort_by_descending_score_ = false;
-  _has_bits_[0] &= ~0x00000020u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline bool TensorsToClassificationCalculatorOptions::_internal_sort_by_descending_score() const {
   return sort_by_descending_score_;
@@ -978,7 +943,7 @@ inline bool TensorsToClassificationCalculatorOptions::sort_by_descending_score()
   return _internal_sort_by_descending_score();
 }
 inline void TensorsToClassificationCalculatorOptions::_internal_set_sort_by_descending_score(bool value) {
-  _has_bits_[0] |= 0x00000020u;
+  _has_bits_[0] |= 0x00000010u;
   sort_by_descending_score_ = value;
 }
 inline void TensorsToClassificationCalculatorOptions::set_sort_by_descending_score(bool value) {
@@ -1045,7 +1010,7 @@ inline void TensorsToClassificationCalculatorOptions::set_allocated_label_map_pa
 
 // optional .mediapipe.TensorsToClassificationCalculatorOptions.LabelMap label_map = 5;
 inline bool TensorsToClassificationCalculatorOptions::_internal_has_label_map() const {
-  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
   PROTOBUF_ASSUME(!value || label_map_ != nullptr);
   return value;
 }
@@ -1054,7 +1019,7 @@ inline bool TensorsToClassificationCalculatorOptions::has_label_map() const {
 }
 inline void TensorsToClassificationCalculatorOptions::clear_label_map() {
   if (label_map_ != nullptr) label_map_->Clear();
-  _has_bits_[0] &= ~0x00000004u;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline const ::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap& TensorsToClassificationCalculatorOptions::_internal_label_map() const {
   const ::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap* p = label_map_;
@@ -1072,14 +1037,14 @@ inline void TensorsToClassificationCalculatorOptions::unsafe_arena_set_allocated
   }
   label_map_ = label_map;
   if (label_map) {
-    _has_bits_[0] |= 0x00000004u;
+    _has_bits_[0] |= 0x00000002u;
   } else {
-    _has_bits_[0] &= ~0x00000004u;
+    _has_bits_[0] &= ~0x00000002u;
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:mediapipe.TensorsToClassificationCalculatorOptions.label_map)
 }
 inline ::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap* TensorsToClassificationCalculatorOptions::release_label_map() {
-  _has_bits_[0] &= ~0x00000004u;
+  _has_bits_[0] &= ~0x00000002u;
   ::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap* temp = label_map_;
   label_map_ = nullptr;
   if (GetArena() != nullptr) {
@@ -1089,13 +1054,13 @@ inline ::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap* TensorsTo
 }
 inline ::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap* TensorsToClassificationCalculatorOptions::unsafe_arena_release_label_map() {
   // @@protoc_insertion_point(field_release:mediapipe.TensorsToClassificationCalculatorOptions.label_map)
-  _has_bits_[0] &= ~0x00000004u;
+  _has_bits_[0] &= ~0x00000002u;
   ::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap* temp = label_map_;
   label_map_ = nullptr;
   return temp;
 }
 inline ::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap* TensorsToClassificationCalculatorOptions::_internal_mutable_label_map() {
-  _has_bits_[0] |= 0x00000004u;
+  _has_bits_[0] |= 0x00000002u;
   if (label_map_ == nullptr) {
     auto* p = CreateMaybeMessage<::mediapipe::TensorsToClassificationCalculatorOptions_LabelMap>(GetArena());
     label_map_ = p;
@@ -1118,9 +1083,9 @@ inline void TensorsToClassificationCalculatorOptions::set_allocated_label_map(::
       label_map = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, label_map, submessage_arena);
     }
-    _has_bits_[0] |= 0x00000004u;
+    _has_bits_[0] |= 0x00000002u;
   } else {
-    _has_bits_[0] &= ~0x00000004u;
+    _has_bits_[0] &= ~0x00000002u;
   }
   label_map_ = label_map;
   // @@protoc_insertion_point(field_set_allocated:mediapipe.TensorsToClassificationCalculatorOptions.label_map)
@@ -1154,7 +1119,7 @@ TensorsToClassificationCalculatorOptions::mutable_label_items() {
 
 // optional bool binary_classification = 4;
 inline bool TensorsToClassificationCalculatorOptions::_internal_has_binary_classification() const {
-  bool value = (_has_bits_[0] & 0x00000040u) != 0;
+  bool value = (_has_bits_[0] & 0x00000020u) != 0;
   return value;
 }
 inline bool TensorsToClassificationCalculatorOptions::has_binary_classification() const {
@@ -1162,7 +1127,7 @@ inline bool TensorsToClassificationCalculatorOptions::has_binary_classification(
 }
 inline void TensorsToClassificationCalculatorOptions::clear_binary_classification() {
   binary_classification_ = false;
-  _has_bits_[0] &= ~0x00000040u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline bool TensorsToClassificationCalculatorOptions::_internal_binary_classification() const {
   return binary_classification_;
@@ -1172,7 +1137,7 @@ inline bool TensorsToClassificationCalculatorOptions::binary_classification() co
   return _internal_binary_classification();
 }
 inline void TensorsToClassificationCalculatorOptions::_internal_set_binary_classification(bool value) {
-  _has_bits_[0] |= 0x00000040u;
+  _has_bits_[0] |= 0x00000020u;
   binary_classification_ = value;
 }
 inline void TensorsToClassificationCalculatorOptions::set_binary_classification(bool value) {
@@ -1272,91 +1237,6 @@ inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
 TensorsToClassificationCalculatorOptions::mutable_allow_classes() {
   // @@protoc_insertion_point(field_mutable_list:mediapipe.TensorsToClassificationCalculatorOptions.allow_classes)
   return _internal_mutable_allow_classes();
-}
-
-// optional int32 tensor_index = 10;
-inline bool TensorsToClassificationCalculatorOptions::_internal_has_tensor_index() const {
-  bool value = (_has_bits_[0] & 0x00000080u) != 0;
-  return value;
-}
-inline bool TensorsToClassificationCalculatorOptions::has_tensor_index() const {
-  return _internal_has_tensor_index();
-}
-inline void TensorsToClassificationCalculatorOptions::clear_tensor_index() {
-  tensor_index_ = 0;
-  _has_bits_[0] &= ~0x00000080u;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToClassificationCalculatorOptions::_internal_tensor_index() const {
-  return tensor_index_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 TensorsToClassificationCalculatorOptions::tensor_index() const {
-  // @@protoc_insertion_point(field_get:mediapipe.TensorsToClassificationCalculatorOptions.tensor_index)
-  return _internal_tensor_index();
-}
-inline void TensorsToClassificationCalculatorOptions::_internal_set_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _has_bits_[0] |= 0x00000080u;
-  tensor_index_ = value;
-}
-inline void TensorsToClassificationCalculatorOptions::set_tensor_index(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_tensor_index(value);
-  // @@protoc_insertion_point(field_set:mediapipe.TensorsToClassificationCalculatorOptions.tensor_index)
-}
-
-// optional string tensor_name = 11;
-inline bool TensorsToClassificationCalculatorOptions::_internal_has_tensor_name() const {
-  bool value = (_has_bits_[0] & 0x00000002u) != 0;
-  return value;
-}
-inline bool TensorsToClassificationCalculatorOptions::has_tensor_name() const {
-  return _internal_has_tensor_name();
-}
-inline void TensorsToClassificationCalculatorOptions::clear_tensor_name() {
-  tensor_name_.ClearToEmpty();
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline const std::string& TensorsToClassificationCalculatorOptions::tensor_name() const {
-  // @@protoc_insertion_point(field_get:mediapipe.TensorsToClassificationCalculatorOptions.tensor_name)
-  return _internal_tensor_name();
-}
-template <typename ArgT0, typename... ArgT>
-PROTOBUF_ALWAYS_INLINE
-inline void TensorsToClassificationCalculatorOptions::set_tensor_name(ArgT0&& arg0, ArgT... args) {
- _has_bits_[0] |= 0x00000002u;
- tensor_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArena());
-  // @@protoc_insertion_point(field_set:mediapipe.TensorsToClassificationCalculatorOptions.tensor_name)
-}
-inline std::string* TensorsToClassificationCalculatorOptions::mutable_tensor_name() {
-  // @@protoc_insertion_point(field_mutable:mediapipe.TensorsToClassificationCalculatorOptions.tensor_name)
-  return _internal_mutable_tensor_name();
-}
-inline const std::string& TensorsToClassificationCalculatorOptions::_internal_tensor_name() const {
-  return tensor_name_.Get();
-}
-inline void TensorsToClassificationCalculatorOptions::_internal_set_tensor_name(const std::string& value) {
-  _has_bits_[0] |= 0x00000002u;
-  tensor_name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArena());
-}
-inline std::string* TensorsToClassificationCalculatorOptions::_internal_mutable_tensor_name() {
-  _has_bits_[0] |= 0x00000002u;
-  return tensor_name_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArena());
-}
-inline std::string* TensorsToClassificationCalculatorOptions::release_tensor_name() {
-  // @@protoc_insertion_point(field_release:mediapipe.TensorsToClassificationCalculatorOptions.tensor_name)
-  if (!_internal_has_tensor_name()) {
-    return nullptr;
-  }
-  _has_bits_[0] &= ~0x00000002u;
-  return tensor_name_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
-}
-inline void TensorsToClassificationCalculatorOptions::set_allocated_tensor_name(std::string* tensor_name) {
-  if (tensor_name != nullptr) {
-    _has_bits_[0] |= 0x00000002u;
-  } else {
-    _has_bits_[0] &= ~0x00000002u;
-  }
-  tensor_name_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), tensor_name,
-      GetArena());
-  // @@protoc_insertion_point(field_set_allocated:mediapipe.TensorsToClassificationCalculatorOptions.tensor_name)
 }
 
 #ifdef __GNUC__

@@ -15,3 +15,10 @@
 
 """Tools for testing."""
 
+<<<<<<< HEAD:third_party/tensorflow/tensorflow/tools/test/__init__.py
+=======
+# A list of assignees
+assignees:
+   - kuaashish
+   - ayushgdev
+>>>>>>> upstream/master:.github/bot_config.yml

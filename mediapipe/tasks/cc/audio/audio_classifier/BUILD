@@ -16,47 +16,13 @@ package(default_visibility = ["//mediapipe/tasks:internal"])
 
 licenses(["notice"])
 
-cc_library(
-    name = "audio_classifier_graph",
-    srcs = ["audio_classifier_graph.cc"],
-    deps = [
-        "//mediapipe/calculators/audio:time_series_framer_calculator",
-        "//mediapipe/calculators/core:constant_side_packet_calculator",
-        "//mediapipe/calculators/core:constant_side_packet_calculator_cc_proto",
-        "//mediapipe/calculators/core:side_packet_to_stream_calculator",
-        "//mediapipe/calculators/tensor:audio_to_tensor_calculator",
-        "//mediapipe/calculators/tensor:audio_to_tensor_calculator_cc_proto",
-        "//mediapipe/calculators/tensor:inference_calculator",
-        "//mediapipe/framework:calculator_cc_proto",
-        "//mediapipe/framework:calculator_framework",
-        "//mediapipe/framework/api2:builder",
-        "//mediapipe/framework/api2:port",
-        "//mediapipe/framework/formats:matrix",
-        "//mediapipe/tasks/cc:common",
-        "//mediapipe/tasks/cc/audio/audio_classifier/proto:audio_classifier_graph_options_cc_proto",
-        "//mediapipe/tasks/cc/audio/utils:audio_tensor_specs",
-        "//mediapipe/tasks/cc/components/containers/proto:classifications_cc_proto",
-        "//mediapipe/tasks/cc/components/processors:classification_postprocessing_graph",
-        "//mediapipe/tasks/cc/components/processors:classifier_options",
-        "//mediapipe/tasks/cc/components/processors/proto:classification_postprocessing_graph_options_cc_proto",
-        "//mediapipe/tasks/cc/core:model_resources",
-        "//mediapipe/tasks/cc/core:model_task_graph",
-        "//mediapipe/tasks/cc/core/proto:inference_subgraph_cc_proto",
-        "//mediapipe/tasks/cc/metadata:metadata_extractor",
-        "//mediapipe/tasks/metadata:metadata_schema_cc",
-        "@com_google_absl//absl/status",
-        "@com_google_absl//absl/status:statusor",
-        "@com_google_absl//absl/types:optional",
-        "@flatbuffers//:runtime_cc",
-        "@org_tensorflow//tensorflow/lite/schema:schema_fbs",
-    ],
-    alwayslink = 1,
-)
-
+# Docs for Mediapipe Tasks Audio Classifier
+# https://developers.google.com/mediapipe/solutions/audio/audio_classifier
 cc_library(
     name = "audio_classifier",
     srcs = ["audio_classifier.cc"],
     hdrs = ["audio_classifier.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":audio_classifier_graph",
         "//mediapipe/framework/api2:builder",
@@ -75,6 +41,42 @@ cc_library(
         "@com_google_absl//absl/status:statusor",
         "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
     ],
+)
+
+cc_library(
+    name = "audio_classifier_graph",
+    srcs = ["audio_classifier_graph.cc"],
+    deps = [
+        "//mediapipe/calculators/audio:time_series_framer_calculator",
+        "//mediapipe/calculators/core:constant_side_packet_calculator",
+        "//mediapipe/calculators/core:constant_side_packet_calculator_cc_proto",
+        "//mediapipe/calculators/core:side_packet_to_stream_calculator",
+        "//mediapipe/calculators/tensor:audio_to_tensor_calculator",
+        "//mediapipe/calculators/tensor:audio_to_tensor_calculator_cc_proto",
+        "//mediapipe/calculators/tensor:inference_calculator_cpu",
+        "//mediapipe/framework:calculator_cc_proto",
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/api2:builder",
+        "//mediapipe/framework/api2:port",
+        "//mediapipe/framework/formats:matrix",
+        "//mediapipe/tasks/cc:common",
+        "//mediapipe/tasks/cc/audio/audio_classifier/proto:audio_classifier_graph_options_cc_proto",
+        "//mediapipe/tasks/cc/audio/utils:audio_tensor_specs",
+        "//mediapipe/tasks/cc/components/containers/proto:classifications_cc_proto",
+        "//mediapipe/tasks/cc/components/processors:classification_postprocessing_graph",
+        "//mediapipe/tasks/cc/components/processors/proto:classification_postprocessing_graph_options_cc_proto",
+        "//mediapipe/tasks/cc/core:model_resources",
+        "//mediapipe/tasks/cc/core:model_task_graph",
+        "//mediapipe/tasks/cc/core/proto:inference_subgraph_cc_proto",
+        "//mediapipe/tasks/cc/metadata:metadata_extractor",
+        "//mediapipe/tasks/metadata:metadata_schema_cc",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/status:statusor",
+        "@com_google_absl//absl/types:optional",
+        "@flatbuffers//:runtime_cc",
+        "@org_tensorflow//tensorflow/lite/schema:schema_fbs",
+    ],
+    alwayslink = 1,
 )
 
 # TODO: mediapipe/tasks/cc/audio/utils:test_utils does not compile in the OSS build

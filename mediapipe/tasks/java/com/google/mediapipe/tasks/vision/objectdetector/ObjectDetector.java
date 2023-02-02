@@ -173,7 +173,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
             return ObjectDetectionResult.create(
                 PacketGetter.getProtoVector(
                     packets.get(DETECTIONS_OUT_STREAM_INDEX), Detection.parser()),
-                packets.get(DETECTIONS_OUT_STREAM_INDEX).getTimestamp());
+                BaseVisionTaskApi.generateResultTimestampMs(
+                    detectorOptions.runningMode(), packets.get(DETECTIONS_OUT_STREAM_INDEX)));
           }
 
           @Override
@@ -189,6 +190,8 @@ public final class ObjectDetector extends BaseVisionTaskApi {
         TaskRunner.create(
             context,
             TaskInfo.<ObjectDetectorOptions>builder()
+                .setTaskName(ObjectDetector.class.getSimpleName())
+                .setTaskRunningModeName(detectorOptions.runningMode().name())
                 .setTaskGraphName(TASK_GRAPH_NAME)
                 .setInputStreams(INPUT_STREAMS)
                 .setOutputStreams(OUTPUT_STREAMS)

@@ -1302,6 +1302,18 @@
     <ClCompile Include="calculators\image\rotation_mode.pb.cc">
       <Filter>calculators\image</Filter>
     </ClCompile>
+    <ClCompile Include="calculators\tensor\tensors_to_audio_calculator.pb.cc">
+      <Filter>calculators\tensor</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\formats\time_series_header.pb.cc">
+      <Filter>framework\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\util\time_series_util.cc">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\mediapipe\calculators\image\color_convert_calculator.cc">
+      <Filter>calculators\image</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\mediapipe\framework\tool\options_util.h">
@@ -2011,6 +2023,15 @@
     </ClInclude>
     <ClInclude Include="calculators\image\rotation_mode.pb.h">
       <Filter>calculators\image</Filter>
+    </ClInclude>
+    <ClInclude Include="calculators\tensor\tensors_to_audio_calculator.pb.h">
+      <Filter>calculators\tensor</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\formats\time_series_header.pb.h">
+      <Filter>framework\formats</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\mediapipe\util\time_series_util.h">
+      <Filter>util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

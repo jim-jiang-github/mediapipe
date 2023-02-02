@@ -14,7 +14,7 @@
 
 # Placeholder for internal Python strict library and test compatibility macro.
 
-package(default_visibility = ["//mediapipe/tasks:internal"])
+package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
 
@@ -32,6 +32,7 @@ py_library(
         ":audio_task_running_mode",
         "//mediapipe/framework:calculator_py_pb2",
         "//mediapipe/python:_framework_bindings",
+        "//mediapipe/python:packet_creator",
         "//mediapipe/tasks/python/core:optional_dependencies",
     ],
 )

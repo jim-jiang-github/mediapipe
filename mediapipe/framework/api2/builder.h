@@ -1,8 +1,10 @@
 #ifndef MEDIAPIPE_FRAMEWORK_API2_BUILDER_H_
 #define MEDIAPIPE_FRAMEWORK_API2_BUILDER_H_
 
+#include <memory>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 #include "absl/container/btree_map.h"
 #include "absl/strings/string_view.h"
@@ -74,6 +76,7 @@ class TagIndexMap {
 
 class Graph;
 class NodeBase;
+class PacketGenerator;
 
 // These structs are used internally to store information about the endpoints
 // of a connection.
@@ -101,6 +104,13 @@ class MultiPort : public Single {
   Single operator[](int index) {
     CHECK_GE(index, 0);
     return Single{&GetWithAutoGrow(&vec_, index)};
+  }
+
+  template <typename U>
+  auto Cast() {
+    using SingleCastT =
+        std::invoke_result_t<decltype(&Single::template Cast<U>), Single*>;
+    return MultiPort<SingleCastT>(&vec_);
   }
 
  private:
@@ -146,6 +156,7 @@ template <bool IsSide, typename T>
 class SourceImpl {
  public:
   using Base = SourceBase;
+  using PayloadT = T;
 
   // Src is used as the return type of fluent methods below. Since these are
   // single-port methods, it is desirable to always decay to a reference to the
@@ -165,21 +176,49 @@ class SourceImpl {
       : SourceImpl(&GetWithAutoGrow(vec, 0)) {}
   explicit SourceImpl(SourceBase* base) : base_(base) {}
 
+  // Connects MediaPipe stream or side packet to a destination:
+  // - node input (input stream) / side input (input side packet)
+  // - graph output (output stream) / side output (output side packet).
+  //
+  // MediaPipe streams and side packets can be connected to multiple
+  // destinations. Side packets and packets added to streams are sent to all
+  // connected destinations.
   template <typename U,
             typename std::enable_if<AllowConnection<U>{}, int>::type = 0>
-  Src& AddTarget(const Dst<U>& dest) {
+  Src& ConnectTo(const Dst<U>& dest) {
     CHECK(dest.base_.source == nullptr);
     dest.base_.source = base_;
     base_->dests_.emplace_back(&dest.base_);
     return *this;
   }
+
+  // Shortcut for `ConnectTo`.
+  //
+  // Connects MediaPipe stream or side packet to a destination:
+  // - node input (input stream) / side input (input side packet)
+  // - graph output (output stream) / side output (output side packet).
+  //
+  // MediaPipe streams and side packets can be connected to multiple
+  // destinations. Side packets and packets added to streams are sent to all
+  // connected destinations.
+  template <typename U>
+  Src& operator>>(const Dst<U>& dest) {
+    return ConnectTo(dest);
+  }
+
+  template <typename U>
+  bool operator==(const SourceImpl<IsSide, U>& other) {
+    return base_ == other.base_;
+  }
+
+  template <typename U>
+  bool operator!=(const SourceImpl<IsSide, U>& other) {
+    return !(*this == other);
+  }
+
   Src& SetName(std::string name) {
     base_->name_ = std::move(name);
     return *this;
-  }
-  template <typename U>
-  Src& operator>>(const Dst<U>& dest) {
-    return AddTarget(dest);
   }
 
   template <typename U,
@@ -189,6 +228,9 @@ class SourceImpl {
   }
 
  private:
+  template <bool, typename U>
+  friend class SourceImpl;
+
   // Never null.
   SourceBase* base_;
 };
@@ -201,10 +243,61 @@ class SourceImpl {
 // when building the graph.
 template <typename T = internal::Generic>
 using Source = SourceImpl<false, T>;
+
+// Represents a stream of packets of a particular type.
+//
+// The intended use:
+// - decouple input/output streams from graph/node during graph construction
+// - pass streams around and connect them as needed, extracting reusable parts
+//   to utility/convenience functions or classes.
+//
+// For example:
+//   Stream<Image> Resize(Stream<Image> image, const Size& size, Graph& graph) {
+//     auto& scaler_node = graph.AddNode("GlScalerCalculator");
+//     auto& opts = scaler_node.GetOptions<GlScalerCalculatorOptions>();
+//     opts.set_output_width(size.width);
+//     opts.set_output_height(size.height);
+//     a >> scaler_node.In("IMAGE");
+//     return scaler_node.Out("IMAGE").Cast<Image>();
+//   }
+//
+// Where graph can use it as:
+//   Graph graph;
+//   Stream<Image> input_image = graph.In("INPUT_IMAGE").Cast<Image>();
+//   Stream<Image> resized_image = Resize(input_image, {64, 64}, graph);
+template <typename T>
+using Stream = Source<T>;
+
 template <typename T = internal::Generic>
 using MultiSource = MultiPort<Source<T>>;
+
 template <typename T = internal::Generic>
 using SideSource = SourceImpl<true, T>;
+
+// Represents a side packet of a particular type.
+//
+// The intended use:
+// - decouple input/output side packets from graph/node during graph
+//   construction
+// - pass side packets around and connect them as needed, extracting reusable
+//   parts utility/convenience functions or classes.
+//
+// For example:
+//   SidePacket<TfLiteModelPtr> GetModel(SidePacket<std::string> model_blob,
+//                                       Graph& graph) {
+//     auto& model_node = graph.AddNode("TfLiteModelCalculator");
+//     model_blob >> model_node.SideIn("MODEL_BLOB");
+//     return model_node.SideOut("MODEL").Cast<TfLiteModelPtr>();
+//   }
+//
+// Where graph can use it as:
+//   Graph graph;
+//   SidePacket<std::string> model_blob =
+//     graph.SideIn("MODEL_BLOB").Cast<std::string>();
+//   SidePacket<TfLiteModelPtr> model = GetModel(model_blob, graph);
+template <typename T>
+using SidePacket = SideSource<T>;
+
 template <typename T = internal::Generic>
 using MultiSideSource = MultiPort<SideSource<T>>;
 
@@ -318,7 +411,7 @@ template <class Calc = internal::Generic>
 class Node;
 #if __cplusplus >= 201703L
 // Deduction guide to silence -Wctad-maybe-unsupported.
-explicit Node()->Node<internal::Generic>;
+explicit Node() -> Node<internal::Generic>;
 #endif  // C++17
 
 template <>
@@ -332,11 +425,11 @@ using GenericNode = Node<internal::Generic>;
 template <class Calc>
 class Node : public NodeBase {
  public:
-  Node() : NodeBase(Calc::kCalculatorName) {}
+  Node() : NodeBase(std::string(Calc::kCalculatorName)) {}
   // Overrides the built-in calculator type string with the provided argument.
   // Can be used to create nodes from pure interfaces.
   // TODO: only use this for pure interfaces
-  Node(const std::string& type_override) : NodeBase(type_override) {}
+  Node(std::string type_override) : NodeBase(std::move(type_override)) {}
 
   // These methods only allow access to ports declared in the contract.
   // The argument must be a tag object created with the MPP_TAG macro.

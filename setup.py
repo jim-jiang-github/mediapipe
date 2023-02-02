@@ -307,6 +307,9 @@ class GenerateMetadataSchema(build_ext.build_ext):
       _copy_to_build_lib_dir(
           self.build_lib,
           'mediapipe/tasks/metadata/' + target + '_generated.py')
+      schema_file = 'mediapipe/tasks/metadata/metadata_schema.fbs'
+      shutil.copyfile(schema_file,
+                      os.path.join(self.build_lib + '/', schema_file))
 
 
 class BazelExtension(setuptools.Extension):
@@ -487,10 +490,10 @@ setuptools.setup(
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: Microsoft :: Windows',
         'Operating System :: POSIX :: Linux',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3 :: Only',
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',

@@ -20,7 +20,7 @@ import numpy as np
 
 
 @dataclasses.dataclass
-class AudioFormat:
+class AudioDataFormat:
   """Audio format metadata.
 
   Attributes:
@@ -35,8 +35,10 @@ class AudioData(object):
   """MediaPipe Tasks' audio container."""
 
   def __init__(
-      self, buffer_length: int,
-      audio_format: AudioFormat = AudioFormat()) -> None:
+      self,
+      buffer_length: int,
+      audio_format: AudioDataFormat = AudioDataFormat()
+  ) -> None:
     """Initializes the `AudioData` object.
 
     Args:
@@ -68,7 +70,11 @@ class AudioData(object):
       ValueError: If the input array has an incorrect shape or if
         `offset` + `size` exceeds the length of the `src` array.
     """
-    if src.shape[1] != self._audio_format.num_channels:
+    if len(src.shape) == 1:
+      if self._audio_format.num_channels != 1:
+        raise ValueError(f"Input audio is mono, but the audio data is expected "
+                         f"to have {self._audio_format.num_channels} channels.")
+    elif src.shape[1] != self._audio_format.num_channels:
       raise ValueError(f"Input audio contains an invalid number of channels. "
                        f"Expect {self._audio_format.num_channels}.")
 
@@ -93,8 +99,30 @@ class AudioData(object):
       self._buffer = np.roll(self._buffer, -shift, axis=0)
       self._buffer[-shift:, :] = src[offset:offset + size].copy()
 
+  @classmethod
+  def create_from_array(cls,
+                        src: np.ndarray,
+                        sample_rate: Optional[float] = None) -> "AudioData":
+    """Creates an `AudioData` object from a NumPy array.
+
+    Args:
+      src: A NumPy source array contains the input audio.
+      sample_rate: the optional audio sample rate.
+
+    Returns:
+      An `AudioData` object that contains a copy of the NumPy source array as
+      the data.
+    """
+    obj = cls(
+        buffer_length=src.shape[0],
+        audio_format=AudioDataFormat(
+            num_channels=1 if len(src.shape) == 1 else src.shape[1],
+            sample_rate=sample_rate))
+    obj.load_from_array(src)
+    return obj
+
   @property
-  def audio_format(self) -> AudioFormat:
+  def audio_format(self) -> AudioDataFormat:
     """Gets the audio format of the audio."""
     return self._audio_format
 

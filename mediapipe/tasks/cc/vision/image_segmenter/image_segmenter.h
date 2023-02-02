@@ -26,12 +26,12 @@ limitations under the License.
 #include "mediapipe/tasks/cc/core/base_options.h"
 #include "mediapipe/tasks/cc/vision/core/base_vision_task_api.h"
 #include "mediapipe/tasks/cc/vision/core/image_processing_options.h"
-#include "mediapipe/tasks/cc/vision/image_segmenter/proto/image_segmenter_options.pb.h"
 #include "tensorflow/lite/kernels/register.h"
 
 namespace mediapipe {
 namespace tasks {
 namespace vision {
+namespace image_segmenter {
 
 // The options for configuring a mediapipe image segmenter task.
 struct ImageSegmenterOptions {
@@ -98,7 +98,7 @@ struct ImageSegmenterOptions {
 //   - list of segmented masks.
 //   - if `output_type` is CATEGORY_MASK, uint8 Image, Image vector of size 1.
 //   - if `output_type` is CONFIDENCE_MASK, float32 Image list of size
-//     `cahnnels`.
+//     `channels`.
 //   - batch is always 1
 // An example of such model can be found at:
 // https://tfhub.dev/tensorflow/lite-model/deeplabv3/1/metadata/2
@@ -191,6 +191,7 @@ class ImageSegmenter : tasks::vision::core::BaseVisionTaskApi {
   absl::Status Close() { return runner_->Close(); }
 };
 
+}  // namespace image_segmenter
 }  // namespace vision
 }  // namespace tasks
 }  // namespace mediapipe

@@ -20,9 +20,11 @@ namespace mediapipe {
 constexpr SwitchContainerOptions::SwitchContainerOptions(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : contained_node_()
+  , tick_input_stream_()
   , select_(0)
   , enable_(false)
-  , synchronize_io_(false){}
+  , synchronize_io_(false)
+  , async_selection_(false){}
 struct SwitchContainerOptionsDefaultTypeInternal {
   constexpr SwitchContainerOptionsDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -47,13 +49,17 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fframework_2ftool_2
   PROTOBUF_FIELD_OFFSET(::mediapipe::SwitchContainerOptions, select_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::SwitchContainerOptions, enable_),
   PROTOBUF_FIELD_OFFSET(::mediapipe::SwitchContainerOptions, synchronize_io_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::SwitchContainerOptions, async_selection_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::SwitchContainerOptions, tick_input_stream_),
   ~0u,
   0,
   1,
   2,
+  3,
+  ~0u,
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 9, sizeof(::mediapipe::SwitchContainerOptions)},
+  { 0, 11, sizeof(::mediapipe::SwitchContainerOptions)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -63,21 +69,22 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 const char descriptor_table_protodef_mediapipe_2fframework_2ftool_2fswitch_5fcontainer_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n/mediapipe/framework/tool/switch_contai"
   "ner.proto\022\tmediapipe\032$mediapipe/framewor"
-  "k/calculator.proto\"\347\001\n\026SwitchContainerOp"
+  "k/calculator.proto\"\233\002\n\026SwitchContainerOp"
   "tions\022=\n\016contained_node\030\002 \003(\0132%.mediapip"
   "e.CalculatorGraphConfig.Node\022\016\n\006select\030\003"
   " \001(\005\022\016\n\006enable\030\004 \001(\010\022\026\n\016synchronize_io\030\005"
-  " \001(\0102P\n\003ext\022\034.mediapipe.CalculatorOption"
-  "s\030\342\232\374\244\001 \001(\0132!.mediapipe.SwitchContainerO"
-  "ptionsJ\004\010\001\020\002B2\n\032com.google.mediapipe.pro"
-  "toB\024SwitchContainerProto"
+  " \001(\010\022\027\n\017async_selection\030\006 \001(\010\022\031\n\021tick_in"
+  "put_stream\030\007 \003(\t2P\n\003ext\022\034.mediapipe.Calc"
+  "ulatorOptions\030\342\232\374\244\001 \001(\0132!.mediapipe.Swit"
+  "chContainerOptionsJ\004\010\001\020\002B2\n\032com.google.m"
+  "ediapipe.protoB\024SwitchContainerProto"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fframework_2ftool_2fswitch_5fcontainer_2eproto_deps[1] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fframework_2ftool_2fswitch_5fcontainer_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fframework_2ftool_2fswitch_5fcontainer_2eproto = {
-  false, false, 384, descriptor_table_protodef_mediapipe_2fframework_2ftool_2fswitch_5fcontainer_2eproto, "mediapipe/framework/tool/switch_container.proto", 
+  false, false, 436, descriptor_table_protodef_mediapipe_2fframework_2ftool_2fswitch_5fcontainer_2eproto, "mediapipe/framework/tool/switch_container.proto", 
   &descriptor_table_mediapipe_2fframework_2ftool_2fswitch_5fcontainer_2eproto_once, descriptor_table_mediapipe_2fframework_2ftool_2fswitch_5fcontainer_2eproto_deps, 1, 1,
   schemas, file_default_instances, TableStruct_mediapipe_2fframework_2ftool_2fswitch_5fcontainer_2eproto::offsets,
   file_level_metadata_mediapipe_2fframework_2ftool_2fswitch_5fcontainer_2eproto, file_level_enum_descriptors_mediapipe_2fframework_2ftool_2fswitch_5fcontainer_2eproto, file_level_service_descriptors_mediapipe_2fframework_2ftool_2fswitch_5fcontainer_2eproto,
@@ -104,6 +111,9 @@ class SwitchContainerOptions::_Internal {
   static void set_has_synchronize_io(HasBits* has_bits) {
     (*has_bits)[0] |= 4u;
   }
+  static void set_has_async_selection(HasBits* has_bits) {
+    (*has_bits)[0] |= 8u;
+  }
 };
 
 void SwitchContainerOptions::clear_contained_node() {
@@ -111,7 +121,8 @@ void SwitchContainerOptions::clear_contained_node() {
 }
 SwitchContainerOptions::SwitchContainerOptions(::PROTOBUF_NAMESPACE_ID::Arena* arena)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena),
-  contained_node_(arena) {
+  contained_node_(arena),
+  tick_input_stream_(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
   // @@protoc_insertion_point(arena_constructor:mediapipe.SwitchContainerOptions)
@@ -119,19 +130,20 @@ SwitchContainerOptions::SwitchContainerOptions(::PROTOBUF_NAMESPACE_ID::Arena* a
 SwitchContainerOptions::SwitchContainerOptions(const SwitchContainerOptions& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       _has_bits_(from._has_bits_),
-      contained_node_(from.contained_node_) {
+      contained_node_(from.contained_node_),
+      tick_input_stream_(from.tick_input_stream_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::memcpy(&select_, &from.select_,
-    static_cast<size_t>(reinterpret_cast<char*>(&synchronize_io_) -
-    reinterpret_cast<char*>(&select_)) + sizeof(synchronize_io_));
+    static_cast<size_t>(reinterpret_cast<char*>(&async_selection_) -
+    reinterpret_cast<char*>(&select_)) + sizeof(async_selection_));
   // @@protoc_insertion_point(copy_constructor:mediapipe.SwitchContainerOptions)
 }
 
 void SwitchContainerOptions::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&select_) - reinterpret_cast<char*>(this)),
-    0, static_cast<size_t>(reinterpret_cast<char*>(&synchronize_io_) -
-    reinterpret_cast<char*>(&select_)) + sizeof(synchronize_io_));
+    0, static_cast<size_t>(reinterpret_cast<char*>(&async_selection_) -
+    reinterpret_cast<char*>(&select_)) + sizeof(async_selection_));
 }
 
 SwitchContainerOptions::~SwitchContainerOptions() {
@@ -161,11 +173,12 @@ void SwitchContainerOptions::Clear() {
   (void) cached_has_bits;
 
   contained_node_.Clear();
+  tick_input_stream_.Clear();
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000007u) {
+  if (cached_has_bits & 0x0000000fu) {
     ::memset(&select_, 0, static_cast<size_t>(
-        reinterpret_cast<char*>(&synchronize_io_) -
-        reinterpret_cast<char*>(&select_)) + sizeof(synchronize_io_));
+        reinterpret_cast<char*>(&async_selection_) -
+        reinterpret_cast<char*>(&select_)) + sizeof(async_selection_));
   }
   _has_bits_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
@@ -212,6 +225,30 @@ const char* SwitchContainerOptions::_InternalParse(const char* ptr, ::PROTOBUF_N
           _Internal::set_has_synchronize_io(&has_bits);
           synchronize_io_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // optional bool async_selection = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 48)) {
+          _Internal::set_has_async_selection(&has_bits);
+          async_selection_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // repeated string tick_input_stream = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 58)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            auto str = _internal_add_tick_input_stream();
+            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+            #ifndef NDEBUG
+            ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "mediapipe.SwitchContainerOptions.tick_input_stream");
+            #endif  // !NDEBUG
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<58>(ptr));
         } else goto handle_unusual;
         continue;
       default: {
@@ -271,6 +308,22 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(5, this->_internal_synchronize_io(), target);
   }
 
+  // optional bool async_selection = 6;
+  if (cached_has_bits & 0x00000008u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(6, this->_internal_async_selection(), target);
+  }
+
+  // repeated string tick_input_stream = 7;
+  for (int i = 0, n = this->_internal_tick_input_stream_size(); i < n; i++) {
+    const auto& s = this->_internal_tick_input_stream(i);
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
+      s.data(), static_cast<int>(s.length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
+      "mediapipe.SwitchContainerOptions.tick_input_stream");
+    target = stream->WriteString(7, s, target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -294,8 +347,16 @@ size_t SwitchContainerOptions::ByteSizeLong() const {
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
+  // repeated string tick_input_stream = 7;
+  total_size += 1 *
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(tick_input_stream_.size());
+  for (int i = 0, n = tick_input_stream_.size(); i < n; i++) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      tick_input_stream_.Get(i));
+  }
+
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000007u) {
+  if (cached_has_bits & 0x0000000fu) {
     // optional int32 select = 3;
     if (cached_has_bits & 0x00000001u) {
       total_size += 1 +
@@ -310,6 +371,11 @@ size_t SwitchContainerOptions::ByteSizeLong() const {
 
     // optional bool synchronize_io = 5;
     if (cached_has_bits & 0x00000004u) {
+      total_size += 1 + 1;
+    }
+
+    // optional bool async_selection = 6;
+    if (cached_has_bits & 0x00000008u) {
       total_size += 1 + 1;
     }
 
@@ -346,8 +412,9 @@ void SwitchContainerOptions::MergeFrom(const SwitchContainerOptions& from) {
   (void) cached_has_bits;
 
   contained_node_.MergeFrom(from.contained_node_);
+  tick_input_stream_.MergeFrom(from.tick_input_stream_);
   cached_has_bits = from._has_bits_[0];
-  if (cached_has_bits & 0x00000007u) {
+  if (cached_has_bits & 0x0000000fu) {
     if (cached_has_bits & 0x00000001u) {
       select_ = from.select_;
     }
@@ -356,6 +423,9 @@ void SwitchContainerOptions::MergeFrom(const SwitchContainerOptions& from) {
     }
     if (cached_has_bits & 0x00000004u) {
       synchronize_io_ = from.synchronize_io_;
+    }
+    if (cached_has_bits & 0x00000008u) {
+      async_selection_ = from.async_selection_;
     }
     _has_bits_[0] |= cached_has_bits;
   }
@@ -385,9 +455,10 @@ void SwitchContainerOptions::InternalSwap(SwitchContainerOptions* other) {
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   contained_node_.InternalSwap(&other->contained_node_);
+  tick_input_stream_.InternalSwap(&other->tick_input_stream_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(SwitchContainerOptions, synchronize_io_)
-      + sizeof(SwitchContainerOptions::synchronize_io_)
+      PROTOBUF_FIELD_OFFSET(SwitchContainerOptions, async_selection_)
+      + sizeof(SwitchContainerOptions::async_selection_)
       - PROTOBUF_FIELD_OFFSET(SwitchContainerOptions, select_)>(
           reinterpret_cast<char*>(&select_),
           reinterpret_cast<char*>(&other->select_));

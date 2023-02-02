@@ -29,9 +29,33 @@ def external_files():
     )
 
     http_file(
+        name = "com_google_mediapipe_bert_text_classifier_no_metadata_tflite",
+        sha256 = "9b4554f6e28a72a3f40511964eed1ccf4e74cc074f81543cacca4faf169a173e",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/bert_text_classifier_no_metadata.tflite?generation=1667948360250899"],
+    )
+
+    http_file(
         name = "com_google_mediapipe_bert_text_classifier_tflite",
         sha256 = "1e5a550c09bff0a13e61858bcfac7654d7fcc6d42106b4f15e11117695069600",
         urls = ["https://storage.googleapis.com/mediapipe-assets/bert_text_classifier.tflite?generation=1666144699858747"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_bert_text_classifier_with_bert_tokenizer_json",
+        sha256 = "49f148a13a4e3b486b1d3c2400e46e5ebd0d375674c0154278b835760e873a95",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/bert_text_classifier_with_bert_tokenizer.json?generation=1667948363241334"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_bert_text_classifier_with_sentence_piece_json",
+        sha256 = "113091f3892691de57e379387256b2ce0cc18a1b5185af866220a46da8221f26",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/bert_text_classifier_with_sentence_piece.json?generation=1667948366009530"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_bert_tokenizer_meta_json",
+        sha256 = "116d70c7c3ef413a8bff54ab758f9ed3d6e51fdc5621d8c920ad2f0035831804",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/bert_tokenizer_meta.json?generation=1667948368809108"],
     )
 
     http_file(
@@ -62,6 +86,12 @@ def external_files():
         name = "com_google_mediapipe_burger_rotated_jpg",
         sha256 = "b7bb5e59ef778f3ce6b3e616c511908a53d513b83a56aae58b7453e14b0a4b2a",
         urls = ["https://storage.googleapis.com/mediapipe-assets/burger_rotated.jpg?generation=1665065843774448"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_canned_gesture_classifier_tflite",
+        sha256 = "ee121d85979de1b86126faabb0a0f4d2e4039c3e33e2cd687db50571001b24d0",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/canned_gesture_classifier.tflite?generation=1668550473107417"],
     )
 
     http_file(
@@ -210,14 +240,14 @@ def external_files():
 
     http_file(
         name = "com_google_mediapipe_face_detection_full_range_sparse_tflite",
-        sha256 = "671dd2f9ed11a78436fc21cc42357a803dfc6f73e9fb86541be942d5716c2dce",
-        urls = ["https://storage.googleapis.com/mediapipe-assets/face_detection_full_range_sparse.tflite?generation=1661875739104017"],
+        sha256 = "2c3728e6da56f21e21a320433396fb06d40d9088f2247c05e5635a688d45dfe1",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/face_detection_full_range_sparse.tflite?generation=1674261618323821"],
     )
 
     http_file(
         name = "com_google_mediapipe_face_detection_full_range_tflite",
-        sha256 = "99bf9494d84f50acc6617d89873f71bf6635a841ea699c17cb3377f9507cfec3",
-        urls = ["https://storage.googleapis.com/mediapipe-assets/face_detection_full_range.tflite?generation=1661875742733283"],
+        sha256 = "3698b18f063835bc609069ef052228fbe86d9c9a6dc8dcb7c7c2d69aed2b181b",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/face_detection_full_range.tflite?generation=1674261620964007"],
     )
 
     http_file(
@@ -257,9 +287,27 @@ def external_files():
     )
 
     http_file(
+        name = "com_google_mediapipe_fist_png",
+        sha256 = "4397b3d3f590c88a8de7d21c08d73a0df4a97fd93f92cbd086eef37fd246daaa",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/fist.png?generation=1672952068696274"],
+    )
+
+    http_file(
         name = "com_google_mediapipe_general_meta_json",
         sha256 = "b95363e4bae89b9c2af484498312aaad4efc7ff57c7eadcc4e5e7adca641445f",
         urls = ["https://storage.googleapis.com/mediapipe-assets/general_meta.json?generation=1665422822603848"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_gesture_embedder_tflite",
+        sha256 = "927e4f6cbe6451da6b4fd1485e2576a6f8dbd95062666661cbd9dea893c41d01",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/gesture_embedder.tflite?generation=1668550476472972"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_gesture_recognizer_task",
+        sha256 = "a966b1d4e774e0423c19c8aa71f070e5a72fe7a03c2663dd2f3cb0b0095ee3e1",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/gesture_recognizer.task?generation=1668100501451433"],
     )
 
     http_file(
@@ -347,6 +395,18 @@ def external_files():
     )
 
     http_file(
+        name = "com_google_mediapipe_input_text_tensor_default_meta_json",
+        sha256 = "9723e59960b0e6ca60d120494c32e798b054ea6e5a441b359c84f759bd2b3a36",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/input_text_tensor_default_meta.json?generation=1667855382021347"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_input_text_tensor_meta_json",
+        sha256 = "c6782f676220e2cc89b70bacccb649fc848c18e33bedc449bf49f5d839b3cc6c",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/input_text_tensor_meta.json?generation=1667855384891533"],
+    )
+
+    http_file(
         name = "com_google_mediapipe_iris_and_gaze_tflite",
         sha256 = "b6dcb860a92a3c7264a8e50786f46cecb529672cdafc17d39c78931257da661d",
         urls = ["https://storage.googleapis.com/mediapipe-assets/iris_and_gaze.tflite?generation=1661875774291949"],
@@ -391,7 +451,7 @@ def external_files():
     http_file(
         name = "com_google_mediapipe_labels_txt",
         sha256 = "536feacc519de3d418de26b2effb4d75694a8c4c0063e36499a46fa8061e2da9",
-        urls = ["https://storage.googleapis.com/mediapipe-assets/labels.txt?generation=1665988394538324"],
+        urls = ["https://storage.googleapis.com/mediapipe-assets/labels.txt?generation=1667892497527642"],
     )
 
     http_file(
@@ -539,6 +599,24 @@ def external_files():
     )
 
     http_file(
+        name = "com_google_mediapipe_movie_review_json",
+        sha256 = "c09b88af05844cad5133b49744fed3a0bd514d4a1c75b9d2f23e9a40bd7bc04e",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/movie_review.json?generation=1667892501695336"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_movie_review_labels_txt",
+        sha256 = "4b9b26392f765e7a872372131cd4cee8ad7c02e496b5a1228279619b138c4b7a",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/movie_review_labels.txt?generation=1667892504334882"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_movie_review_tflite",
+        sha256 = "3935ee73b13d435327d05af4d6f37dc3c146e117e1c3d572ae4d2ae0f5f412fe",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/movie_review.tflite?generation=1667855395736217"],
+    )
+
+    http_file(
         name = "com_google_mediapipe_mozart_square_jpg",
         sha256 = "4feb4dadc5d6f853ade57b8c9d4c9a1f5ececd6469616c8e505f9a14823392b6",
         urls = ["https://storage.googleapis.com/mediapipe-assets/mozart_square.jpg?generation=1661875853838871"],
@@ -635,6 +713,18 @@ def external_files():
     )
 
     http_file(
+        name = "com_google_mediapipe_portrait_expected_detection_pbtxt",
+        sha256 = "bb54e08e87844ef14bb185d5cb808908eb6011bfa6db48bd22d9650f6fda338b",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/portrait_expected_detection.pbtxt?generation=1674261627835475"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_portrait_jpg",
+        sha256 = "a6f11efaa834706db23f275b6115058fa87fc7f14362681e6abe14e82749de3e",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/portrait.jpg?generation=1674261630039907"],
+    )
+
+    http_file(
         name = "com_google_mediapipe_pose_detection_tflite",
         sha256 = "a63c614bef30d35947f13be361820b1e4e3bec9cfeebf4d11216a18373108e85",
         urls = ["https://storage.googleapis.com/mediapipe-assets/pose_detection.tflite?generation=1661875889147923"],
@@ -661,7 +751,19 @@ def external_files():
     http_file(
         name = "com_google_mediapipe_README_md",
         sha256 = "a96d08c9c70cd9717207ed72c926e02e5eada751f00bdc5d3a7e82e3492b72cb",
-        urls = ["https://storage.googleapis.com/mediapipe-assets/README.md?generation=1661875904887163"],
+        urls = ["https://storage.googleapis.com/mediapipe-assets/README.md?generation=1668124179156767"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_regex_one_embedding_with_metadata_tflite",
+        sha256 = "b8f5d6d090c2c73984b2b92cd2fda27e5630562741a93d127b9a744d60505bc0",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/regex_one_embedding_with_metadata.tflite?generation=1667888045310541"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_regex_vocab_txt",
+        sha256 = "b1134b10927a53ce4224bbc30ccf075c9969c94ebf40c368966d1dcf445ca923",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/regex_vocab.txt?generation=1667892507770551"],
     )
 
     http_file(
@@ -746,6 +848,12 @@ def external_files():
         name = "com_google_mediapipe_selfie_segmentation_tflite",
         sha256 = "8d13b7fae74af625c641226813616a2117bd6bca19eb3b75574621fc08557f27",
         urls = ["https://storage.googleapis.com/mediapipe-assets/selfie_segmentation.tflite?generation=1661875931201364"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_sentence_piece_tokenizer_meta_json",
+        sha256 = "416bfe231710502e4a93e1b1950c0c6e5db49cffb256d241ef3d3f2d0d57718b",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/sentence_piece_tokenizer_meta.json?generation=1667948375508564"],
     )
 
     http_file(
@@ -893,6 +1001,36 @@ def external_files():
     )
 
     http_file(
+        name = "com_google_mediapipe_yamnet_embedding_metadata_tflite",
+        sha256 = "7baa72708e3919bae5a5dc78d932847bc28008af14febd083eff62d28af9c72a",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/yamnet_embedding_metadata.tflite?generation=1668295071595506"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_gesture_embedder_keras_metadata_pb",
+        sha256 = "c76b856101e2284293a5e5963b7c445e407a0b3e56ec63eb78f64d883e51e3aa",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/gesture_embedder/keras_metadata.pb?generation=1668550482128410"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_gesture_embedder_saved_model_pb",
+        sha256 = "0082d37c5b85487fbf553e00a63f640945faf3da2d561a5f5a24c3194fecda6a",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/gesture_embedder/saved_model.pb?generation=1668550484904822"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_mobilebert_tiny_keras_metadata_pb",
+        sha256 = "cef8131a414c602b9d4742ac57f4f90bc5d8a42baec36b65deece884e2d0cf0f",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/mobilebert_tiny/keras_metadata.pb?generation=1673297965144159"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_mobilebert_tiny_saved_model_pb",
+        sha256 = "323c997cd3e17df1b2e3bdebe3cfe2b17c5ffd9488a26a4afb59ee819196837a",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/mobilebert_tiny/saved_model.pb?generation=1673297968138825"],
+    )
+
+    http_file(
         name = "com_google_mediapipe_object_detection_saved_model_model_ckpt_data-00000-of-00001",
         sha256 = "ad2f733f271dd5000a8c7f926bfea1083e6408b34d4f3b60679e5a6f96251c97",
         urls = ["https://storage.googleapis.com/mediapipe-assets/object_detection_saved_model/model.ckpt.data-00000-of-00001?generation=1661875984176294"],
@@ -926,4 +1064,34 @@ def external_files():
         name = "com_google_mediapipe_object_detection_saved_model_saved_model_pb",
         sha256 = "f29606cf218397d5580c496e50fd28cddf66e2f59b819ab9c761b72270a5adf3",
         urls = ["https://storage.googleapis.com/mediapipe-assets/object_detection_saved_model/saved_model.pb?generation=1661875999264354"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_gesture_embedder_variables_variables_data-00000-of-00001",
+        sha256 = "c156c9654c9ffb1091bb9f06c71080bd1e428586276d3f39c33fbab27fe0522d",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/gesture_embedder/variables/variables.data-00000-of-00001?generation=1668550487965052"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_gesture_embedder_variables_variables_index",
+        sha256 = "76ea482b8da6bdb3d65d3b2ea989c1699c9fa0d6df0cb6d80863d1dc6fe7c4bd",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/gesture_embedder/variables/variables.index?generation=1668550490691823"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_mobilebert_tiny_assets_vocab_txt",
+        sha256 = "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/mobilebert_tiny/assets/vocab.txt?generation=1673297970948751"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_mobilebert_tiny_variables_variables_data-00000-of-00001",
+        sha256 = "c3857370046cd3a2f345657cf1bb259a4e7e09185d7f0808e57803e9d41ebba4",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/mobilebert_tiny/variables/variables.data-00000-of-00001?generation=1673297975132568"],
+    )
+
+    http_file(
+        name = "com_google_mediapipe_mobilebert_tiny_variables_variables_index",
+        sha256 = "4df4d7c0fefe99903ab6ebf44b7478196ce613082d2ca692a5a37a7f24e562ed",
+        urls = ["https://storage.googleapis.com/mediapipe-assets/mobilebert_tiny/variables/variables.index?generation=1673297977586840"],
     )

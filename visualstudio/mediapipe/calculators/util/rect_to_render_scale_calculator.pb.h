@@ -180,8 +180,22 @@ class RectToRenderScaleCalculatorOptions PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kProcessTimestampBoundsFieldNumber = 2,
     kMultiplierFieldNumber = 1,
   };
+  // optional bool process_timestamp_bounds = 2 [default = false];
+  bool has_process_timestamp_bounds() const;
+  private:
+  bool _internal_has_process_timestamp_bounds() const;
+  public:
+  void clear_process_timestamp_bounds();
+  bool process_timestamp_bounds() const;
+  void set_process_timestamp_bounds(bool value);
+  private:
+  bool _internal_process_timestamp_bounds() const;
+  void _internal_set_process_timestamp_bounds(bool value);
+  public:
+
   // optional float multiplier = 1 [default = 0.01];
   bool has_multiplier() const;
   private:
@@ -208,6 +222,7 @@ class RectToRenderScaleCalculatorOptions PROTOBUF_FINAL :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  bool process_timestamp_bounds_;
   float multiplier_;
   friend struct ::TableStruct_mediapipe_2fcalculators_2futil_2frect_5fto_5frender_5fscale_5fcalculator_2eproto;
 };
@@ -224,7 +239,7 @@ class RectToRenderScaleCalculatorOptions PROTOBUF_FINAL :
 
 // optional float multiplier = 1 [default = 0.01];
 inline bool RectToRenderScaleCalculatorOptions::_internal_has_multiplier() const {
-  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
   return value;
 }
 inline bool RectToRenderScaleCalculatorOptions::has_multiplier() const {
@@ -232,7 +247,7 @@ inline bool RectToRenderScaleCalculatorOptions::has_multiplier() const {
 }
 inline void RectToRenderScaleCalculatorOptions::clear_multiplier() {
   multiplier_ = 0.01f;
-  _has_bits_[0] &= ~0x00000001u;
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline float RectToRenderScaleCalculatorOptions::_internal_multiplier() const {
   return multiplier_;
@@ -242,12 +257,40 @@ inline float RectToRenderScaleCalculatorOptions::multiplier() const {
   return _internal_multiplier();
 }
 inline void RectToRenderScaleCalculatorOptions::_internal_set_multiplier(float value) {
-  _has_bits_[0] |= 0x00000001u;
+  _has_bits_[0] |= 0x00000002u;
   multiplier_ = value;
 }
 inline void RectToRenderScaleCalculatorOptions::set_multiplier(float value) {
   _internal_set_multiplier(value);
   // @@protoc_insertion_point(field_set:mediapipe.RectToRenderScaleCalculatorOptions.multiplier)
+}
+
+// optional bool process_timestamp_bounds = 2 [default = false];
+inline bool RectToRenderScaleCalculatorOptions::_internal_has_process_timestamp_bounds() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool RectToRenderScaleCalculatorOptions::has_process_timestamp_bounds() const {
+  return _internal_has_process_timestamp_bounds();
+}
+inline void RectToRenderScaleCalculatorOptions::clear_process_timestamp_bounds() {
+  process_timestamp_bounds_ = false;
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline bool RectToRenderScaleCalculatorOptions::_internal_process_timestamp_bounds() const {
+  return process_timestamp_bounds_;
+}
+inline bool RectToRenderScaleCalculatorOptions::process_timestamp_bounds() const {
+  // @@protoc_insertion_point(field_get:mediapipe.RectToRenderScaleCalculatorOptions.process_timestamp_bounds)
+  return _internal_process_timestamp_bounds();
+}
+inline void RectToRenderScaleCalculatorOptions::_internal_set_process_timestamp_bounds(bool value) {
+  _has_bits_[0] |= 0x00000001u;
+  process_timestamp_bounds_ = value;
+}
+inline void RectToRenderScaleCalculatorOptions::set_process_timestamp_bounds(bool value) {
+  _internal_set_process_timestamp_bounds(value);
+  // @@protoc_insertion_point(field_set:mediapipe.RectToRenderScaleCalculatorOptions.process_timestamp_bounds)
 }
 
 #ifdef __GNUC__

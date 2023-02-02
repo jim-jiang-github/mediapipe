@@ -181,9 +181,11 @@ class SwitchContainerOptions PROTOBUF_FINAL :
 
   enum : int {
     kContainedNodeFieldNumber = 2,
+    kTickInputStreamFieldNumber = 7,
     kSelectFieldNumber = 3,
     kEnableFieldNumber = 4,
     kSynchronizeIoFieldNumber = 5,
+    kAsyncSelectionFieldNumber = 6,
   };
   // repeated .mediapipe.CalculatorGraphConfig.Node contained_node = 2;
   int contained_node_size() const;
@@ -202,6 +204,30 @@ class SwitchContainerOptions PROTOBUF_FINAL :
   ::mediapipe::CalculatorGraphConfig_Node* add_contained_node();
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::mediapipe::CalculatorGraphConfig_Node >&
       contained_node() const;
+
+  // repeated string tick_input_stream = 7;
+  int tick_input_stream_size() const;
+  private:
+  int _internal_tick_input_stream_size() const;
+  public:
+  void clear_tick_input_stream();
+  const std::string& tick_input_stream(int index) const;
+  std::string* mutable_tick_input_stream(int index);
+  void set_tick_input_stream(int index, const std::string& value);
+  void set_tick_input_stream(int index, std::string&& value);
+  void set_tick_input_stream(int index, const char* value);
+  void set_tick_input_stream(int index, const char* value, size_t size);
+  std::string* add_tick_input_stream();
+  void add_tick_input_stream(const std::string& value);
+  void add_tick_input_stream(std::string&& value);
+  void add_tick_input_stream(const char* value);
+  void add_tick_input_stream(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& tick_input_stream() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_tick_input_stream();
+  private:
+  const std::string& _internal_tick_input_stream(int index) const;
+  std::string* _internal_add_tick_input_stream();
+  public:
 
   // optional int32 select = 3;
   bool has_select() const;
@@ -242,6 +268,19 @@ class SwitchContainerOptions PROTOBUF_FINAL :
   void _internal_set_synchronize_io(bool value);
   public:
 
+  // optional bool async_selection = 6;
+  bool has_async_selection() const;
+  private:
+  bool _internal_has_async_selection() const;
+  public:
+  void clear_async_selection();
+  bool async_selection() const;
+  void set_async_selection(bool value);
+  private:
+  bool _internal_async_selection() const;
+  void _internal_set_async_selection(bool value);
+  public:
+
   static const int kExtFieldNumber = 345967970;
   static ::PROTOBUF_NAMESPACE_ID::internal::ExtensionIdentifier< ::mediapipe::CalculatorOptions,
       ::PROTOBUF_NAMESPACE_ID::internal::MessageTypeTraits< ::mediapipe::SwitchContainerOptions >, 11, false >
@@ -256,9 +295,11 @@ class SwitchContainerOptions PROTOBUF_FINAL :
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::mediapipe::CalculatorGraphConfig_Node > contained_node_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> tick_input_stream_;
   ::PROTOBUF_NAMESPACE_ID::int32 select_;
   bool enable_;
   bool synchronize_io_;
+  bool async_selection_;
   friend struct ::TableStruct_mediapipe_2fframework_2ftool_2fswitch_5fcontainer_2eproto;
 };
 // ===================================================================
@@ -390,6 +431,108 @@ inline void SwitchContainerOptions::_internal_set_synchronize_io(bool value) {
 inline void SwitchContainerOptions::set_synchronize_io(bool value) {
   _internal_set_synchronize_io(value);
   // @@protoc_insertion_point(field_set:mediapipe.SwitchContainerOptions.synchronize_io)
+}
+
+// optional bool async_selection = 6;
+inline bool SwitchContainerOptions::_internal_has_async_selection() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool SwitchContainerOptions::has_async_selection() const {
+  return _internal_has_async_selection();
+}
+inline void SwitchContainerOptions::clear_async_selection() {
+  async_selection_ = false;
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline bool SwitchContainerOptions::_internal_async_selection() const {
+  return async_selection_;
+}
+inline bool SwitchContainerOptions::async_selection() const {
+  // @@protoc_insertion_point(field_get:mediapipe.SwitchContainerOptions.async_selection)
+  return _internal_async_selection();
+}
+inline void SwitchContainerOptions::_internal_set_async_selection(bool value) {
+  _has_bits_[0] |= 0x00000008u;
+  async_selection_ = value;
+}
+inline void SwitchContainerOptions::set_async_selection(bool value) {
+  _internal_set_async_selection(value);
+  // @@protoc_insertion_point(field_set:mediapipe.SwitchContainerOptions.async_selection)
+}
+
+// repeated string tick_input_stream = 7;
+inline int SwitchContainerOptions::_internal_tick_input_stream_size() const {
+  return tick_input_stream_.size();
+}
+inline int SwitchContainerOptions::tick_input_stream_size() const {
+  return _internal_tick_input_stream_size();
+}
+inline void SwitchContainerOptions::clear_tick_input_stream() {
+  tick_input_stream_.Clear();
+}
+inline std::string* SwitchContainerOptions::add_tick_input_stream() {
+  // @@protoc_insertion_point(field_add_mutable:mediapipe.SwitchContainerOptions.tick_input_stream)
+  return _internal_add_tick_input_stream();
+}
+inline const std::string& SwitchContainerOptions::_internal_tick_input_stream(int index) const {
+  return tick_input_stream_.Get(index);
+}
+inline const std::string& SwitchContainerOptions::tick_input_stream(int index) const {
+  // @@protoc_insertion_point(field_get:mediapipe.SwitchContainerOptions.tick_input_stream)
+  return _internal_tick_input_stream(index);
+}
+inline std::string* SwitchContainerOptions::mutable_tick_input_stream(int index) {
+  // @@protoc_insertion_point(field_mutable:mediapipe.SwitchContainerOptions.tick_input_stream)
+  return tick_input_stream_.Mutable(index);
+}
+inline void SwitchContainerOptions::set_tick_input_stream(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:mediapipe.SwitchContainerOptions.tick_input_stream)
+  tick_input_stream_.Mutable(index)->assign(value);
+}
+inline void SwitchContainerOptions::set_tick_input_stream(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:mediapipe.SwitchContainerOptions.tick_input_stream)
+  tick_input_stream_.Mutable(index)->assign(std::move(value));
+}
+inline void SwitchContainerOptions::set_tick_input_stream(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  tick_input_stream_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:mediapipe.SwitchContainerOptions.tick_input_stream)
+}
+inline void SwitchContainerOptions::set_tick_input_stream(int index, const char* value, size_t size) {
+  tick_input_stream_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:mediapipe.SwitchContainerOptions.tick_input_stream)
+}
+inline std::string* SwitchContainerOptions::_internal_add_tick_input_stream() {
+  return tick_input_stream_.Add();
+}
+inline void SwitchContainerOptions::add_tick_input_stream(const std::string& value) {
+  tick_input_stream_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:mediapipe.SwitchContainerOptions.tick_input_stream)
+}
+inline void SwitchContainerOptions::add_tick_input_stream(std::string&& value) {
+  tick_input_stream_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:mediapipe.SwitchContainerOptions.tick_input_stream)
+}
+inline void SwitchContainerOptions::add_tick_input_stream(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  tick_input_stream_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:mediapipe.SwitchContainerOptions.tick_input_stream)
+}
+inline void SwitchContainerOptions::add_tick_input_stream(const char* value, size_t size) {
+  tick_input_stream_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:mediapipe.SwitchContainerOptions.tick_input_stream)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+SwitchContainerOptions::tick_input_stream() const {
+  // @@protoc_insertion_point(field_list:mediapipe.SwitchContainerOptions.tick_input_stream)
+  return tick_input_stream_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+SwitchContainerOptions::mutable_tick_input_stream() {
+  // @@protoc_insertion_point(field_mutable_list:mediapipe.SwitchContainerOptions.tick_input_stream)
+  return &tick_input_stream_;
 }
 
 #ifdef __GNUC__

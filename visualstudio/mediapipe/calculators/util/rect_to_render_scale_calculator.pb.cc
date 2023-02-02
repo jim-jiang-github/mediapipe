@@ -19,7 +19,8 @@ PROTOBUF_PRAGMA_INIT_SEG
 namespace mediapipe {
 constexpr RectToRenderScaleCalculatorOptions::RectToRenderScaleCalculatorOptions(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : multiplier_(0.01f){}
+  : process_timestamp_bounds_(false)
+  , multiplier_(0.01f){}
 struct RectToRenderScaleCalculatorOptionsDefaultTypeInternal {
   constexpr RectToRenderScaleCalculatorOptionsDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -41,10 +42,12 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_mediapipe_2fcalculators_2futil
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::mediapipe::RectToRenderScaleCalculatorOptions, multiplier_),
+  PROTOBUF_FIELD_OFFSET(::mediapipe::RectToRenderScaleCalculatorOptions, process_timestamp_bounds_),
+  1,
   0,
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 6, sizeof(::mediapipe::RectToRenderScaleCalculatorOptions)},
+  { 0, 7, sizeof(::mediapipe::RectToRenderScaleCalculatorOptions)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -54,18 +57,19 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 const char descriptor_table_protodef_mediapipe_2fcalculators_2futil_2frect_5fto_5frender_5fscale_5fcalculator_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n@mediapipe/calculators/util/rect_to_ren"
   "der_scale_calculator.proto\022\tmediapipe\032$m"
-  "ediapipe/framework/calculator.proto\"\234\001\n\""
+  "ediapipe/framework/calculator.proto\"\305\001\n\""
   "RectToRenderScaleCalculatorOptions\022\030\n\nmu"
-  "ltiplier\030\001 \001(\002:\0040.012\\\n\003ext\022\034.mediapipe."
-  "CalculatorOptions\030\361\345\345\216\001 \001(\0132-.mediapipe."
-  "RectToRenderScaleCalculatorOptions"
+  "ltiplier\030\001 \001(\002:\0040.01\022\'\n\030process_timestam"
+  "p_bounds\030\002 \001(\010:\005false2\\\n\003ext\022\034.mediapipe"
+  ".CalculatorOptions\030\361\345\345\216\001 \001(\0132-.mediapipe"
+  ".RectToRenderScaleCalculatorOptions"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_mediapipe_2fcalculators_2futil_2frect_5fto_5frender_5fscale_5fcalculator_2eproto_deps[1] = {
   &::descriptor_table_mediapipe_2fframework_2fcalculator_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_mediapipe_2fcalculators_2futil_2frect_5fto_5frender_5fscale_5fcalculator_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_mediapipe_2fcalculators_2futil_2frect_5fto_5frender_5fscale_5fcalculator_2eproto = {
-  false, false, 274, descriptor_table_protodef_mediapipe_2fcalculators_2futil_2frect_5fto_5frender_5fscale_5fcalculator_2eproto, "mediapipe/calculators/util/rect_to_render_scale_calculator.proto", 
+  false, false, 315, descriptor_table_protodef_mediapipe_2fcalculators_2futil_2frect_5fto_5frender_5fscale_5fcalculator_2eproto, "mediapipe/calculators/util/rect_to_render_scale_calculator.proto", 
   &descriptor_table_mediapipe_2fcalculators_2futil_2frect_5fto_5frender_5fscale_5fcalculator_2eproto_once, descriptor_table_mediapipe_2fcalculators_2futil_2frect_5fto_5frender_5fscale_5fcalculator_2eproto_deps, 1, 1,
   schemas, file_default_instances, TableStruct_mediapipe_2fcalculators_2futil_2frect_5fto_5frender_5fscale_5fcalculator_2eproto::offsets,
   file_level_metadata_mediapipe_2fcalculators_2futil_2frect_5fto_5frender_5fscale_5fcalculator_2eproto, file_level_enum_descriptors_mediapipe_2fcalculators_2futil_2frect_5fto_5frender_5fscale_5fcalculator_2eproto, file_level_service_descriptors_mediapipe_2fcalculators_2futil_2frect_5fto_5frender_5fscale_5fcalculator_2eproto,
@@ -84,6 +88,9 @@ class RectToRenderScaleCalculatorOptions::_Internal {
  public:
   using HasBits = decltype(std::declval<RectToRenderScaleCalculatorOptions>()._has_bits_);
   static void set_has_multiplier(HasBits* has_bits) {
+    (*has_bits)[0] |= 2u;
+  }
+  static void set_has_process_timestamp_bounds(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
 };
@@ -98,11 +105,14 @@ RectToRenderScaleCalculatorOptions::RectToRenderScaleCalculatorOptions(const Rec
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       _has_bits_(from._has_bits_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  multiplier_ = from.multiplier_;
+  ::memcpy(&process_timestamp_bounds_, &from.process_timestamp_bounds_,
+    static_cast<size_t>(reinterpret_cast<char*>(&multiplier_) -
+    reinterpret_cast<char*>(&process_timestamp_bounds_)) + sizeof(multiplier_));
   // @@protoc_insertion_point(copy_constructor:mediapipe.RectToRenderScaleCalculatorOptions)
 }
 
 void RectToRenderScaleCalculatorOptions::SharedCtor() {
+process_timestamp_bounds_ = false;
 multiplier_ = 0.01f;
 }
 
@@ -132,7 +142,11 @@ void RectToRenderScaleCalculatorOptions::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  multiplier_ = 0.01f;
+  cached_has_bits = _has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    process_timestamp_bounds_ = false;
+    multiplier_ = 0.01f;
+  }
   _has_bits_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
@@ -150,6 +164,14 @@ const char* RectToRenderScaleCalculatorOptions::_InternalParse(const char* ptr, 
           _Internal::set_has_multiplier(&has_bits);
           multiplier_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
           ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // optional bool process_timestamp_bounds = 2 [default = false];
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+          _Internal::set_has_process_timestamp_bounds(&has_bits);
+          process_timestamp_bounds_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
         } else goto handle_unusual;
         continue;
       default: {
@@ -184,9 +206,15 @@ failure:
 
   cached_has_bits = _has_bits_[0];
   // optional float multiplier = 1 [default = 0.01];
-  if (cached_has_bits & 0x00000001u) {
+  if (cached_has_bits & 0x00000002u) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(1, this->_internal_multiplier(), target);
+  }
+
+  // optional bool process_timestamp_bounds = 2 [default = false];
+  if (cached_has_bits & 0x00000001u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(2, this->_internal_process_timestamp_bounds(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -205,12 +233,19 @@ size_t RectToRenderScaleCalculatorOptions::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // optional float multiplier = 1 [default = 0.01];
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000001u) {
-    total_size += 1 + 4;
-  }
+  if (cached_has_bits & 0x00000003u) {
+    // optional bool process_timestamp_bounds = 2 [default = false];
+    if (cached_has_bits & 0x00000001u) {
+      total_size += 1 + 1;
+    }
 
+    // optional float multiplier = 1 [default = 0.01];
+    if (cached_has_bits & 0x00000002u) {
+      total_size += 1 + 4;
+    }
+
+  }
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
         _internal_metadata_, total_size, &_cached_size_);
@@ -242,8 +277,15 @@ void RectToRenderScaleCalculatorOptions::MergeFrom(const RectToRenderScaleCalcul
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_multiplier()) {
-    _internal_set_multiplier(from._internal_multiplier());
+  cached_has_bits = from._has_bits_[0];
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      process_timestamp_bounds_ = from.process_timestamp_bounds_;
+    }
+    if (cached_has_bits & 0x00000002u) {
+      multiplier_ = from.multiplier_;
+    }
+    _has_bits_[0] |= cached_has_bits;
   }
 }
 
@@ -269,6 +311,7 @@ void RectToRenderScaleCalculatorOptions::InternalSwap(RectToRenderScaleCalculato
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
+  swap(process_timestamp_bounds_, other->process_timestamp_bounds_);
   swap(multiplier_, other->multiplier_);
 }
 

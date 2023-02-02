@@ -15,12 +15,13 @@
 package com.google.mediapipe.tasks.components.containers;
 
 import com.google.auto.value.AutoValue;
+import com.google.mediapipe.formats.proto.ClassificationProto;
 import java.util.Objects;
 
 /**
- * Category is a util class, contains a category name, its display name, a float value as score, and
- * the index of the label in the corresponding label file. Typically it's used as result of
- * classification or detection tasks.
+ * Category is a util class, that contains a category name, its display name, a float value as
+ * score, and the index of the label in the corresponding label file. Typically it's used as result
+ * of classification or detection tasks.
  */
 @AutoValue
 public abstract class Category {
@@ -36,6 +37,16 @@ public abstract class Category {
    */
   public static Category create(float score, int index, String categoryName, String displayName) {
     return new AutoValue_Category(score, index, categoryName, displayName);
+  }
+
+  /**
+   * Creates a {@link Category} object from a {@link ClassificationProto.Classification} protobuf
+   * message.
+   *
+   * @param proto the {@link ClassificationProto.Classification} protobuf message to convert.
+   */
+  public static Category createFromProto(ClassificationProto.Classification proto) {
+    return create(proto.getScore(), proto.getIndex(), proto.getLabel(), proto.getDisplayName());
   }
 
   /** The probability score of this label category. */

@@ -41,6 +41,7 @@
     <ClCompile Include="..\..\mediapipe\calculators\core\split_proto_list_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\core\split_vector_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\image\affine_transformation_runner_opencv.cc" />
+    <ClCompile Include="..\..\mediapipe\calculators\image\color_convert_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\image\feature_detector_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\image\image_cropping_calculator.cc" />
     <ClCompile Include="..\..\mediapipe\calculators\image\image_properties_calculator.cc" />
@@ -265,6 +266,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\mediapipe\util\tflite\tflite_model_loader.cc" />
+    <ClCompile Include="..\..\mediapipe\util\time_series_util.cc" />
     <ClCompile Include="..\..\mediapipe\util\tracking\box_detector.cc" />
     <ClCompile Include="..\..\mediapipe\util\tracking\box_tracker.cc" />
     <ClCompile Include="..\..\mediapipe\util\tracking\camera_motion.cc" />
@@ -318,6 +320,7 @@
     <ClCompile Include="calculators\image\warp_affine_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\image_to_tensor_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\inference_calculator.pb.cc" />
+    <ClCompile Include="calculators\tensor\tensors_to_audio_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\tensors_to_classification_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\tensors_to_detections_calculator.pb.cc" />
     <ClCompile Include="calculators\tensor\tensors_to_floats_calculator.pb.cc" />
@@ -372,6 +375,7 @@
     <ClCompile Include="framework\formats\matrix_data.pb.cc" />
     <ClCompile Include="framework\formats\object_detection\anchor.pb.cc" />
     <ClCompile Include="framework\formats\rect.pb.cc" />
+    <ClCompile Include="framework\formats\time_series_header.pb.cc" />
     <ClCompile Include="framework\mediapipe_options.pb.cc" />
     <ClCompile Include="framework\packet_factory.pb.cc" />
     <ClCompile Include="framework\packet_generator.pb.cc" />
@@ -507,6 +511,7 @@
     <ClInclude Include="..\..\mediapipe\util\tflite\op_resolver.h" />
     <ClInclude Include="..\..\mediapipe\util\tflite\tflite_gpu_runner.h" />
     <ClInclude Include="..\..\mediapipe\util\tflite\tflite_model_loader.h" />
+    <ClInclude Include="..\..\mediapipe\util\time_series_util.h" />
     <ClInclude Include="..\..\mediapipe\util\tracking\box_detector.h" />
     <ClInclude Include="..\..\mediapipe\util\tracking\box_tracker.h" />
     <ClInclude Include="..\..\mediapipe\util\tracking\camera_motion.h" />
@@ -554,6 +559,7 @@
     <ClInclude Include="calculators\image\warp_affine_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\image_to_tensor_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\inference_calculator.pb.h" />
+    <ClInclude Include="calculators\tensor\tensors_to_audio_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\tensors_to_classification_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\tensors_to_detections_calculator.pb.h" />
     <ClInclude Include="calculators\tensor\tensors_to_floats_calculator.pb.h" />
@@ -608,6 +614,7 @@
     <ClInclude Include="framework\formats\matrix_data.pb.h" />
     <ClInclude Include="framework\formats\object_detection\anchor.pb.h" />
     <ClInclude Include="framework\formats\rect.pb.h" />
+    <ClInclude Include="framework\formats\time_series_header.pb.h" />
     <ClInclude Include="framework\mediapipe_options.pb.h" />
     <ClInclude Include="framework\packet_factory.pb.h" />
     <ClInclude Include="framework\packet_generator.pb.h" />
@@ -754,7 +761,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../;../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/protobuf/src;../../third_party/protobuf/third_party/zlib;../../third_party/tensorflow;../../third_party/tensorflow/third_party/gemmlowp;../../third_party/tensorflow/third_party/flatbuffers/include;../../third_party/tensorflow/third_party/eigen3;../../third_party/tensorflow/third_party/XNNPACK/third_party/FP16/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../;../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/multichannel-audio-tools;../../third_party/opencv/include;../../third_party/pffft;../../third_party/protobuf/src;../../third_party/protobuf/third_party/zlib;../../third_party/tensorflow;../../third_party/tensorflow/third_party/gemmlowp;../../third_party/tensorflow/third_party/flatbuffers/include;../../third_party/tensorflow/third_party/eigen3;../../third_party/tensorflow/third_party/XNNPACK/third_party/FP16/include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <ObjectFileName>$(IntDir)_\%(RelativeDir)</ObjectFileName>
@@ -779,7 +786,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../;../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/protobuf/src;../../third_party/protobuf/third_party/zlib;../../third_party/tensorflow;../../third_party/tensorflow/third_party/gemmlowp;../../third_party/tensorflow/third_party/flatbuffers/include;../../third_party/tensorflow/third_party/eigen3;../../third_party/tensorflow/third_party/XNNPACK/third_party/FP16/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../;../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/multichannel-audio-tools;../../third_party/opencv/include;../../third_party/pffft;../../third_party/protobuf/src;../../third_party/protobuf/third_party/zlib;../../third_party/tensorflow;../../third_party/tensorflow/third_party/gemmlowp;../../third_party/tensorflow/third_party/flatbuffers/include;../../third_party/tensorflow/third_party/eigen3;../../third_party/tensorflow/third_party/XNNPACK/third_party/FP16/include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <ObjectFileName>$(IntDir)_\%(RelativeDir)</ObjectFileName>
@@ -808,7 +815,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../;../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/protobuf/src;../../third_party/protobuf/third_party/zlib;../../third_party/tensorflow;../../third_party/tensorflow/third_party/gemmlowp;../../third_party/tensorflow/third_party/flatbuffers/include;../../third_party/tensorflow/third_party/eigen3;../../third_party/tensorflow/third_party/XNNPACK/third_party/FP16/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../;../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/multichannel-audio-tools;../../third_party/opencv/include;../../third_party/pffft;../../third_party/protobuf/src;../../third_party/protobuf/third_party/zlib;../../third_party/tensorflow;../../third_party/tensorflow/third_party/gemmlowp;../../third_party/tensorflow/third_party/flatbuffers/include;../../third_party/tensorflow/third_party/eigen3;../../third_party/tensorflow/third_party/XNNPACK/third_party/FP16/include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -835,7 +842,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../;../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/opencv/include;../../third_party/protobuf/src;../../third_party/protobuf/third_party/zlib;../../third_party/tensorflow;../../third_party/tensorflow/third_party/gemmlowp;../../third_party/tensorflow/third_party/flatbuffers/include;../../third_party/tensorflow/third_party/eigen3;../../third_party/tensorflow/third_party/XNNPACK/third_party/FP16/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../;../../;../../third_party/abseil;../../third_party/glog/src;../../third_party/glog/build;../../third_party/multichannel-audio-tools;../../third_party/opencv/include;../../third_party/pffft;../../third_party/protobuf/src;../../third_party/protobuf/third_party/zlib;../../third_party/tensorflow;../../third_party/tensorflow/third_party/gemmlowp;../../third_party/tensorflow/third_party/flatbuffers/include;../../third_party/tensorflow/third_party/eigen3;../../third_party/tensorflow/third_party/XNNPACK/third_party/FP16/include</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <ObjectFileName>$(IntDir)_\%(RelativeDir)</ObjectFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>

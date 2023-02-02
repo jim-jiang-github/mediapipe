@@ -25,8 +25,9 @@ from mediapipe.model_maker.python.core.utils import model_util
 from mediapipe.model_maker.python.core.utils import quantization
 from mediapipe.model_maker.python.vision.core import image_preprocessing
 from mediapipe.model_maker.python.vision.image_classifier import hyperparameters as hp
+from mediapipe.model_maker.python.vision.image_classifier import image_classifier_options
+from mediapipe.model_maker.python.vision.image_classifier import model_options as model_opt
 from mediapipe.model_maker.python.vision.image_classifier import model_spec as ms
-from mediapipe.model_maker.python.vision.image_classifier import train_image_classifier_lib
 from mediapipe.tasks.python.metadata.metadata_writers import image_classifier as image_classifier_writer
 from mediapipe.tasks.python.metadata.metadata_writers import metadata_writer
 
@@ -35,106 +36,89 @@ class ImageClassifier(classifier.Classifier):
   """ImageClassifier for building image classification model."""
 
   def __init__(self, model_spec: ms.ModelSpec, label_names: List[str],
-               hparams: hp.HParams):
+               hparams: hp.HParams,
+               model_options: model_opt.ImageClassifierModelOptions):
     """Initializes ImageClassifier class.
 
     Args:
       model_spec: Specification for the model.
       label_names: A list of label names for the classes.
       hparams: The hyperparameters for training image classifier.
+      model_options: Model options for creating image classifier.
     """
     super().__init__(
-        model_spec=model_spec,
-        label_names=label_names,
-        shuffle=hparams.shuffle,
-        full_train=hparams.do_fine_tuning)
+        model_spec=model_spec, label_names=label_names, shuffle=hparams.shuffle)
     self._hparams = hparams
+    self._model_options = model_options
     self._preprocess = image_preprocessing.Preprocessor(
         input_shape=self._model_spec.input_image_shape,
         num_classes=self._num_classes,
         mean_rgb=self._model_spec.mean_rgb,
         stddev_rgb=self._model_spec.stddev_rgb,
         use_augmentation=hparams.do_data_augmentation)
+    self._callbacks = model_util.get_default_callbacks(self._hparams.export_dir)
+    self._loss_function = tf.keras.losses.CategoricalCrossentropy(
+        label_smoothing=self._hparams.label_smoothing)
+    self._metric_function = 'accuracy'
     self._history = None  # Training history returned from `keras_model.fit`.
 
   @classmethod
   def create(
       cls,
-      model_spec: ms.SupportedModels,
       train_data: classification_ds.ClassificationDataset,
       validation_data: classification_ds.ClassificationDataset,
-      hparams: Optional[hp.HParams] = None,
+      options: image_classifier_options.ImageClassifierOptions,
   ) -> 'ImageClassifier':
-    """Creates and trains an image classifier.
+    """Creates and trains an ImageClassifier.
 
-    Loads data and trains the model based on data for image classification.
+    Loads data and trains the model based on data for image classification. If a
+    checkpoint file exists in the {options.hparams.export_dir}/checkpoint/
+    directory, the training process will load the weight from the checkpoint
+    file for continual training.
 
     Args:
-      model_spec: Specification for the model.
       train_data: Training data.
       validation_data: Validation data.
-      hparams: Hyperparameters for training image classifier.
+      options: configuration to create image classifier.
 
     Returns:
       An instance based on ImageClassifier.
     """
-    if hparams is None:
-      hparams = hp.HParams()
+    if options.hparams is None:
+      options.hparams = hp.HParams()
 
-    spec = ms.SupportedModels.get(model_spec)
+    if options.model_options is None:
+      options.model_options = model_opt.ImageClassifierModelOptions()
+
+    spec = ms.SupportedModels.get(options.supported_model)
     image_classifier = cls(
-        model_spec=spec, label_names=train_data.label_names, hparams=hparams)
-
-    image_classifier._create_model()
-
-    tf.compat.v1.logging.info('Training the models...')
-    image_classifier._train(
-        train_data=train_data, validation_data=validation_data)
-
+        model_spec=spec,
+        label_names=train_data.label_names,
+        hparams=options.hparams,
+        model_options=options.model_options)
+    image_classifier._create_and_train_model(train_data, validation_data)
     return image_classifier
 
-  def _train(self, train_data: classification_ds.ClassificationDataset,
-             validation_data: classification_ds.ClassificationDataset):
-    """Trains the model with input train_data.
-
-    The training results are recorded by a self._history object returned by
-    tf.keras.Model.fit().
+  def _create_and_train_model(
+      self, train_data: classification_ds.ClassificationDataset,
+      validation_data: classification_ds.ClassificationDataset):
+    """Creates and trains the model and optimizer.
 
     Args:
       train_data: Training data.
       validation_data: Validation data.
     """
-
-    tf.compat.v1.logging.info('Training the models...')
-    hparams = self._hparams
-    if len(train_data) < hparams.batch_size:
-      raise ValueError('The size of the train_data (%d) couldn\'t be smaller '
-                       'than batch_size (%d). To solve this problem, set '
-                       'the batch_size smaller or increase the size of the '
-                       'train_data.' % (len(train_data), hparams.batch_size))
-
-    train_dataset = train_data.gen_tf_dataset(
-        batch_size=hparams.batch_size,
-        is_training=True,
-        shuffle=self._shuffle,
-        preprocess=self._preprocess)
-    hparams.steps_per_epoch = model_util.get_steps_per_epoch(
-        steps_per_epoch=hparams.steps_per_epoch,
-        batch_size=hparams.batch_size,
+    self._create_model()
+    self._hparams.steps_per_epoch = model_util.get_steps_per_epoch(
+        steps_per_epoch=self._hparams.steps_per_epoch,
+        batch_size=self._hparams.batch_size,
         train_data=train_data)
-    train_dataset = train_dataset.take(count=hparams.steps_per_epoch)
-
-    validation_dataset = validation_data.gen_tf_dataset(
-        batch_size=hparams.batch_size,
-        is_training=False,
-        preprocess=self._preprocess)
-
-    # Train the model.
-    self._history = train_image_classifier_lib.train_model(
-        model=self._model,
-        hparams=hparams,
-        train_ds=train_dataset,
-        validation_ds=validation_dataset)
+    self._optimizer = self._create_optimizer()
+    self._train_model(
+        train_data=train_data,
+        validation_data=validation_data,
+        preprocessor=self._preprocess,
+        checkpoint_path=os.path.join(self._hparams.export_dir, 'checkpoint'))
 
   def _create_model(self):
     """Creates the classifier model from TFHub pretrained models."""
@@ -145,7 +129,7 @@ class ImageClassifier(classifier.Classifier):
 
     self._model = tf.keras.Sequential([
         tf.keras.Input(shape=(image_size[0], image_size[1], 3)), module_layer,
-        tf.keras.layers.Dropout(rate=self._hparams.dropout_rate),
+        tf.keras.layers.Dropout(rate=self._model_options.dropout_rate),
         tf.keras.layers.Dense(
             units=self._num_classes,
             activation='softmax',
@@ -167,13 +151,13 @@ class ImageClassifier(classifier.Classifier):
 
     Args:
       model_name: File name to save TFLite model with metadata. The full export
-        path is {self._hparams.model_dir}/{model_name}.
+        path is {self._hparams.export_dir}/{model_name}.
       quantization_config: The configuration for model quantization.
     """
-    if not tf.io.gfile.exists(self._hparams.model_dir):
-      tf.io.gfile.makedirs(self._hparams.model_dir)
-    tflite_file = os.path.join(self._hparams.model_dir, model_name)
-    metadata_file = os.path.join(self._hparams.model_dir, 'metadata.json')
+    if not tf.io.gfile.exists(self._hparams.export_dir):
+      tf.io.gfile.makedirs(self._hparams.export_dir)
+    tflite_file = os.path.join(self._hparams.export_dir, model_name)
+    metadata_file = os.path.join(self._hparams.export_dir, 'metadata.json')
 
     tflite_model = model_util.convert_to_tflite(
         model=self._model,
@@ -183,8 +167,38 @@ class ImageClassifier(classifier.Classifier):
         tflite_model,
         self._model_spec.mean_rgb,
         self._model_spec.stddev_rgb,
-        labels=metadata_writer.Labels().add(self._label_names))
+        labels=metadata_writer.Labels().add(list(self._label_names)))
     tflite_model_with_metadata, metadata_json = writer.populate()
     model_util.save_tflite(tflite_model_with_metadata, tflite_file)
     with open(metadata_file, 'w') as f:
       f.write(metadata_json)
+
+  def _create_optimizer(self) -> tf.keras.optimizers.Optimizer:
+    """Creates an optimizer with learning rate schedule.
+
+    Uses Keras CosineDecay schedule for the learning rate by default.
+
+    Returns:
+      A tf.keras.optimizers.Optimizer for model training.
+    """
+    # Learning rate is linear to batch size.
+    init_lr = self._hparams.learning_rate * self._hparams.batch_size / 256
+
+    # Get decay steps.
+    total_training_steps = self._hparams.steps_per_epoch * self._hparams.epochs
+    default_decay_steps = (
+        self._hparams.decay_samples // self._hparams.batch_size)
+    decay_steps = max(total_training_steps, default_decay_steps)
+
+    learning_rate_fn = tf.keras.experimental.CosineDecay(
+        initial_learning_rate=init_lr, decay_steps=decay_steps, alpha=0.0)
+    warmup_steps = self._hparams.warmup_epochs * self._hparams.steps_per_epoch
+    if warmup_steps:
+      learning_rate_fn = model_util.WarmUp(
+          initial_learning_rate=init_lr,
+          decay_schedule_fn=learning_rate_fn,
+          warmup_steps=warmup_steps)
+    optimizer = tf.keras.optimizers.RMSprop(
+        learning_rate=learning_rate_fn, rho=0.9, momentum=0.9, epsilon=0.001)
+
+    return optimizer

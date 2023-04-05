@@ -4,7 +4,6 @@ Gesture HandGestureRecognition::GestureRecognition(const std::vector<PoseInfo>& 
 {
     if (single_hand_joint_vector.size() != 21)
         return Gesture::NoGesture;
-
     // ´óÄ´Ö¸½Ç¶È
     Vector2D thumb_vec1;
     thumb_vec1.x = single_hand_joint_vector[0].x - single_hand_joint_vector[2].x;

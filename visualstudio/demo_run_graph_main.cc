@@ -19,6 +19,7 @@
 //
 // An example of sending OpenCV webcam frames into a MediaPipe graph.
 #include <cstdlib>
+#include <Windows.h>
 
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
@@ -60,14 +61,14 @@ absl::Status RunMPPGraph() {
 
     cv::VideoWriter writer;
     const bool save_video = !absl::GetFlag(FLAGS_output_video_path).empty();
-    if (!save_video) {
-        cv::namedWindow(kWindowName, /*flags=WINDOW_AUTOSIZE*/ 1);
-#if ((CV_MAJOR_VERSION*10+CV_MINOR_VERSION) >= 32)
-        capture.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
-        capture.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
-        capture.set(cv::CAP_PROP_FPS, 30);
-#endif
-    }
+    //    if (!save_video) {
+    //        cv::namedWindow(kWindowName, /*flags=WINDOW_AUTOSIZE*/ 1);
+    //#if ((CV_MAJOR_VERSION*10+CV_MINOR_VERSION) >= 32)
+    //        capture.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
+    //        capture.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
+    //        capture.set(cv::CAP_PROP_FPS, 30);
+    //#endif
+    //    }
 
     LOG(INFO) << "Start running the calculator graph.";
     ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller,
@@ -84,9 +85,9 @@ absl::Status RunMPPGraph() {
     for (auto const start_time = std::chrono::system_clock::now();
         user_input.wait_key != 27; user_input.wait_key = cv::waitKeyEx(1)) {
         // close window after wait key
-        if (cv::getWindowProperty(kWindowName, cv::WND_PROP_VISIBLE) < 1.0) {
+       /* if (cv::getWindowProperty(kWindowName, cv::WND_PROP_VISIBLE) < 1.0) {
             break;
-        }
+        }*/
 
         // Capture opencv camera or video frame.
         cv::Mat camera_frame_raw;
@@ -147,9 +148,12 @@ absl::Status RunMPPGraph() {
                     }
 
                     Gesture result = handGestureRecognition.GestureRecognition(singleHandGestureInfo);
-
-
-
+                    if (result == Gesture::One) 
+                    {
+                        int x = (int)singleHandGestureInfo[0].x;
+                        int y = (int)singleHandGestureInfo[0].y;
+                        SetCursorPos(x * 10 - 3000, y * 10 - 3500);
+                    }
                 }
             }
         }

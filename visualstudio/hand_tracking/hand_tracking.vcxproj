@@ -179,7 +179,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\third_party\opencv\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world410d.lib</AdditionalDependencies>
+      <AdditionalDependencies>opencv_world410d.lib;user32.lib</AdditionalDependencies>
       <AdditionalOptions>/WHOLEARCHIVE:mediapipe.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
@@ -208,7 +208,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalLibraryDirectories>..\..\third_party\opencv\x64</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opencv_world410.lib</AdditionalDependencies>
+      <AdditionalDependencies>opencv_world410.lib;user32.lib</AdditionalDependencies>
       <AdditionalOptions>/WHOLEARCHIVE:mediapipe.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>

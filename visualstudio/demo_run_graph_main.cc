@@ -32,12 +32,14 @@
 #include "mediapipe/framework/port/opencv_video_inc.h"
 #include "mediapipe/framework/port/parse_text_proto.h"
 #include "mediapipe/framework/port/status.h"
-
+#include "mediapipe/framework/formats/landmark.pb.h"
+#include "hand_tracking/HandGestureRecognition.h"
 constexpr char const* kWindowName = "MediaPipe";
 
 constexpr char const* kInputStream = "input_video";
 constexpr char const* kUserInput = "user_input";
 constexpr char const* kOutputStream = "output_video";
+constexpr char const* kOutputLandmarks = "landmarks";
 
 ABSL_FLAG(std::string, input_video_path, "",
     "Full path of video to load. "
@@ -70,11 +72,14 @@ absl::Status RunMPPGraph() {
     LOG(INFO) << "Start running the calculator graph.";
     ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller,
         graph.AddOutputStreamPoller(kOutputStream));
+    ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller_landmarks,
+        graph.AddOutputStreamPoller(kOutputLandmarks));
     MP_RETURN_IF_ERROR(graph.StartRun({}));
 
     LOG(INFO) << "Start grabbing and processing frames.";
 
     UserInput user_input;
+    HandGestureRecognition handGestureRecognition;
 
     for (auto const start_time = std::chrono::system_clock::now();
         user_input.wait_key != 27; user_input.wait_key = cv::waitKeyEx(1)) {
@@ -108,20 +113,62 @@ absl::Status RunMPPGraph() {
         MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(
             kInputStream, mediapipe::Adopt(input_frame.release()).At(timestamp)));
 
-        // Get the graph result packet, or stop if that fails.
+
+
         mediapipe::Packet packet;
-        if (poller.Next(&packet)) {
-            auto& output_frame = packet.Get<mediapipe::ImageFrame>();
+        mediapipe::Packet packet_landmarks;
+        if (!poller.Next(&packet))
+            return absl::OkStatus();
 
-            // Convert back to opencv for display or saving.
-            cv::Mat output_frame_mat = mediapipe::formats::MatView(&output_frame);
-            cv::cvtColor(output_frame_mat, output_frame_mat, cv::COLOR_RGB2BGR);
+        if (poller_landmarks.QueueSize() > 0)
+        {
+            if (poller_landmarks.Next(&packet_landmarks))
+            {
+                std::vector<mediapipe::NormalizedLandmarkList> output_landmarks = packet_landmarks.Get<std::vector<mediapipe::NormalizedLandmarkList>>();
+                int* hand_gesture_recognition_result = new int[output_landmarks.size()];
+                std::vector<PoseInfo> hand_landmarks;
+                hand_landmarks.clear();
 
-            cv::imshow(kWindowName, output_frame_mat);
+                for (int m = 0; m < output_landmarks.size(); ++m)
+                {
+                    mediapipe::NormalizedLandmarkList single_hand_NormalizedLandmarkList = output_landmarks[m];
+
+                    std::vector<PoseInfo> singleHandGestureInfo;
+                    singleHandGestureInfo.clear();
+
+                    for (int i = 0; i < single_hand_NormalizedLandmarkList.landmark_size(); ++i)
+                    {
+                        PoseInfo info;
+                        const mediapipe::NormalizedLandmark landmark = single_hand_NormalizedLandmarkList.landmark(i);
+                        info.x = landmark.x() * camera_frame.cols;
+                        info.y = landmark.y() * camera_frame.rows;
+                        singleHandGestureInfo.push_back(info);
+                        hand_landmarks.push_back(info);
+                    }
+
+                    Gesture result = handGestureRecognition.GestureRecognition(singleHandGestureInfo);
+
+
+
+                }
+            }
         }
-        else {
-            break;
-        }
+
+
+        //// Get the graph result packet, or stop if that fails.
+        //mediapipe::Packet packet;
+        //if (poller.Next(&packet)) {
+        //    auto& output_frame = packet.Get<mediapipe::ImageFrame>();
+
+        //    // Convert back to opencv for display or saving.
+        //    cv::Mat output_frame_mat = mediapipe::formats::MatView(&output_frame);
+        //    cv::cvtColor(output_frame_mat, output_frame_mat, cv::COLOR_RGB2BGR);
+
+        //    cv::imshow(kWindowName, output_frame_mat);
+        //}
+        //else {
+        //    break;
+        //}
     }
 
     LOG(INFO) << "Shutting down...";

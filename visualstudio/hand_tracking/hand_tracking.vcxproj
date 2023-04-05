@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="HandGestureRecognition.cpp" />
     <ClCompile Include="hand_tracking.cc" />
   </ItemGroup>
   <ItemGroup>
@@ -40,6 +41,9 @@
     <ProjectReference Include="..\mediapipe\mediapipe.vcxproj">
       <Project>{e3c083bf-698d-456a-b5b5-82a6839a4ccc}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HandGestureRecognition.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

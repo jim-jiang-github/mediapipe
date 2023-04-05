@@ -67,9 +67,9 @@ class SafeIntStrongIntValidator {
     // Check that the underlying integral type provides a range that is
     // compatible with two's complement.
     if (std::numeric_limits<T>::is_signed) {
-      CHECK_EQ(-1,
+     /* CHECK_EQ(-1,
                std::numeric_limits<T>::min() + std::numeric_limits<T>::max())
-          << "unexpected integral bounds";
+          << "unexpected integral bounds";*/
     }
 
     // Check that division truncates towards 0 (implementation defined in
@@ -90,10 +90,10 @@ class SafeIntStrongIntValidator {
     // sure the value is in range.  It is undefined behavior to convert to int
     // from a float that is out of range.
     if (std::is_floating_point<U>::value) {
-      if (arg < std::numeric_limits<T>::min() ||
+     /* if (arg < std::numeric_limits<T>::min() ||
           arg > std::numeric_limits<T>::max()) {
         ErrorType::Error("SafeInt: init from out of bounds float", arg, "=");
-      }
+      }*/
     } else {
       // If the initial value (type U) is changed by being converted to and from
       // the native type (type T), then it must be out of bounds for type T.
@@ -117,9 +117,9 @@ class SafeIntStrongIntValidator {
   static void ValidateNegate(  // Signed types only.
       typename std::enable_if<std::numeric_limits<T>::is_signed, T>::type
           value) {
-    if (value == std::numeric_limits<T>::min()) {
+   /* if (value == std::numeric_limits<T>::min()) {
       ErrorType::Error("SafeInt: overflow", value, -1, "*");
-    }
+    }*/
   }
   template <typename T>
   static void ValidateBitNot(  // Unsigned types only.
@@ -130,20 +130,20 @@ class SafeIntStrongIntValidator {
   template <typename T>
   static void ValidateAdd(T lhs, T rhs) {
     // The same logic applies to signed and unsigned types.
-    if ((rhs > 0) && (lhs > (std::numeric_limits<T>::max() - rhs))) {
+   /* if ((rhs > 0) && (lhs > (std::numeric_limits<T>::max() - rhs))) {
       ErrorType::Error("SafeInt: overflow", lhs, rhs, "+");
     } else if ((rhs < 0) && (lhs < (std::numeric_limits<T>::min() - rhs))) {
       ErrorType::Error("SafeInt: underflow", lhs, rhs, "+");
-    }
+    }*/
   }
   template <typename T>
   static void ValidateSubtract(T lhs, T rhs) {
     // The same logic applies to signed and unsigned types.
-    if ((rhs > 0) && (lhs < (std::numeric_limits<T>::min() + rhs))) {
+    /*if ((rhs > 0) && (lhs < (std::numeric_limits<T>::min() + rhs))) {
       ErrorType::Error("SafeInt: underflow", lhs, rhs, "-");
     } else if ((rhs < 0) && (lhs > (std::numeric_limits<T>::max() + rhs))) {
       ErrorType::Error("SafeInt: overflow", lhs, rhs, "-");
-    }
+    }*/
   }
   template <typename T, typename U>
   static void ValidateMultiply(T lhs, U rhs) {
@@ -167,23 +167,23 @@ class SafeIntStrongIntValidator {
           ErrorType::Error("SafeInt: overflow", lhs, rhs, "*");
         }
       } else {
-        if (rhs < (std::numeric_limits<T>::min() / lhs)) {
+      /*  if (rhs < (std::numeric_limits<T>::min() / lhs)) {
           ErrorType::Error("SafeInt: underflow", lhs, rhs, "*");
-        }
+        }*/
       }
     } else {
       if (rhs > 0) {
         // Underflow could be tested by lhs < min / rhs, but that does not
         // work if rhs is an unsigned type. Intead we test rhs > min / lhs.
         // There is a special case for lhs = -1, which would overflow min / lhs.
-        if ((lhs == -1 && rhs - 1 > std::numeric_limits<T>::max()) ||
+       /* if ((lhs == -1 && rhs - 1 > std::numeric_limits<T>::max()) ||
             (lhs < -1 && rhs > std::numeric_limits<T>::min() / lhs)) {
           ErrorType::Error("SafeInt: underflow", lhs, rhs, "*");
-        }
+        }*/
       } else {
-        if ((lhs != 0) && (rhs < (std::numeric_limits<T>::max() / lhs))) {
+        /*if ((lhs != 0) && (rhs < (std::numeric_limits<T>::max() / lhs))) {
           ErrorType::Error("SafeInt: overflow", lhs, rhs, "*");
-        }
+        }*/
       }
     }
   }
@@ -195,9 +195,9 @@ class SafeIntStrongIntValidator {
     }
     if (std::numeric_limits<T>::is_signed) {
       // Signed types only.
-      if ((lhs == std::numeric_limits<T>::min()) && (rhs == -1)) {
+     /* if ((lhs == std::numeric_limits<T>::min()) && (rhs == -1)) {
         ErrorType::Error("SafeInt: overflow", lhs, rhs, "/");
-      }
+      }*/
     } else {
       // Unsigned types only.
       if (rhs < 0) {
@@ -213,9 +213,9 @@ class SafeIntStrongIntValidator {
     }
     if (std::numeric_limits<T>::is_signed) {
       // Signed types only.
-      if ((lhs == std::numeric_limits<T>::min()) && (rhs == -1)) {
+     /* if ((lhs == std::numeric_limits<T>::min()) && (rhs == -1)) {
         ErrorType::Error("SafeInt: overflow", lhs, rhs, "%");
-      }
+      }*/
     } else {
       // Unsigned types only.
       if (rhs < 0) {

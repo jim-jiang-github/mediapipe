@@ -879,12 +879,12 @@ inline void LogDestination::WaitForSinks(LogMessage::LogMessageData* data) {
       (*sinks_)[i]->WaitTillSent();
     }
   }
-  const bool send_to_sink =
+ /* const bool send_to_sink =
       (data->send_method_ == &LogMessage::SendToSink) ||
       (data->send_method_ == &LogMessage::SendToSinkAndLog);
   if (send_to_sink && data->sink_ != NULL) {
     data->sink_->WaitTillSent();
-  }
+  }*/
 }
 
 LogDestination* LogDestination::log_destinations_[NUM_SEVERITIES];

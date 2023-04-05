@@ -1500,7 +1500,6 @@ private:
   LogMessageData* allocated_;
   LogMessageData* data_;
 
-  friend class LogDestination;
 
   LogMessage(const LogMessage&);
   void operator=(const LogMessage&);

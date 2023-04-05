@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,97 +25,98 @@
 
 namespace mediapipe {
 
-// The GraphService API can be used to define extensions to a graph's execution
-// environment. These are, essentially, graph-level singletons, and are
-// available to all calculators in the graph (and in any subgraphs) without
-// requiring a manual connection.
-//
-// IMPORTANT: this is an experimental API. Get in touch with the MediaPipe team
-// if you want to use it. In most cases, you should use a side packet instead.
+    // The GraphService API can be used to define extensions to a graph's execution
+    // environment. These are, essentially, graph-level singletons, and are
+    // available to all calculators in the graph (and in any subgraphs) without
+    // requiring a manual connection.
+    //
+    // IMPORTANT: this is an experimental API. Get in touch with the MediaPipe team
+    // if you want to use it. In most cases, you should use a side packet instead.
 
-class GraphServiceBase {
- public:
-  // TODO: fix services for which default init is broken, remove
-  // this setting.
-  enum DefaultInitSupport {
-    kAllowDefaultInitialization,
-    kDisallowDefaultInitialization
-  };
+    class GraphServiceBase {
+    public:
+        // TODO: fix services for which default init is broken, remove
+        // this setting.
+        enum DefaultInitSupport {
+            kAllowDefaultInitialization,
+            kDisallowDefaultInitialization
+        };
 
-  constexpr GraphServiceBase(const char* key) : key(key) {}
+        constexpr GraphServiceBase(const char* key) : key(key) {}
 
-  virtual ~GraphServiceBase() = default;
-  inline virtual absl::StatusOr<Packet> CreateDefaultObject() const {
-    return DefaultInitializationUnsupported();
-  }
+        virtual ~GraphServiceBase() = default;
+        virtual absl::StatusOr<Packet> CreateDefaultObject() const {
+            return DefaultInitializationUnsupported();
+        }
 
-  const char* key;
+        const char* key;
 
- protected:
-  absl::Status DefaultInitializationUnsupported() const {
-    return absl::UnimplementedError(absl::StrCat(
-        "Graph service '", key, "' does not support default initialization"));
-  }
-};
-
-template <typename T>
-class GraphService : public GraphServiceBase {
- public:
-  using type = T;
-  using packet_type = std::shared_ptr<T>;
-
-  constexpr GraphService(const char* my_key, DefaultInitSupport default_init =
-                                                 kDisallowDefaultInitialization)
-      : GraphServiceBase(my_key), default_init_(default_init) {}
-
-  absl::StatusOr<Packet> CreateDefaultObject() const override {
-    if (default_init_ != kAllowDefaultInitialization) {
-      return DefaultInitializationUnsupported();
-    }
-    auto packet_or = CreateDefaultObjectInternal();
-    if (packet_or.ok()) {
-      return MakePacket<std::shared_ptr<T>>(std::move(packet_or).value());
-    } else {
-      return packet_or.status();
-    }
-  }
-
- private:
-  absl::StatusOr<std::shared_ptr<T>> CreateDefaultObjectInternal() const {
-    auto call_create = [](auto x) -> decltype(decltype(x)::type::Create()) {
-      return decltype(x)::type::Create();
+    protected:
+        absl::Status DefaultInitializationUnsupported() const {
+            return absl::UnimplementedError(absl::StrCat(
+                "Graph service '", key, "' does not support default initialization"));
+        }
     };
-    if constexpr (std::is_invocable_r_v<absl::StatusOr<std::shared_ptr<T>>,
-                                        decltype(call_create), type_tag<T>>) {
-      return T::Create();
-    }
-    if constexpr (std::is_default_constructible_v<T>) {
-      return std::make_shared<T>();
-    }
-    return DefaultInitializationUnsupported();
-  }
 
-  template <class U>
-  struct type_tag {
-    using type = U;
-  };
+    template <typename T>
+    class GraphService : public GraphServiceBase {
+    public:
+        using type = T;
+        using packet_type = std::shared_ptr<T>;
 
-  DefaultInitSupport default_init_;
-};
+        constexpr GraphService(const char* my_key, DefaultInitSupport default_init =
+            kDisallowDefaultInitialization)
+            : GraphServiceBase(my_key), default_init_(default_init) {}
 
-template <typename T>
-class ServiceBinding {
- public:
-  bool IsAvailable() { return service_ != nullptr; }
-  T& GetObject() { return *service_; }
+        absl::StatusOr<Packet> CreateDefaultObject() const override {
+            if (default_init_ != kAllowDefaultInitialization) {
+                return DefaultInitializationUnsupported();
+            }
+            auto packet_or = CreateDefaultObjectInternal();
+            if (packet_or.ok()) {
+                return MakePacket<std::shared_ptr<T>>(std::move(packet_or).value());
+            }
+            else {
+                return packet_or.status();
+            }
+        }
 
-  ServiceBinding() {}
-  explicit ServiceBinding(std::shared_ptr<T> service) : service_(service) {}
+    private:
+        absl::StatusOr<std::shared_ptr<T>> CreateDefaultObjectInternal() const {
+            auto call_create = [](auto x) -> decltype(decltype(x)::type::Create()) {
+                return decltype(x)::type::Create();
+            };
+          /*  if constexpr (std::is_invocable_r_v<absl::StatusOr<std::shared_ptr<T>>,
+                decltype(call_create), type_tag<T>>) {
+                return T::Create();
+            }*/
+            if constexpr (std::is_default_constructible_v<T>) {
+                return std::make_shared<T>();
+            }
+            return DefaultInitializationUnsupported();
+        }
 
- private:
-  std::shared_ptr<T> service_;
-};
+        template <class U>
+        struct type_tag {
+            using type = U;
+        };
 
-}  // namespace mediapipe
+        DefaultInitSupport default_init_;
+    };
 
-#endif  // MEDIAPIPE_FRAMEWORK_GRAPH_SERVICE_H_
+    template <typename T>
+    class ServiceBinding {
+    public:
+        bool IsAvailable() { return service_ != nullptr; }
+        T& GetObject() { return *service_; }
+
+        ServiceBinding() {}
+        explicit ServiceBinding(std::shared_ptr<T> service) : service_(service) {}
+
+    private:
+        std::shared_ptr<T> service_;
+    };
+
+} // namespace mediapipe
+
+#endif // MEDIAPIPE_FRAMEWORK_GRAPH_SERVICE_H_

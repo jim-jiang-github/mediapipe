@@ -131,8 +131,8 @@ namespace mediapipe {
 //      }));
 
 namespace registration_internal {
-inline constexpr char kCxxSep[] = "::";
-inline constexpr char kNameSep[] = ".";
+ static constexpr char kCxxSep[] = "::";
+ static constexpr char kNameSep[] = ".";
 
 template <typename T>
 struct WrapStatusOr {
